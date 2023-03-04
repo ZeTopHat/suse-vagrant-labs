@@ -1,0 +1,6 @@
+---
+ipaddress: "192.168.0.152"
+fqdn: "ha15n2.labs.suse.com"
+short: "ha15n2"
+ntpserver: "129.168.0.1"
+haproduct: "sle-ha/15.4/x86_64"

@@ -1,0 +1,7 @@
+distinguished_name = authldap.labs.suse.com
+prompt = no
+
+[authldap.labs.suse.com]
+countryName = US
+stateOrProvinceName = Utah
+commonName = authldap.labs.suse.com

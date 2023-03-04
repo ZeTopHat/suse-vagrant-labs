@@ -1,0 +1,5 @@
+---
+ipaddress: "192.168.0.22"
+fqdn: "auth12sp5.labs.suse.com"
+short: "auth12sp5"
+ntpserver: "129.168.0.1"

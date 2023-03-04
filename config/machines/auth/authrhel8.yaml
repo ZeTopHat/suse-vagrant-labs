@@ -1,0 +1,5 @@
+---
+ipaddress: "192.168.0.28"
+fqdn: "authrhel8.labs.suse.com"
+short: "authrhel8"
+ntpserver: "129.168.0.1"

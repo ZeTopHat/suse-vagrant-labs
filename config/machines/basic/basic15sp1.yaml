@@ -1,0 +1,5 @@
+---
+ipaddress: "192.168.0.13"
+fqdn: "basic15sp1.labs.suse.com"
+short: "basic15sp1"
+ntpserver: "129.168.0.1"

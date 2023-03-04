@@ -1,0 +1,5 @@
+---
+ipaddress: "192.168.0.24"
+fqdn: "auth389.labs.suse.com"
+short: "auth389"
+ntpserver: "129.168.0.1"

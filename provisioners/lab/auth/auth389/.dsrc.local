@@ -1,0 +1,5 @@
+[auth389]
+# Note that '/' is replaced with '%%2f'.
+uri=ldapi://%%2fvar%%2frun%%2fslapd-auth389.socket
+basedn = dc=auth389,dc=suse,dc=com
+binddn = cn=Directory Manager

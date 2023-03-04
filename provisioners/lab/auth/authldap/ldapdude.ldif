@@ -1,0 +1,13 @@
+dn: uid=ldapdude,ou=Users,dc=authldap,dc=suse,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+cn: ldapdude
+uid: ldapdude
+sn: ldapdude
+uidNumber: 16789
+gidNumber: 100
+homeDirectory: /home/ldapdude
+loginShell: /bin/bash
+gecos: ldap dude
+userPassword: {crypt}x

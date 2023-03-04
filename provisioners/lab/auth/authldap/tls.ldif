@@ -1,0 +1,10 @@
+dn: cn=config
+changetype: modify
+add: olcTLSCACertificateFile
+olcTLSCACertificateFile: /etc/openldap/certs/ca.pem
+-
+add: olcTLSCertificateFile
+olcTLSCertificateFile: /etc/openldap/certs/authldap.pem
+-
+add: olcTLSCertificateKeyFile
+olcTLSCertificateKeyFile: /etc/openldap/certs/authldap.key

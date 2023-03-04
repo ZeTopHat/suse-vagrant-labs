@@ -1,0 +1,7 @@
+distinguished_name = auth389.labs.suse.com
+prompt = no
+
+[auth389.labs.suse.com]
+countryName = US
+stateOrProvinceName = Utah
+commonName = auth389.labs.suse.com

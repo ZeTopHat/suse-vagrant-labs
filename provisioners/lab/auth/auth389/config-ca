@@ -1,0 +1,7 @@
+distinguished_name = SUSE_LABS
+prompt = no
+
+[SUSE_LABS]
+countryName = US
+stateOrProvinceName = Utah
+commonName = SUSE_LABS

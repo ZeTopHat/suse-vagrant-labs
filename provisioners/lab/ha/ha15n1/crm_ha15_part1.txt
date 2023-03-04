@@ -1,0 +1,11 @@
+primitive dlm ocf:pacemaker:controld \
+        op start timeout=90s interval=0 \
+        op stop timeout=100s interval=0
+primitive lvmlockd lvmlockd \
+        op start timeout=90s interval=0 \
+        op stop timeout=100s interval=0
+
+group g-shared dlm lvmlockd
+
+clone c-shared g-shared \
+	meta interleave=true ordered=true

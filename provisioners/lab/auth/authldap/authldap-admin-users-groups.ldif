@@ -1,0 +1,19 @@
+dn: dc=authldap,dc=suse,dc=com
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: authldap
+dc: authldap
+
+dn: cn=admin,dc=authldap,dc=suse,dc=com
+objectClass: organizationalRole
+cn: admin
+Description: Directory Manager
+
+dn: ou=Users,dc=authldap,dc=suse,dc=com
+objectClass: organizationalUnit
+ou: Users
+
+dn: ou=Groups,dc=authldap,dc=suse,dc=com
+objectClass: organizationalUnit
+ou: Groups

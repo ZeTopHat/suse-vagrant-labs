@@ -1,0 +1,119 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# This is the Vagrantfile template for the SUSE Vagrant Labs Project
+
+Vagrant.configure("2") do |config|
+  # The custom.yaml is the only other file you need local with your Vagrantfile of choice.
+  custom_vars = YAML.load_file("./custom.yaml")
+  # The custom.yaml is important in determining where the root directory is for this project. It defaults to "./"
+  WD = custom_vars["wheredir"]
+  # This loads in global variables such as what the box names are and what box urls will be used.
+  global_vars = YAML.load_file("#{WD}config/global.yaml")
+  # This includes confidential information such as registration codes. The project does not sync this file.
+  secret_vars = YAML.load_file("#{WD}config/secret.yaml")
+### !! "LABNAME.yaml" must be replace with the actual lab name yaml file here. e.g. "ha.yaml" After that the variable can be pulled from the second line down from here. ###
+  lab_vars = YAML.load_file("#{WD}config/lab/LABNAME.yaml")
+  # Load the labname variable to be used in the rest of the template.
+  LABNAME = lab_vars["labname"]
+  # Don't sync a files from the current directory to a "/vagrant" folder on the VMs. This is enabled by default in vagrant, but disabled by default in our project.
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  # global libvirt parameters for the VMs, if they don't specify individually. The cpu, memory, and disk size are set by the custom.yaml file.
+  config.vm.provider :libvirt do |libvirt, override|
+    libvirt.cpus = custom_vars["libvirt"]["cpus"]
+    libvirt.memory = custom_vars["libvirt"]["memory"]
+    libvirt.machine_virtual_size = custom_vars["libvirt"]["machine_virtual_size"]
+    # You could set additional disks here if you wanted.
+    #libvirt.storage :file, size: "10G"
+  end
+
+  # This is a trigger to unregister SLE machines just before they are destroyed.
+  config.trigger.before :destroy do |trigger|
+    trigger.name = "unregister"
+    trigger.info = "unregister client"
+    trigger.on_error = :continue
+    # This is a list set by the lab yaml of all the machines that the SUSEConnect -d should run on.
+    trigger.only_on = lab_vars["suseconnect-d"]
+    trigger.run_remote = {inline: <<-SHELL
+      echo "nameserver #{custom_vars["nameserver"]}" >>/etc/resolv.conf
+      if [[ $( SUSEConnect --status | python -c "import sys, json; print(json.load(sys.stdin)[0]['status'])" ) == "Registered" ]];
+      then
+        SUSEConnect -d;
+      fi
+    SHELL
+    }
+  end
+
+  # SLE 12
+  config.vm.define "#{LABNAME}12sp5" do |sle|
+    # Pulls in the machine specific yaml file.
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}12sp5.yaml")
+    # Pulls in the global box name for sle12sp5
+    sle.vm.box = global_vars["box"]["sle12sp5"]
+    # Pulls in the global box url for sle12sp5
+    sle.vm.box_url = global_vars["boxurl"]["sle12sp5"]
+    # FQDN of the machine, set by the machine yaml.
+    sle.vm.hostname = machine_vars["fqdn"]
+    # A private NAT network is given as an example here. The IP address is set by the machine yaml.
+    sle.vm.network "private_network", ip: machine_vars["ipaddress"], hostname: true
+    # This will run a common bootstrap provision. It runs things you'd want on nearly all machines. e.g. registration, ntp, packages not included by box but always desired in lab.
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/common/bootstrap.sh"
+      # Specifying the SLE12 provision (Configures for ntpd rather than chronyd as an example)
+      s.args = "SLE12"
+      s.env = {
+        # Environment variables to be sent to the provision bootstraps. This includes the registration code, IP address, FQDN, Short hostname, and NTP Server.
+        "SLEREGCODE" => secret_vars["sleregcode"],
+        "IPADDRESS" => machine_vars["ipaddress"],
+        "FQDN" => machine_vars["fqdn"],
+        "SHORT" => machine_vars["short"],
+        "NTPSERVER" => machine_vars["ntpserver"]
+      }
+    end
+    # Example provision of an entire file. It will set default umask permissions with vagrant:vagrant ownership. Use the provision script to adjust as needed.
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}12sp5/krb5.conf", destination: "/tmp/"
+    # A Machine specific bootstrap provision. This could also be a lab wide provision if that was preferred or needed.
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}12sp5/bootstrap.sh"
+      # This allows for verification of the right machine/script as well as arguments in the provision for a training deployment or a full deployment.
+      s.args = "#{LABNAME}12sp5 fulldeploy"
+    end
+  end
+
+  # SLE 15
+  config.vm.define "#{LABNAME}15sp4" do |sle|
+    # Pulls in the machine specific yaml file.
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}15sp4.yaml")
+    # Pulls in the global box name for sle12sp5
+    sle.vm.box = global_vars["box"]["sle15sp4"]
+    # Pulls in the global box url for sle12sp5
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
+    # FQDN of the machine, set by the machine yaml.
+    sle.vm.hostname = machine_vars["fqdn"]
+    # A private NAT network is given as an example here. The IP address is set by the machine yaml.
+    sle.vm.network "private_network", ip: machine_vars["ipaddress"], hostname: true
+    # This will run a common bootstrap provision. It runs things you'd want on nearly all machines. e.g. registration, ntp, packages not included by box but always desired in lab.
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/common/bootstrap.sh"
+      # Specifying the SLE15 provision (Configures for chronyd rather than ntpd as an example)
+      s.args = "SLE15"
+      s.env = {
+        # Environment variables to be sent to the provision bootstraps. This includes the registration code, IP address, FQDN, Short hostname, and NTP Server.
+        "SLEREGCODE" => secret_vars["sleregcode"],
+        "IPADDRESS" => machine_vars["ipaddress"],
+        "FQDN" => machine_vars["fqdn"],
+        "SHORT" => machine_vars["short"],
+        "NTPSERVER" => machine_vars["ntpserver"]
+      }
+    end
+    # Example provision of an entire file. It will set default umask permissions with vagrant:vagrant ownership. Use the provision script to adjust as needed.
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15sp4/krb5.conf", destination: "/tmp/"
+    # A Machine specific bootstrap provision. This could also be a lab wide provision if that was preferred or needed.
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/lab/auth/#{LABNAME}15sp4/bootstrap.sh"
+      # This allows for verification of the right machine/script as well as arguments in the provision for a training deployment or a full deployment.
+      s.args = "#{LABNAME}15sp4 fulldeploy"
+    end
+  end
+end
+

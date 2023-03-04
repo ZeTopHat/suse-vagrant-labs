@@ -1,0 +1,210 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure("2") do |config|
+  custom_vars = YAML.load_file("./custom.yaml")
+  WD = custom_vars["wheredir"]
+  global_vars = YAML.load_file("#{WD}config/global.yaml")
+  secret_vars = YAML.load_file("#{WD}config/secret.yaml")
+  lab_vars = YAML.load_file("#{WD}config/lab/auth.yaml")
+  LABNAME = lab_vars["labname"]
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.provider :libvirt do |libvirt, override|
+    libvirt.cpus = custom_vars["libvirt"]["cpus"]
+    libvirt.memory = custom_vars["libvirt"]["memory"]
+    libvirt.machine_virtual_size = custom_vars["libvirt"]["machine_virtual_size"]
+  end
+
+  config.trigger.before :destroy do |trigger|
+    trigger.name = "unregister"
+    trigger.info = "unregister client"
+    trigger.on_error = :continue
+    trigger.only_on = lab_vars["suseconnect-d"]
+    trigger.run_remote = {inline: <<-SHELL
+      echo "nameserver #{custom_vars["nameserver"]}" >>/etc/resolv.conf
+      if [[ $( SUSEConnect --status | python -c "import sys, json; print(json.load(sys.stdin)[0]['status'])" ) == "Registered" ]];
+      then
+        SUSEConnect -d;
+      fi
+    SHELL
+    }
+  end
+
+  
+  config.vm.define "#{LABNAME}12sp5" do |sle|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}12sp5.yaml")
+    sle.vm.box = global_vars["box"]["sle12sp5"]
+    sle.vm.box_url = global_vars["boxurl"]["sle12sp5"]
+    sle.vm.hostname = machine_vars["fqdn"]
+    sle.vm.network "private_network", ip: machine_vars["ipaddress"], hostname: true
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/common/bootstrap.sh"
+      s.args = "SLE12"
+      s.env = {
+        "SLEREGCODE" => secret_vars["sleregcode"],
+        "IPADDRESS" => machine_vars["ipaddress"],
+        "FQDN" => machine_vars["fqdn"],
+        "SHORT" => machine_vars["short"],
+        "NTPSERVER" => machine_vars["ntpserver"]
+      }
+    end
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}12sp5/bootstrap.sh"
+      s.args = "#{LABNAME}12sp5 training"
+    end
+  end
+
+  # 15 Auth Client
+  config.vm.define "#{LABNAME}15sp4" do |sle|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}15sp4.yaml")
+    sle.vm.box = global_vars["box"]["sle15sp4"]
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
+    sle.vm.hostname = machine_vars["fqdn"]
+    sle.vm.network "private_network", ip: machine_vars["ipaddress"], hostname: true
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/common/bootstrap.sh"
+      s.args = "SLE15"
+      s.env = {
+        "SLEREGCODE" => secret_vars["sleregcode"],
+        "IPADDRESS" => machine_vars["ipaddress"],
+        "FQDN" => machine_vars["fqdn"],
+        "SHORT" => machine_vars["short"],
+        "NTPSERVER" => machine_vars["ntpserver"]
+      }
+    end
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15sp4/bootstrap.sh"
+      s.args = "#{LABNAME}15sp4 training"
+    end
+  end
+
+  # OpenLDAP2 Server
+  config.vm.define "#{LABNAME}ldap" do |sle|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}ldap.yaml")
+    sle.vm.box = global_vars["box"]["sle12sp5"]
+    sle.vm.box_url = global_vars["boxurl"]["sle12sp5"]
+    sle.vm.hostname = machine_vars["fqdn"]
+    sle.vm.network "private_network", ip: machine_vars["ipaddress"], hostname: true
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/common/bootstrap.sh"
+      s.args = "SLE12"
+      s.env = {
+        "SLEREGCODE" => secret_vars["sleregcode"],
+        "IPADDRESS" => machine_vars["ipaddress"],
+        "FQDN" => machine_vars["fqdn"],
+        "SHORT" => machine_vars["short"],
+        "NTPSERVER" => machine_vars["ntpserver"]
+      }
+    end
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}ldap/config-authldap", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}ldap/config-ca", destination: "/tmp/"
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}ldap/bootstrap.sh"
+      s.args = "#{LABNAME}ldap training"
+    end
+  end
+
+  # 389 Directory Server
+  config.vm.define "#{LABNAME}389" do |sle|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}389.yaml")
+    sle.vm.box = global_vars["box"]["sle15sp4"]
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
+    sle.vm.hostname = machine_vars["fqdn"]
+    sle.vm.network "private_network", ip: machine_vars["ipaddress"], hostname: true
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/common/bootstrap.sh"
+      s.args = "SLE15"
+      s.env = {
+        "SLEREGCODE" => secret_vars["sleregcode"],
+        "IPADDRESS" => machine_vars["ipaddress"],
+        "FQDN" => machine_vars["fqdn"],
+        "SHORT" => machine_vars["short"],
+        "NTPSERVER" => machine_vars["ntpserver"]
+      }
+    end
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}389/config-auth389", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}389/config-ca", destination: "/tmp/"
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}389/bootstrap.sh"
+      s.args = "#{LABNAME}389 training"
+    end
+  end
+
+  # Kerberos Server
+  config.vm.define "#{LABNAME}krb5" do |sle|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}krb5.yaml")
+    sle.vm.box = global_vars["box"]["sle15sp4"]
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
+    sle.vm.hostname = machine_vars["fqdn"]
+    sle.vm.network "private_network", ip: machine_vars["ipaddress"], hostname: true
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/common/bootstrap.sh"
+      s.args = "SLE15"
+      s.env = {
+        "SLEREGCODE" => secret_vars["sleregcode"],
+        "IPADDRESS" => machine_vars["ipaddress"],
+        "FQDN" => machine_vars["fqdn"],
+        "SHORT" => machine_vars["short"],
+        "NTPSERVER" => machine_vars["ntpserver"]
+      }
+    end
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}krb5/bootstrap.sh"
+      s.args = "#{LABNAME}krb5 training"
+    end
+  end
+
+  # Windows AD Server 2019, authdc01.labs.suse.com
+  config.vm.define "#{LABNAME}dc01", primary: true do |windows|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}dc01.yaml")
+    windows.vm.box = global_vars["box"]["windows2019"]
+    windows.vm.box_version = ">= 0"
+    windows.vm.guest = :windows
+    windows.vm.boot_timeout = 600
+    windows.vm.graceful_halt_timeout = 600
+    windows.vm.hostname = machine_vars["short"]
+    windows.vm.network "private_network", ip: machine_vars["ipaddress"]
+    windows.vm.communicator = "winrm"
+    windows.winrm.transport = :plaintext
+    windows.winrm.basic_auth_only = true
+    windows.winrm.ssl_peer_verification = false
+    windows.winrm.port = 55985
+    windows.winrm.username = "Administrator"
+    windows.winrm.password = "vagrant"
+    windows.vm.provider :libvirt do |libvirt, override|
+      libvirt.cpus = 2
+      libvirt.memory = 4096
+      libvirt.machine_virtual_size = 40
+    end
+    windows.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}dc01/bootstrap.ps1"
+    end
+  end
+
+  config.vm.define "#{LABNAME}rhel8" do |rhe|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}rhel8.yaml")
+    rhe.vm.box = global_vars["box"]["rhel8"]
+    rhe.vm.box_version = ">= 0"
+    rhe.vm.hostname = machine_vars["fqdn"]
+    rhe.vm.network "private_network", ip: machine_vars["ipaddress"], hostname: true
+    rhe.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/common/bootstrap.sh"
+      s.args = "RHE8"
+      s.env = {
+        "IPADDRESS" => machine_vars["ipaddress"],
+        "FQDN" => machine_vars["fqdn"],
+        "SHORT" => machine_vars["short"],
+        "NTPSERVER" => machine_vars["ntpserver"]
+      }
+    end
+    rhe.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}rhel8/bootstrap.sh"
+      s.args = "#{LABNAME}rhel8 training"
+    end
+  end
+end
+

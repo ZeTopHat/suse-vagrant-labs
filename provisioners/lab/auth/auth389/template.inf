@@ -1,0 +1,10 @@
+[general]
+full_machine_name = auth389.labs.suse.com
+[slapd]
+instance_name = auth389
+root_password = vagrant389 
+self_sign_cert = False
+[backend-userroot]
+create_suffix_entry = True
+sample_entries = yes
+suffix = dc=auth389,dc=suse,dc=com

@@ -1,0 +1,6 @@
+[auth389]
+uri = ldaps://auth389.labs.suse.com
+basedn = dc=auth389,dc=suse,dc=com
+binddn = cn=Directory Manager
+# do NOT provide a specific file, this needs to be a directory with c_rehash run on it.
+tls_cacertdir = /etc/ssl/auth389/

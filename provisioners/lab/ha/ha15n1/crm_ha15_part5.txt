@@ -1,0 +1,22 @@
+primitive nfs-fs Filesystem \
+        params device="/dev/sdb2" directory="/exports/data2" fstype=ext4 \
+        op start timeout=60s interval=0 \
+        op stop timeout=60s interval=0 \
+        op monitor timeout=40s interval=20s
+primitive nfs-data2 exportfs \
+        params clientspec="*" directory="/exports/data2" fsid=1 \
+        op start timeout=40s interval=0 \
+        op stop timeout=120s interval=0 \
+        op monitor timeout=20s interval=10s
+primitive nfs-mount Filesystem \
+        params device="192.168.0.252:/exports/data2" directory="/mnt/" fstype=nfs \
+        op start timeout=60s interval=0 \
+        op stop timeout=60s interval=0 \
+        op monitor timeout=40s interval=20s \
+        meta target-role=Started
+primitive nfs-vip IPaddr2 \
+        params ip=192.168.0.252 nic=eth1
+
+group g-nfs nfs-fs nfs-data2 nfs-vip
+
+colocation nfs-mount-not-with-export -inf: nfs-mount:Started g-nfs:Started

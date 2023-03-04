@@ -1,0 +1,11 @@
+primitive dlm ocf:pacemaker:controld \
+        op start timeout=90s interval=0 \
+        op stop timeout=100s interval=0
+primitive clvmd ocf:heartbeat:clvm \
+        op start timeout=90s interval=0 \
+        op stop timeout=100s interval=0
+
+group g-clvm dlm clvmd
+
+clone c-clvm g-clvm \
+        meta interleave=true ordered=true
