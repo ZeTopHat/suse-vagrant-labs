@@ -60,7 +60,7 @@ Vagrant.configure("2") do |config|
     end
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}iscsi/bootstrap.sh"
-      s.args = "#{LABNAME}iscsi training"
+      s.args = "#{LABNAME}iscsi #{custom_vars["deployment"]}"
     end
   end
 
@@ -83,12 +83,17 @@ Vagrant.configure("2") do |config|
         "NTPSERVER" => machine_vars["ntpserver"]
       }
     end
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15n1/crm_ha15_part1.txt", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15n1/crm_ha15_part2.txt", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15n1/crm_ha15_part3.txt", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15n1/crm_ha15_part4.txt", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15n1/crm_ha15_part5.txt", destination: "/tmp/"
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15n1/authorized_keys", destination: "/tmp/"
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15n1/id_rsa", destination: "/tmp/"
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15n1/id_rsa.pub", destination: "/tmp/"
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15n1/bootstrap.sh"
-      s.args = "#{LABNAME}15n1 training"
+      s.args = "#{LABNAME}15n1 #{custom_vars["deployment"]}"
       s.env = {
         "HAREGCODE" => secret_vars["haregcode"],
         "HAPRODUCT" => machine_vars["haproduct"],
@@ -120,7 +125,7 @@ Vagrant.configure("2") do |config|
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15n2/id_rsa.pub", destination: "/tmp/"
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15n2/bootstrap.sh"
-      s.args = "#{LABNAME}15n2 training"
+      s.args = "#{LABNAME}15n2 #{custom_vars["deployment"]}"
       s.env = {
         "HAREGCODE" => secret_vars["haregcode"],
         "HAPRODUCT" => machine_vars["haproduct"],
@@ -150,9 +155,13 @@ Vagrant.configure("2") do |config|
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}12n1/authorized_keys", destination: "/tmp/"
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}12n1/id_rsa", destination: "/tmp/"
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}12n1/id_rsa.pub", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}12n1/crm_ha12_part1.txt", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}12n1/crm_ha12_part2.txt", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}12n1/crm_ha12_part3.txt", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}12n1/crm_ha12_part4.txt", destination: "/tmp/"
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}12n1/bootstrap.sh"
-      s.args = "#{LABNAME}12n1 training"
+      s.args = "#{LABNAME}12n1 #{custom_vars["deployment"]}"
       s.env = {
         "HAREGCODE" => secret_vars["haregcode"],
         "HAPRODUCT" => machine_vars["haproduct"],
@@ -184,7 +193,7 @@ Vagrant.configure("2") do |config|
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}12n2/id_rsa.pub", destination: "/tmp/"
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}12n2/bootstrap.sh"
-      s.args = "#{LABNAME}12n2 training"
+      s.args = "#{LABNAME}12n2 #{custom_vars["deployment"]}"
       s.env = {
         "HAREGCODE" => secret_vars["haregcode"],
         "HAPRODUCT" => machine_vars["haproduct"],

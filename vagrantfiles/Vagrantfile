@@ -76,7 +76,7 @@ Vagrant.configure("2") do |config|
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}12sp5/bootstrap.sh"
       # This allows for verification of the right machine/script as well as arguments in the provision for a training deployment or a full deployment.
-      s.args = "#{LABNAME}12sp5 fulldeploy"
+      s.args = "#{LABNAME}12sp5 custom_vars["deployment"]"
     end
   end
 
@@ -112,7 +112,7 @@ Vagrant.configure("2") do |config|
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/lab/auth/#{LABNAME}15sp4/bootstrap.sh"
       # This allows for verification of the right machine/script as well as arguments in the provision for a training deployment or a full deployment.
-      s.args = "#{LABNAME}15sp4 fulldeploy"
+      s.args = "#{LABNAME}15sp4 custom_vars["deployment"]"
     end
   end
 end

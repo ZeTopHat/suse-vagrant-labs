@@ -57,7 +57,7 @@ Vagrant.configure("2") do |config|
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}12sp5/sssd.conf", destination: "/tmp/"
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}12sp5/bootstrap.sh"
-      s.args = "#{LABNAME}12sp5 fulldeploy"
+      s.args = "#{LABNAME}12sp5 #{custom_vars["deployment"]}"
     end
   end
 
@@ -84,7 +84,7 @@ Vagrant.configure("2") do |config|
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15sp4/sssd.conf", destination: "/tmp/"
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15sp4/bootstrap.sh"
-      s.args = "#{LABNAME}15sp4 fulldeploy"
+      s.args = "#{LABNAME}15sp4 #{custom_vars["deployment"]}"
     end
   end
 
@@ -117,7 +117,7 @@ Vagrant.configure("2") do |config|
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}ldap/ldap-sssd.conf", destination: "/tmp/"
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}ldap/bootstrap.sh"
-      s.args = "#{LABNAME}ldap fulldeploy"
+      s.args = "#{LABNAME}ldap #{custom_vars["deployment"]}"
     end
   end
 
@@ -146,7 +146,7 @@ Vagrant.configure("2") do |config|
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}389/.dsrc.remote", destination: "/tmp/"
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}389/bootstrap.sh"
-      s.args = "#{LABNAME}389 fulldeploy"
+      s.args = "#{LABNAME}389 #{custom_vars["deployment"]}"
     end
   end
 
@@ -173,7 +173,7 @@ Vagrant.configure("2") do |config|
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}krb5/kdc-sssd.conf", destination: "/tmp/"
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}krb5/bootstrap.sh"
-      s.args = "#{LABNAME}krb5 fulldeploy"
+      s.args = "#{LABNAME}krb5 #{custom_vars["deployment"]}"
     end
   end
 
@@ -222,7 +222,7 @@ Vagrant.configure("2") do |config|
     end
     rhe.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}rhel8/bootstrap.sh"
-      s.args = "#{LABNAME}rhel8 fulldeploy"
+      s.args = "#{LABNAME}rhel8 #{custom_vars["deployment"]}"
     end
   end
 end
