@@ -1,0 +1,19 @@
+---
+
+# This is the Vagrantfile template for the SUSE Vagrant Labs Project
+
+# A Vagrantfile and custom.json could be in any directory so long as this variable properly points to the root location of the project.
+# This variable tells the Vagrantfile where the root of this project is located.
+wheredir: "../"
+# This provides the default values for any libvirt machine deployed by a Vagrantfile that isn't explicitly defined otherwise in its own section of the Vagrantfile.
+libvirt:
+  cpus: 1
+  memory: 2048
+  machine_virtual_size: 42
+# This points to the hypervisor as a nameserver. (Currently used for the destroy trigger to make sure SUSEConnect -d will work.) 
+nameserver: "192.168.0.1"
+# This indicates what kind of deployment the machine will be using. Most commonly, "fulldeploy" or "training" would be set. However, possibilities for more modular usage are there. 
+# e.g. In HA, "drbd" or "fulldeploy drbd" could be used.
+deployment: "fulldeploy"
+# this gives the name of the hypervisor bridge device.
+bridgename: "br0"
