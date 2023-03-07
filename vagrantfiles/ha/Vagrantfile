@@ -71,7 +71,7 @@ Vagrant.configure("2") do |config|
     sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
     sle.vm.hostname = machine_vars["fqdn"]
     sle.vm.network "private_network", ip: machine_vars["ipaddress"], hostname: true
-    sle.vm.network "public_network", dev: "br0", mode: "bridge", type: "bridge"
+    sle.vm.network "public_network", dev: custom_vars["bridgename"], mode: "bridge", type: "bridge"
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/common/bootstrap.sh"
       s.args = "SLE15"
@@ -108,7 +108,7 @@ Vagrant.configure("2") do |config|
     sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
     sle.vm.hostname = machine_vars["fqdn"]
     sle.vm.network "private_network", ip: machine_vars["ipaddress"], hostname: true
-    sle.vm.network "public_network", dev: "br0", mode: "bridge", type: "bridge"
+    sle.vm.network "public_network", dev: custom_vars["bridgename"], mode: "bridge", type: "bridge"
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/common/bootstrap.sh"
       s.args = "SLE15"
@@ -140,7 +140,7 @@ Vagrant.configure("2") do |config|
     sle.vm.box_url = global_vars["boxurl"]["sle12sp5"]
     sle.vm.hostname = machine_vars["fqdn"]
     sle.vm.network "private_network", ip: machine_vars["ipaddress"], hostname: true
-    sle.vm.network "public_network", dev: "br0", mode: "bridge", type: "bridge"
+    sle.vm.network "public_network", dev: custom_vars["bridgename"], mode: "bridge", type: "bridge"
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/common/bootstrap.sh"
       s.args = "SLE12"
@@ -176,7 +176,7 @@ Vagrant.configure("2") do |config|
     sle.vm.box_url = global_vars["boxurl"]["sle12sp5"]
     sle.vm.hostname = machine_vars["fqdn"]
     sle.vm.network "private_network", ip: machine_vars["ipaddress"], hostname: true
-    sle.vm.network "public_network", dev: "br0", mode: "bridge", type: "bridge"
+    sle.vm.network "public_network", dev: custom_vars["bridgename"], mode: "bridge", type: "bridge"
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/common/bootstrap.sh"
       s.args = "SLE12"

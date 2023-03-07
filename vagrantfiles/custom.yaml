@@ -1,6 +1,8 @@
 ---
 
-# This is the Vagrantfile template for the SUSE Vagrant Labs Project
+# This is the custom.json template for the SUSE Vagrant Labs Project
+
+# The purpose of this file is to provide variables specifically to the "deployer" of this project. It allows for defaults, but also quick tweaks to suit their environment.
 
 # A Vagrantfile and custom.json could be in any directory so long as this variable properly points to the root location of the project.
 # This variable tells the Vagrantfile where the root of this project is located.

@@ -6,3 +6,4 @@ libvirt:
   machine_virtual_size: 42
 nameserver: "192.168.0.1"
 deployment: "fulldeploy"
+bridgename: "br0"
