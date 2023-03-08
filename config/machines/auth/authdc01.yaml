@@ -1,5 +1,5 @@
 ---
-ipaddress: "192.168.0.26"
+ipaddress: ".26"
 fqdn: "authdc01.labs.suse.com"
 short: "authdc01"
 ntpserver: "129.168.0.1"

@@ -1,5 +1,5 @@
 ---
-ipaddress: "192.168.0.25"
+ipaddress: ".25"
 fqdn: "auth15sp4.labs.suse.com"
 short: "auth15sp4"
 ntpserver: "129.168.0.1"
