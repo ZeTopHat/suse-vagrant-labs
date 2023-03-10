@@ -1,0 +1,12 @@
+---
+wheredir: "../../"
+deployment: "training"
+libvirt:
+  cpus: 1
+  memory: 1024
+  machine_virtual_size: 42
+network:
+  bridgename: "br0"
+  nameserver: "192.168.0.1"
+  primarysubnet: "192.168.160"
+  secondarysubnet: "192.168.161"
