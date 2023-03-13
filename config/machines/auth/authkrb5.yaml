@@ -1,5 +1,5 @@
 ---
-ipaddress: "192.168.0.21"
+ipaddress: ".21"
 fqdn: "authkrb5.labs.suse.com"
 short: "authkrb5"
 ntpserver: "129.168.0.1"

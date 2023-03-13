@@ -25,7 +25,7 @@ Vagrant.configure("2") do |config|
     trigger.on_error = :continue
     trigger.only_on = lab_vars["suseconnect-d"]
     trigger.run_remote = {inline: <<-SHELL
-      echo "nameserver #{custom_vars["nameserver"]}" >>/etc/resolv.conf
+      echo "nameserver #{custom_vars["network"]["nameserver"]}" >>/etc/resolv.conf
       if [[ $( SUSEConnect --status | python -c "import sys, json; print(json.load(sys.stdin)[0]['status'])" ) == "Registered" ]];
       then
         SUSEConnect -d;
@@ -40,13 +40,13 @@ Vagrant.configure("2") do |config|
     sle.vm.box = global_vars["box"]["sle12sp5"]
     sle.vm.box_url = global_vars["boxurl"]["sle12sp5"]
     sle.vm.hostname = machine_vars["fqdn"]
-    sle.vm.network "private_network", ip: machine_vars["ipaddress"], hostname: true
+    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/common/bootstrap.sh"
       s.args = "SLE12"
       s.env = {
         "SLEREGCODE" => secret_vars["sleregcode"],
-        "IPADDRESS" => machine_vars["ipaddress"],
+        "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
         "NTPSERVER" => machine_vars["ntpserver"]
@@ -57,7 +57,7 @@ Vagrant.configure("2") do |config|
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}12sp5/sssd.conf", destination: "/tmp/"
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}12sp5/bootstrap.sh"
-      s.args = "#{LABNAME}12sp5 fulldeploy"
+      s.args = "#{LABNAME}12sp5 #{custom_vars["deployment"]}"
     end
   end
 
@@ -67,13 +67,13 @@ Vagrant.configure("2") do |config|
     sle.vm.box = global_vars["box"]["sle15sp4"]
     sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
     sle.vm.hostname = machine_vars["fqdn"]
-    sle.vm.network "private_network", ip: machine_vars["ipaddress"], hostname: true
+    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/common/bootstrap.sh"
       s.args = "SLE15"
       s.env = {
         "SLEREGCODE" => secret_vars["sleregcode"],
-        "IPADDRESS" => machine_vars["ipaddress"],
+        "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
         "NTPSERVER" => machine_vars["ntpserver"]
@@ -84,7 +84,7 @@ Vagrant.configure("2") do |config|
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15sp4/sssd.conf", destination: "/tmp/"
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15sp4/bootstrap.sh"
-      s.args = "#{LABNAME}15sp4 fulldeploy"
+      s.args = "#{LABNAME}15sp4 #{custom_vars["deployment"]}"
     end
   end
 
@@ -94,13 +94,13 @@ Vagrant.configure("2") do |config|
     sle.vm.box = global_vars["box"]["sle12sp5"]
     sle.vm.box_url = global_vars["boxurl"]["sle12sp5"]
     sle.vm.hostname = machine_vars["fqdn"]
-    sle.vm.network "private_network", ip: machine_vars["ipaddress"], hostname: true
+    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/common/bootstrap.sh"
       s.args = "SLE12"
       s.env = {
         "SLEREGCODE" => secret_vars["sleregcode"],
-        "IPADDRESS" => machine_vars["ipaddress"],
+        "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
         "NTPSERVER" => machine_vars["ntpserver"]
@@ -117,7 +117,7 @@ Vagrant.configure("2") do |config|
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}ldap/ldap-sssd.conf", destination: "/tmp/"
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}ldap/bootstrap.sh"
-      s.args = "#{LABNAME}ldap fulldeploy"
+      s.args = "#{LABNAME}ldap #{custom_vars["deployment"]}"
     end
   end
 
@@ -127,13 +127,13 @@ Vagrant.configure("2") do |config|
     sle.vm.box = global_vars["box"]["sle15sp4"]
     sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
     sle.vm.hostname = machine_vars["fqdn"]
-    sle.vm.network "private_network", ip: machine_vars["ipaddress"], hostname: true
+    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/common/bootstrap.sh"
       s.args = "SLE15"
       s.env = {
         "SLEREGCODE" => secret_vars["sleregcode"],
-        "IPADDRESS" => machine_vars["ipaddress"],
+        "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
         "NTPSERVER" => machine_vars["ntpserver"]
@@ -146,7 +146,7 @@ Vagrant.configure("2") do |config|
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}389/.dsrc.remote", destination: "/tmp/"
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}389/bootstrap.sh"
-      s.args = "#{LABNAME}389 fulldeploy"
+      s.args = "#{LABNAME}389 #{custom_vars["deployment"]}"
     end
   end
 
@@ -156,13 +156,13 @@ Vagrant.configure("2") do |config|
     sle.vm.box = global_vars["box"]["sle15sp4"]
     sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
     sle.vm.hostname = machine_vars["fqdn"]
-    sle.vm.network "private_network", ip: machine_vars["ipaddress"], hostname: true
+    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/common/bootstrap.sh"
       s.args = "SLE15"
       s.env = {
         "SLEREGCODE" => secret_vars["sleregcode"],
-        "IPADDRESS" => machine_vars["ipaddress"],
+        "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
         "NTPSERVER" => machine_vars["ntpserver"]
@@ -173,7 +173,7 @@ Vagrant.configure("2") do |config|
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}krb5/kdc-sssd.conf", destination: "/tmp/"
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}krb5/bootstrap.sh"
-      s.args = "#{LABNAME}krb5 fulldeploy"
+      s.args = "#{LABNAME}krb5 #{custom_vars["deployment"]}"
     end
   end
 
@@ -186,7 +186,7 @@ Vagrant.configure("2") do |config|
     windows.vm.boot_timeout = 600
     windows.vm.graceful_halt_timeout = 600
     windows.vm.hostname = machine_vars["short"]
-    windows.vm.network "private_network", ip: machine_vars["ipaddress"]
+    windows.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}"
     windows.vm.communicator = "winrm"
     windows.winrm.transport = :plaintext
     windows.winrm.basic_auth_only = true
@@ -209,12 +209,12 @@ Vagrant.configure("2") do |config|
     rhe.vm.box = global_vars["box"]["rhel8"]
     rhe.vm.box_version = ">= 0"
     rhe.vm.hostname = machine_vars["fqdn"]
-    rhe.vm.network "private_network", ip: machine_vars["ipaddress"], hostname: true
+    rhe.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
     rhe.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/common/bootstrap.sh"
       s.args = "RHE8"
       s.env = {
-        "IPADDRESS" => machine_vars["ipaddress"],
+        "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
         "NTPSERVER" => machine_vars["ntpserver"]
@@ -222,7 +222,7 @@ Vagrant.configure("2") do |config|
     end
     rhe.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}rhel8/bootstrap.sh"
-      s.args = "#{LABNAME}rhel8 fulldeploy"
+      s.args = "#{LABNAME}rhel8 #{custom_vars["deployment"]}"
     end
   end
 end

@@ -30,6 +30,7 @@ if [ "$MACHINE" == "ha12n2" ]; then
   systemctl enable --now iscsi iscsid
   iscsiadm -m discovery -t sendtargets -p 192.168.0.150
   iscsiadm --mode node --target iqn.2019-12.com.suse.labs.haiscsi:ha12 --portal haiscsi.labs.suse.com:3260 -o new
+  systemctl restart iscsi iscsid
   # these need to be done after iscsi and softdog to avoid issues when the kernel updates
   zypper install -y --oldpackage dlm-kmp-default$(rpm -q kernel-default | grep -Eo '\-[0-9.-]+') libdlm ocfs2-kmp-default$(rpm -q kernel-default | grep -Eo '\-[0-9.-]+')
   if [ "$DEPLOY" == "training" ]; then
