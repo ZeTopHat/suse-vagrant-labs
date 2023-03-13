@@ -43,3 +43,46 @@ zypper patch -y
 zypper patch -y
 mandb -c
 sh -c 'echo root:sumapass | chpasswd'
+
+if [$DEPLOYMENT == "training"]; then
+  echo "training"
+elif [$DEPLOYMENT == "fulldeploy"]; then
+    echo "fulldeploy"
+    export MANAGER_FORCE_INSTALL='0'
+    export ACTIVATE_SLP='n'
+    export MANAGER_ADMIN_EMAIL='susemanager@labs.suse.com'
+    export MANAGER_ENABLE_TFTP='y'
+    export MANAGER_IP="$(ip address show eth2 | grep 'inet ' | awk '{print $2}'| cut -d'/' -f1))"
+    export MANAGER_DB_PORT='5432'
+    export DB_BACKEND='postgresql'
+    export MANAGER_DB_HOST='localhost'
+    export MANAGER_DB_NAME='susemanager'
+    export MANAGER_DB_PROTOCOL='TCP'
+    export MANAGER_PASS='sumapass'
+    export MANAGER_PASS2='sumapass'
+    export MANAGER_USER='susemanager'
+    export LOCAL_DB='1'
+    export CERT_CITY='Pleasant Grove'
+    export CERT_COUNTRY='US'
+    export CERT_EMAIL='susemanager@labs.suse.com'
+    export CERT_O='SUSE'
+    export CERT_OU='SUSE Support'
+    export CERT_PASS='sumapass'
+    export CERT_PASS2='sumapass'
+    export CERT_STATE='UT'
+    export RHN_USER='admin'
+    export RHN_PASS='sumapass'
+    export SCC_USER="$SCCORGUSER"
+    export SCC_PASS="$SCCORGPASS"
+    /usr/lib/susemanager/bin/mgr-setup -s
+
+    # Mirror Products Needed 15 SP3 (basic stuff)
+    # Mirror Products Needed 12 SP5 (basic stuff)
+    # Mirror Products Needed 15 SP4 (basic stuff)
+    # Mirror Products Needed SUMA Proxy 4.3 (basic stuff)
+
+else
+  echo "Deployment no recognized."
+fi
+
+echo "Finished deploying suma_server ${DEPLOYMENT} configurations."

@@ -40,7 +40,7 @@ Vagrant.configure("2") do |config|
     ### Loads all of the machine yaml values for use as variables for provisioning script variables.
     ### Also loads all secrets values for use as variables for provisioning script variables.
     env_vars = {}
-    [machine_vars, secret_vars].each do |vars|
+    [machine_vars, secret_vars, custom_vars].each do |vars|
       vars.each do |k, v|
         env_var_name = k.to_s.upcase
         env_var_value = v
@@ -53,11 +53,11 @@ Vagrant.configure("2") do |config|
 
     ### Variables that interact with the other yaml files. 
     ### Also include them as variables for provisioning scripts.
-
     ipaddress = "#{custom_vars["network"][machine_vars[:subnet]]}#{machine_vars[:ipaddress]}"
     env_vars["IPADDRESS"] = ipaddress
 
-    ### Overwrites 
+
+    ## Vagrant Machine Portion
     config.vm.define machine_vars[:short] do |node|
       node.vm.box = global_vars["box"][machine_vars[:box]]
       node.vm.box_url = global_vars["boxurl"][machine_vars[:box]]
