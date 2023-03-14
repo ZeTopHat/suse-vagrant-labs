@@ -5,7 +5,7 @@ sed -i 's/rpm.install.excludedocs = yes/rpm.install.excludedocs = no/' /etc/zypp
 echo "$IPADDRESS  $FQDN $SHORT" >> /etc/hosts
 
 #ip addr add $STATIC dev eth2
-#ip route replace default via $GATEWAY dev eth2
+ip route replace default via $GATEWAY dev eth2
 
 mkdir -p /tmp/data-backup/var/cache/
 mkdir -p /var/lib/pgsql/
@@ -48,11 +48,11 @@ if [ $DEPLOYMENT == "training" ]; then
   echo "training"
 elif [ $DEPLOYMENT == "fulldeploy" ]; then
     echo "fulldeploy"
-    export MANAGER_FORCE_INSTALL='0'
+    export MANAGER_FORCE_INSTALL='1'
     export ACTIVATE_SLP='n'
-    export MANAGER_ADMIN_EMAIL='susemanager@labs.suse.com'
+    export MANAGER_ADMIN_EMAIL='sumalabs@labs.suse.com'
     export MANAGER_ENABLE_TFTP='y'
-    export MANAGER_IP="$(ip address show eth2 | grep 'inet ' | awk '{print $2}'| cut -d'/' -f1))"
+    export MANAGER_IP="$(ip address show eth2 | grep 'inet ' | awk '{print $2}'| cut -d'/' -f1)"
     export MANAGER_DB_PORT='5432'
     export DB_BACKEND='postgresql'
     export MANAGER_DB_HOST='localhost'
@@ -75,11 +75,27 @@ elif [ $DEPLOYMENT == "fulldeploy" ]; then
     export SCC_USER="$SCCORGUSER"
     export SCC_PASS="$SCCORGPASS"
     /usr/lib/susemanager/bin/mgr-setup -s
-
-    # Mirror Products Needed 15 SP3 (basic stuff)
-    # Mirror Products Needed 12 SP5 (basic stuff)
-    # Mirror Products Needed 15 SP4 (basic stuff)
-    # Mirror Products Needed SUMA Proxy 4.3 (basic stuff)
+    curl -s -k -X POST https://localhost/rhn/newlogin/CreateFirstUser.do\
+>   -d "submitted=true" \
+>   -d "orgName=SUMALABS" \
+>   -d "login=admin" \
+>   -d "desiredpassword=sumapass" \
+>   -d "desiredpasswordConfirm=sumapass" \
+>   -d "email=lab-noise@labs.suse.com" \
+>   -d "firstNames=Administrator" \
+>   -d "lastName=Administrator" \
+>   -o /dev/null
+    mgr-sync refresh
+    # Mirror Products 15 SP3 and 15 SP4
+    mgr-sync add channels\
+    sle-product-sles15-sp3-pool-x86_64 sle-product-sles15-sp3-updates-x86_64\
+    sle-module-basesystem15-sp3-pool-x86_64 sle-module-basesystem15-sp3-updates-x86_64\
+    sle-manager-tools15-pool-x86_64-sp3 sle-manager-tools15-updates-x86_64-sp3\
+    sle-module-server-applications15-sp3-pool-x86_64 sle-module-server-applications15-sp3-updates-x86_64\
+    sle-product-sles15-sp4-pool-x86_64 sle-product-sles15-sp4-updates-x86_64\
+    sle-module-basesystem15-sp4-pool-x86_64 sle-module-basesystem15-sp4-updates-x86_64\
+    sle-manager-tools15-pool-x86_64-sp4 sle-manager-tools15-updates-x86_64-sp4\
+    sle-module-server-applications15-sp4-pool-x86_64 sle-module-server-applications15-sp4-updates-x86_64
 
 else
   echo "Deployment not recognized."
