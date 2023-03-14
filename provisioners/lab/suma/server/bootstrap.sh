@@ -48,31 +48,12 @@ if [ $DEPLOYMENT == "training" ]; then
   echo "training"
 elif [ $DEPLOYMENT == "fulldeploy" ]; then
     echo "fulldeploy"
-    export MANAGER_FORCE_INSTALL='1'
-    export ACTIVATE_SLP='n'
-    export MANAGER_ADMIN_EMAIL='sumalabs@labs.suse.com'
-    export MANAGER_ENABLE_TFTP='y'
-    export MANAGER_IP="$(ip address show eth2 | grep 'inet ' | awk '{print $2}'| cut -d'/' -f1)"
-    export MANAGER_DB_PORT='5432'
-    export DB_BACKEND='postgresql'
-    export MANAGER_DB_HOST='localhost'
-    export MANAGER_DB_NAME='susemanager'
-    export MANAGER_DB_PROTOCOL='TCP'
-    export MANAGER_PASS='sumapass'
-    export MANAGER_PASS2='sumapass'
-    export MANAGER_USER='susemanager'
-    export LOCAL_DB='1'
-    export CERT_CITY='Pleasant Grove'
-    export CERT_COUNTRY='US'
-    export CERT_EMAIL='susemanager@labs.suse.com'
-    export CERT_O='SUSE'
-    export CERT_OU='Support'
-    export CERT_PASS='sumapass'
-    export CERT_PASS2='sumapass'
-    export CERT_STATE='UT'
-    export SCC_USER="$SCCORGUSER"
-    export SCC_PASS="$SCCORGPASS"
+
+    # Run SUMA Setup
+    cp /tmp/setup_env.sh /root/setup_env.sh
     /usr/lib/susemanager/bin/mgr-setup -s
+
+    # Configure First User in webUI
     curl -s -k -X POST https://localhost/rhn/newlogin/CreateFirstUser.do\
 >   -d "submitted=true" \
 >   -d "orgName=SUMALABS" \
@@ -83,7 +64,10 @@ elif [ $DEPLOYMENT == "fulldeploy" ]; then
 >   -d "firstNames=Administrator" \
 >   -d "lastName=Administrator" \
 >   -o /dev/null
+
+    # First SCC Sync
     mgr-sync refresh
+
     # Mirror Products 15 SP3 and 15 SP4
     mgr-sync add channels\
     sle-product-sles15-sp3-pool-x86_64 sle-product-sles15-sp3-updates-x86_64\
