@@ -55,6 +55,8 @@ Vagrant.configure("2") do |config|
     ipaddress = "#{custom_vars["network"][machine_vars[:subnet]]}#{machine_vars[:ipaddress]}"
     env_vars["IPADDRESS"] = ipaddress
 
+    subnet = "#{custom_vars["network"][machine_vars[:subnet]]}"
+    env_vars["SUBNET"] = subnet
 
     ## Vagrant Machine Portion
     config.vm.define machine_vars[:short] do |node|
@@ -70,7 +72,7 @@ Vagrant.configure("2") do |config|
       if machine_vars[:public] == "true"
         node.vm.network "public_network", dev: custom_vars["network"]["bridgename"], mode: "bridge", type: "bridge"
       end
-      Dir.glob("#{WD}provisioners/lab/#{LABNAME}/#{machine_vars[:files]}/*")
+      Dir.glob("#{WD}provisioners/lab/#{LABNAME}/#{machine_vars[:files]}/*") do |file|
         node.vm.provision "file", source: file, destination: "/tmp/#{File.basename(file)}"
       end
       node.vm.provision "shell" do |s|   

@@ -83,5 +83,7 @@ else
   echo "Deployment not recognized."
 fi
 
+sed -i "s/\$SUBNET/${SUBNET}/g" /tmp/hosts
+cp /tmp/hosts /etc/hosts
 sh -c 'echo root:sumapass | chpasswd'
 echo "Finished deploying suma_server ${DEPLOYMENT} configurations."
