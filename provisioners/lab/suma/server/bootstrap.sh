@@ -42,11 +42,11 @@ zypper install -y -t pattern documentation enhanced_base suma_server yast2_basis
 zypper patch -y
 zypper patch -y
 mandb -c
-sh -c 'echo root:sumapass | chpasswd'
 
-if [$DEPLOYMENT == "training"]; then
+
+if [ $DEPLOYMENT == "training" ]; then
   echo "training"
-elif [$DEPLOYMENT == "fulldeploy"]; then
+elif [ $DEPLOYMENT == "fulldeploy" ]; then
     echo "fulldeploy"
     export MANAGER_FORCE_INSTALL='0'
     export ACTIVATE_SLP='n'
@@ -82,7 +82,8 @@ elif [$DEPLOYMENT == "fulldeploy"]; then
     # Mirror Products Needed SUMA Proxy 4.3 (basic stuff)
 
 else
-  echo "Deployment no recognized."
+  echo "Deployment not recognized."
 fi
 
+sh -c 'echo root:sumapass | chpasswd'
 echo "Finished deploying suma_server ${DEPLOYMENT} configurations."
