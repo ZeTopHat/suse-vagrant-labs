@@ -66,12 +66,10 @@ elif [ $DEPLOYMENT == "fulldeploy" ]; then
     export CERT_COUNTRY='US'
     export CERT_EMAIL='susemanager@labs.suse.com'
     export CERT_O='SUSE'
-    export CERT_OU='SUSE Support'
+    export CERT_OU='Support'
     export CERT_PASS='sumapass'
     export CERT_PASS2='sumapass'
     export CERT_STATE='UT'
-    export RHN_USER='admin'
-    export RHN_PASS='sumapass'
     export SCC_USER="$SCCORGUSER"
     export SCC_PASS="$SCCORGPASS"
     /usr/lib/susemanager/bin/mgr-setup -s
