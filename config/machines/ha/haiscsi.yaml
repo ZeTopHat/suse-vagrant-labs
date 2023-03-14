@@ -1,5 +1,0 @@
----
-ipaddress: ".150"
-fqdn: "haiscsi.labs.suse.com"
-short: "haiscsi"
-ntpserver: "129.168.0.1"
