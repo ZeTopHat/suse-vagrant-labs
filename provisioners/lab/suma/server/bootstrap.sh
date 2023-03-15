@@ -55,8 +55,10 @@ elif [ $DEPLOYMENT == "fulldeploy" ]; then
 
   # Configure First User in webUI
   curl -s -k -X POST https://localhost/rhn/newlogin/CreateFirstUser.do -d "submitted=true" -d "orgName=SUMALABS" -d "login=admin" -d "desiredpassword=sumapass" -d "desiredpasswordConfirm=sumapass" -d "email=lab-noise@labs.suse.com" -d "firstNames=Administrator" -d "lastName=Administrator" -o /dev/null
-
-  /usr/bin/expect -c "set timeout -1; set username \"admin\"; set password \"sumapass\"; spawn mgr-sync refresh; expect -re \"Login:\" { send \"\$username\r\"; exp_continue } -re \"Password:\" { send \"\$password\r\"; exp_continue } eof" || true
+  
+  sleep 80
+  # May already be running from the SUMA setup, but is useful for verification, caching the password, and an example of expect working (hopefully).
+  /usr/bin/expect -c "set timeout -1; set username \"admin\"; set password \"sumapass\"; spawn mgr-sync refresh; expect -re \"Login:\" { send \"\$username\r\"; exp_continue } -re \"Password:\" { send \"\$password\r\"; exp_continue } eof"
 
   # Mirror Products 15 SP3 and 15 SP4
   mgr-sync add channels\
@@ -69,6 +71,7 @@ elif [ $DEPLOYMENT == "fulldeploy" ]; then
   sle-manager-tools15-pool-x86_64-sp4 sle-manager-tools15-updates-x86_64-sp4\
   sle-module-server-applications15-sp4-pool-x86_64 sle-module-server-applications15-sp4-updates-x86_64
 
+  # Potentially add logic to create activation key, and bootstrap clients as well.
 else
   echo "Deployment not recognized."
 fi
