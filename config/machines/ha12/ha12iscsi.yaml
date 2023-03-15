@@ -1,0 +1,5 @@
+---
+ipaddress: ".120"
+fqdn: "ha12iscsi.labs.suse.com"
+short: "ha12iscsi"
+ntpserver: "192.168.0.1"
