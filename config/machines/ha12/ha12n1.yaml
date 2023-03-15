@@ -2,5 +2,5 @@
 ipaddress: ".121"
 fqdn: "ha12n1.labs.suse.com"
 short: "ha12n1"
-ntpserver: "129.168.0.1"
+ntpserver: "192.168.0.1"
 haproduct: "sle-ha/12.5/x86_64"

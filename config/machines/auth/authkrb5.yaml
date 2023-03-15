@@ -2,4 +2,4 @@
 ipaddress: ".21"
 fqdn: "authkrb5.labs.suse.com"
 short: "authkrb5"
-ntpserver: "129.168.0.1"
+ntpserver: "192.168.0.1"
