@@ -1,0 +1,7 @@
+$SUBNET.100 sumaserver.labs.suse.com    sumaserver
+$SUBNET.101 sumaproxy.labs.suse.com     sumaproxy
+$SUBNET.11  client1.labs.suse.com       client1
+$SUBNET.12  client2.labs.suse.com       client2
+$SUBNET.13  client4.labs.suse.com       client3
+$SUBNET.14  client4.labs.suse.com       client4
+$SUBNET.15  client5.labs.suse.com       client5
