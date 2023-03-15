@@ -1,6 +1,6 @@
 box: "sle15sp3"
-short: "proxy"
-fqdn: "proxy.labs.suse.com"
+short: "sumaproxy"
+fqdn: "sumaproxy.labs.suse.com"
 subnet: "primarysubnet"
 ipaddress: ".101"
 cpus: "2"
