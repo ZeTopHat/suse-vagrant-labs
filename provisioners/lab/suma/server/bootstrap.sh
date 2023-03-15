@@ -37,7 +37,7 @@ SUSEConnect -p sle-module-development-tools/15.3/x86_64
 SUSEConnect -p sle-module-python2/15.3/x86_64
 zypper install -y man man-pages-posix man-pages rsyslog vim-data aaa_base-extras wget zypper-log
 systemctl enable --now rsyslog
-zypper install -y spacecmd spacewalk-utils* salt-bash-completion
+zypper install -y spacecmd spacewalk-utils* salt-bash-completion expect
 zypper install -y -t pattern documentation enhanced_base suma_server yast2_basis yast2_server
 zypper patch -y
 zypper patch -y
@@ -57,15 +57,7 @@ elif [ $DEPLOYMENT == "fulldeploy" ]; then
   curl -s -k -X POST https://localhost/rhn/newlogin/CreateFirstUser.do -d "submitted=true" -d "orgName=SUMALABS" -d "login=admin" -d "desiredpassword=sumapass" -d "desiredpasswordConfirm=sumapass" -d "email=lab-noise@labs.suse.com" -d "firstNames=Administrator" -d "lastName=Administrator" -o /dev/null
 
   # First SCC Sync
-  /usr/bin/expect -c "
-  set timeout -1;
-  set username \"admin\";
-  set password \"sumapass\";
-  spawn mgr-sync refresh;
-  expect -re \"Login:\" { send \"\$username\r\"; exp_continue }
-  -re \"Password:\" { send \"\$password\r\"; exp_continue }
-  eof
-  "
+  /usr/bin/expect -c "set timeout -1; set username \"admin\"; set password \"sumapass\"; spawn mgr-sync refresh; expect -re \"Login:\" { send \"\$username\r\"; exp_continue } -re \"Password:\" { send \"\$password\r\"; exp_continue } eof"
 
   # Mirror Products 15 SP3 and 15 SP4
   mgr-sync add channels\
