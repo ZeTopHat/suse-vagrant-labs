@@ -27,7 +27,10 @@ elif [ "$ENVIRONMENT" == "RHE8" ]; then
   dnf clean all
   mv /etc/dnf/protected.d/redhat-release.conf /root/
   # curl -Sks https://suma-mainlab-1.gtslab.prv.suse.com/pub/bootstrap/bootstrap-res8.sh | /bin/bash
-  curl -Sks https://suma-mainlab-1.gtslab.prv.suse.com/pub/bootstrap/bootstrap-res87.sh | /bin/bash
+  # After accepting key in suma we want a "dnf install screen" and then a "dnf update"
+elif [ "$ENVIRONMENT" == "OE8" ]; then
+  hostnamectl set-hostname $FQDN
+  # curl -Sks https://suma-mainlab-1.gtslab.prv.suse.com/pub/bootstrap/bootstrap-res8.sh | /bin/bash
   # After accepting key in suma we want a "dnf install screen" and then a "dnf update"
 else
   echo "Environment not recognized."

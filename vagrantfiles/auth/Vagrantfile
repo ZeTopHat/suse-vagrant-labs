@@ -204,7 +204,8 @@ Vagrant.configure("2") do |config|
     end
   end
 
-  config.vm.define "#{LABNAME}rhel8" do |rhe|
+  # RHEL 8
+  config.vm.define "#{LABNAME}rhel8", autostart: custom_vars["extra"] do |rhe|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}rhel8.yaml")
     rhe.vm.box = global_vars["box"]["rhel8"]
     rhe.vm.box_version = ">= 0"
