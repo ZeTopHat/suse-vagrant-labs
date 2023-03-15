@@ -42,7 +42,7 @@ zypper install -y -t pattern documentation enhanced_base suma_server yast2_basis
 zypper patch -y
 zypper patch -y
 mandb -c
-
+timedatectl set-timezone America/Denver
 
 if [ $DEPLOYMENT == "training" ]; then
   echo "training"
@@ -71,7 +71,24 @@ elif [ $DEPLOYMENT == "fulldeploy" ]; then
   sle-manager-tools15-pool-x86_64-sp4 sle-manager-tools15-updates-x86_64-sp4\
   sle-module-server-applications15-sp4-pool-x86_64 sle-module-server-applications15-sp4-updates-x86_64
 
-  # Potentially add logic to create activation key, and bootstrap clients as well.
+  ## Automatic Bootstrapping (Not a priority yet, but some steps below)
+  ## Is a bit tricky because you have to wait for the packages to sync, at least for sle-manager tools. 
+  ## It might be better to do that if there is an external database to load. That could be useful for some dev environments and testing, not necessarily for training.
+
+  #sleep 15
+  ## Create the first activation key, and bootstrap script
+  # spacecmd -u admin -p sumapass -- activationkey_create -n sles15sp3 -d sles15sp3 -b sle-product-sles15-sp3-pool-x86_64
+  # mgr-bootstrap --activation-keys=1-sles15sp3 --script=bootstrap-sles15sp3.sh --force-bundle
+  
+  ## Better to manually copy sshkeys, but will do later.
+  # expect -c "set timeout 1; set host client1; spawn ssh \$host; expect -re \"Are you sure you want to continue connecting\" { send \"yes\r\"; exp_continue } -re \".*password:\" { send \"\x003\"; exp_continue } eof"
+  
+  ## Some Vagrant boxes are missing the logrotate package, trick to add it here.
+  # mgr-create-bootstrap-repo -c SLE-15-SP3-x86_64 logrotate
+
+  ## Bootstrap (make sure the /etc/hosts is set correctly on the client)
+  # spacecmd -u admin -p sumapass -- system_bootstrap -H "client1" -u "root" -P "linux" -a "1-sles15sp3"
+
 else
   echo "Deployment not recognized."
 fi
