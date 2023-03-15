@@ -2,7 +2,8 @@
 
 sed -i 's/rpm.install.excludedocs = yes/rpm.install.excludedocs = no/' /etc/zypp/zypp.conf
 
-echo "$IPADDRESS  $FQDN $SHORT" >> /etc/hosts
+sed -i "s/\$SUBNET/${SUBNET}/g" /tmp/hosts
+cp /tmp/hosts /etc/hosts
 
 rpm -e --nodeps sles-release
 SUSEConnect -r $SUMAPROXYREGCODE -p SUSE-Manager-Proxy/4.2/x86_64
