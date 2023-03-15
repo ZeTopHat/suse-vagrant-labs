@@ -10,6 +10,8 @@ wheredir: "../"
 # This indicates what kind of deployment the machine will be using. Most commonly, "fulldeploy" or "training" would be set. However, possibilities for more modular usage are there. 
 # e.g. In HA, "drbd" or "fulldeploy drbd" could be used.
 deployment: "fulldeploy"
+# This variable enables extra machines from the lab's Vagrantfile, if any. (e.g. RHEL8 or OEL8 machines)
+extra: false
 # This provides the default values for any libvirt machine deployed by a Vagrantfile that isn't explicitly defined otherwise in its own section of the Vagrantfile.
 libvirt:
   cpus: 1

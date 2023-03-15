@@ -1,6 +1,7 @@
 ---
 wheredir: "../../"
 deployment: "fulldeploy"
+extra: false
 libvirt:
   cpus: 1
   memory: 2048
