@@ -2,10 +2,10 @@
 
 sed -i 's/rpm.install.excludedocs = yes/rpm.install.excludedocs = no/' /etc/zypp/zypp.conf
 
-echo "$IPADDRESS  $FQDN $SHORT" >> /etc/hosts
-
 #ip addr add $STATIC dev eth2
 ip route replace default via $GATEWAY dev eth2
+sed -i "s/\$SUBNET/${SUBNET}/g" /tmp/hosts
+cp /tmp/hosts /etc/hosts
 
 mkdir -p /tmp/data-backup/var/cache/
 mkdir -p /var/lib/pgsql/
@@ -47,26 +47,34 @@ mandb -c
 if [ $DEPLOYMENT == "training" ]; then
   echo "training"
 elif [ $DEPLOYMENT == "fulldeploy" ]; then
-    echo "fulldeploy"
+  echo "fulldeploy"
 
-    # Run SUMA Setup
-    cp /tmp/setup_env.sh /root/setup_env.sh
-    /usr/lib/susemanager/bin/mgr-setup -s
+  # Run SUMA Setup
+  cp /tmp/setup_env.sh /root/setup_env.sh
+  /usr/lib/susemanager/bin/mgr-setup -s
 
-    # Configure First User in webUI
-    curl -s -k -X POST https://localhost/rhn/newlogin/CreateFirstUser.do\
->   -d "submitted=true" \
->   -d "orgName=SUMALABS" \
->   -d "login=admin" \
->   -d "desiredpassword=sumapass" \
->   -d "desiredpasswordConfirm=sumapass" \
->   -d "email=lab-noise@labs.suse.com" \
->   -d "firstNames=Administrator" \
->   -d "lastName=Administrator" \
->   -o /dev/null
+  # Configure First User in webUI
+  curl -s -k -X POST https://localhost/rhn/newlogin/CreateFirstUser.do -d "submitted=true" -d "orgName=SUMALABS" -d "login=admin" -d "desiredpassword=sumapass" -d "desiredpasswordConfirm=sumapass" -d "email=lab-noise@labs.suse.com" -d "firstNames=Administrator" -d "lastName=Administrator" -o /dev/null
 
-    # First SCC Sync
-    mgr-sync refresh
+  # First SCC Sync
+  /usr/bin/expect - <<EOF
+  set timeout -1
+  set username "admin"
+  set password "sumapass"
+  spawn mgr-sync refresh
+
+  expect {
+    -re "Login:" {
+      send "\$username\r"
+      exp_continue
+    }
+    -re "Password:" {
+      send "\$password\r"
+      exp_continue
+    }
+    eof
+  }
+EOF 
 
     # Mirror Products 15 SP3 and 15 SP4
     mgr-sync add channels\
@@ -83,7 +91,5 @@ else
   echo "Deployment not recognized."
 fi
 
-sed -i "s/\$SUBNET/${SUBNET}/g" /tmp/hosts
-cp /tmp/hosts /etc/hosts
 sh -c 'echo root:sumapass | chpasswd'
 echo "Finished deploying suma_server ${DEPLOYMENT} configurations."
