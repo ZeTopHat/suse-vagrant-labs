@@ -57,35 +57,26 @@ elif [ $DEPLOYMENT == "fulldeploy" ]; then
   curl -s -k -X POST https://localhost/rhn/newlogin/CreateFirstUser.do -d "submitted=true" -d "orgName=SUMALABS" -d "login=admin" -d "desiredpassword=sumapass" -d "desiredpasswordConfirm=sumapass" -d "email=lab-noise@labs.suse.com" -d "firstNames=Administrator" -d "lastName=Administrator" -o /dev/null
 
   # First SCC Sync
-  /usr/bin/expect - <<EOF
-  set timeout -1
-  set username "admin"
-  set password "sumapass"
-  spawn mgr-sync refresh
+  /usr/bin/expect -c "
+  set timeout -1;
+  set username \"admin\";
+  set password \"sumapass\";
+  spawn mgr-sync refresh;
+  expect -re \"Login:\" { send \"\$username\r\"; exp_continue }
+  -re \"Password:\" { send \"\$password\r\"; exp_continue }
+  eof
+  "
 
-  expect {
-    -re "Login:" {
-      send "\$username\r"
-      exp_continue
-    }
-    -re "Password:" {
-      send "\$password\r"
-      exp_continue
-    }
-    eof
-  }
-EOF 
-
-    # Mirror Products 15 SP3 and 15 SP4
-    mgr-sync add channels\
-    sle-product-sles15-sp3-pool-x86_64 sle-product-sles15-sp3-updates-x86_64\
-    sle-module-basesystem15-sp3-pool-x86_64 sle-module-basesystem15-sp3-updates-x86_64\
-    sle-manager-tools15-pool-x86_64-sp3 sle-manager-tools15-updates-x86_64-sp3\
-    sle-module-server-applications15-sp3-pool-x86_64 sle-module-server-applications15-sp3-updates-x86_64\
-    sle-product-sles15-sp4-pool-x86_64 sle-product-sles15-sp4-updates-x86_64\
-    sle-module-basesystem15-sp4-pool-x86_64 sle-module-basesystem15-sp4-updates-x86_64\
-    sle-manager-tools15-pool-x86_64-sp4 sle-manager-tools15-updates-x86_64-sp4\
-    sle-module-server-applications15-sp4-pool-x86_64 sle-module-server-applications15-sp4-updates-x86_64
+  # Mirror Products 15 SP3 and 15 SP4
+  mgr-sync add channels\
+  sle-product-sles15-sp3-pool-x86_64 sle-product-sles15-sp3-updates-x86_64\
+  sle-module-basesystem15-sp3-pool-x86_64 sle-module-basesystem15-sp3-updates-x86_64\
+  sle-manager-tools15-pool-x86_64-sp3 sle-manager-tools15-updates-x86_64-sp3\
+  sle-module-server-applications15-sp3-pool-x86_64 sle-module-server-applications15-sp3-updates-x86_64\
+  sle-product-sles15-sp4-pool-x86_64 sle-product-sles15-sp4-updates-x86_64\
+  sle-module-basesystem15-sp4-pool-x86_64 sle-module-basesystem15-sp4-updates-x86_64\
+  sle-manager-tools15-pool-x86_64-sp4 sle-manager-tools15-updates-x86_64-sp4\
+  sle-module-server-applications15-sp4-pool-x86_64 sle-module-server-applications15-sp4-updates-x86_64
 
 else
   echo "Deployment not recognized."
