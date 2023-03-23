@@ -1,6 +1,6 @@
 ---
 wheredir: "../../"
-deployment: "fulldeploy" ## Current options "training" or "fulldeploy"
+deployment: "training" ## Current options "training" or "fulldeploy"
 extra: false
 libvirt:
   cpus: 1
