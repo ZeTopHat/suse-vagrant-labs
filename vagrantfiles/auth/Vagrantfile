@@ -202,6 +202,9 @@ Vagrant.configure("2") do |config|
     windows.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}dc01/bootstrap.ps1"
     end
+    windows.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}dc01/bootstrap2.ps1"
+    end
   end
 
   # RHEL 8
