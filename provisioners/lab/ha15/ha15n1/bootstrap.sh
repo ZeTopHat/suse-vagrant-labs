@@ -59,6 +59,7 @@ if [ "$MACHINE" == "ha15n1" ]; then
     crm configure load update /tmp/crm_ha15_part4.txt
     mkfs.ext4 /dev/sdb2
     mkdir -p /exports/data2
+    crm_resource --wait
     vgcreate --shared vg-shared /dev/sda
     lvcreate -an -L 9.9G -n lv-shared vg-shared
     crm configure load update /tmp/crm_ha15_part2.txt
