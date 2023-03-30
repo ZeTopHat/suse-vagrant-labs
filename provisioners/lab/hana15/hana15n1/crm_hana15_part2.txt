@@ -1,0 +1,10 @@
+primitive rsc_SAPHana_HXE_HDB00 ocf:suse:SAPHana \
+        operations $id=rsc_sap_HXE_HDB00-operations \
+        op monitor interval=61 role=Slave timeout=700 \
+        op start interval=0 timeout=1200 \
+        op stop interval=0 timeout=1200 \
+        op promote interval=0 timeout=1200 \
+        op monitor interval=60 role=Master timeout=700 \
+        params SID=HXE InstanceNumber=00 PREFER_SITE_TAKEOVER=true DUPLICATE_PRIMARY_TIMEOUT=7200 AUTOMATED_REGISTER=true
+ms msl_SAPHana_HXE_HDB00 rsc_SAPHana_HXE_HDB00 \
+        meta is-managed=true notify=true clone-max=2 clone-node-max=1 target-role=Started interleave=true

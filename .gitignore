@@ -2,3 +2,5 @@ config/secret.yaml
 .vagrant/
 .git/
 .build/
+provisioners/lab/hana15/hanaiso/*
+!provisioners/lab/hana15/hanaiso/README

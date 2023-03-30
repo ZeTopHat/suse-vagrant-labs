@@ -1,0 +1,3 @@
+---
+suseconnect-d: ["hana15iscsi", "hana15n1", "hana15n2"]
+labname: "hana15"
