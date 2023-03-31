@@ -73,6 +73,8 @@ if [ "$MACHINE" == "hana15n1" ]; then
     crm configure load update /tmp/crm_hana15_part3.txt
     crm configure load update /tmp/crm_hana15_part4.txt
     crm configure load update /tmp/crm_hana15_part5.txt
+    crm_resource --wait
+    crm resource cleanup
   else
     echo "Deployment not recognized."
   fi
