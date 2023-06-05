@@ -10,8 +10,11 @@ box:
   sle12sp3: "SLES-12-SP3-Vagrant.x86_64"
   sle12sp2: "SLES-12-SP2-Vagrant.x86_64"
   sle12sp1: "SLES-12-SP1-Vagrant.x86_64"
+  leap15sp4: "opensuse/Leap-15.4.x86_64"
+  leap42sp3: "generic/opensuse42"
   windows2019: "peru/windows-server-2019-standard-x64-eval"
   rhel8: "generic/rhel8"
+  rhel9: "generic/rhel9"
   oel8: "generic/oracle8"
 boxurl:
   sle15sp5: "http://download.opensuse.org/repositories/Virtualization:/Appliances:/Images:/SLE-15-SP5/images/boxes/SLES-15-SP5-Vagrant.x86_64.json"

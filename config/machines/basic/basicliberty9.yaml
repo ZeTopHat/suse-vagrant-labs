@@ -1,0 +1,5 @@
+---
+ipaddress: ".10"
+fqdn: "basicliberty9.labs.suse.com"
+short: "basicliberty9"
+ntpserver: "192.168.0.1"
