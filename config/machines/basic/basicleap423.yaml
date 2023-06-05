@@ -1,0 +1,5 @@
+---
+ipaddress: ".20"
+fqdn: "basicleap423.labs.suse.com"
+short: "basicleap423"
+ntpserver: "192.168.0.1"

@@ -21,6 +21,23 @@ elif [ "$ENVIRONMENT" == "SLE15" ]; then
   systemctl restart chronyd
   systemctl enable chronyd
   echo "$IPADDRESS $FQDN $SHORT" >>/etc/hosts
+elif [ "$ENVIRONMENT" == "LEAP42" ]; then
+  echo "Deploying common LEAP 42 configurations..."
+  sed -i 's/rpm.install.excludedocs = yes/rpm.install.excludedocs = no/' /etc/zypp/zypp.conf
+  zypper install -y ntp man
+  echo "server $NTPSERVER iburst" >>/etc/ntp.conf
+  systemctl restart ntpd
+  systemctl enable ntpd
+  echo "$IPADDRESS $FQDN $SHORT" >>/etc/hosts
+elif [ "$ENVIRONMENT" == "LEAP15" ]; then
+  echo "Deploying common LEAP 15 configurations..."
+  sed -i 's/rpm.install.excludedocs = yes/rpm.install.excludedocs = no/' /etc/zypp/zypp.conf
+  zypper install -y vim-data chrony man
+  echo "maxdistance 16.0" >>/etc/chrony.conf
+  echo "server $NTPSERVER" >>/etc/chrony.conf
+  systemctl restart chronyd
+  systemctl enable chronyd
+  echo "$IPADDRESS $FQDN $SHORT" >>/etc/hosts
 elif [ "$ENVIRONMENT" == "RHE8" ]; then
   hostnamectl set-hostname $FQDN
   sed -i 's/enabled=1/enabled=0/' /etc/yum.repos.d/epel.repo
