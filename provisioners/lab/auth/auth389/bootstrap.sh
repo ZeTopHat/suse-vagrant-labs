@@ -24,7 +24,7 @@ if [ "$MACHINE" == "auth389" ]; then
     ln -s /root/.dsrc.local /root/.dsrc
     dsidm auth389 user create --uid geeko --cn geeko --displayName "ldap geeko" --uidNumber 4321 --gidNumber 100 --homeDirectory /home/geeko
     dsidm auth389 account reset_password uid=geeko,ou=people,dc=auth389,dc=suse,dc=com vagrant389
-    dsidm auth389 group create --cn 389admins
+    dsidm auth389 posixgroup create --cn 389admins --gidNumber 99998
     dsidm auth389 group add_member 389admins uid=geeko,ou=people,dc=auth389,dc=suse,dc=com
     dsconf auth389 config replace nsslapd-security=on && dsconf auth389 config replace nsslapd-dynamic-plugins=on
     dsconf auth389 plugin memberof enable && dsconf auth389 plugin memberof set --scope dc=auth389,dc=suse,dc=com
