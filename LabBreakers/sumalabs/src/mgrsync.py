@@ -11,13 +11,14 @@ def lab1(debug=False):
     if utils.query_yes_no("About to execute the scenario: " + lab_name + "\nDo you want to proceed?", default='no'): 
         print("")
         bar_title= lab_name + " - [Loading]\n"
-        line1 = "8.8.8.8    scc.suse.com        scc"
-        line2 = "8.8.4.4    updates.suse.com    updates"
+        task_manager = utils.TaskManager()
 
+        @task_manager.add_task
         def task1():
             time.sleep(1)
             pass
 
+        @task_manager.add_task  
         def task2():    
             if debug:
                 print("Current content of /etc/hosts before adding lines:")
@@ -25,27 +26,31 @@ def lab1(debug=False):
                     print(f.read())
             pass
 
+        @task_manager.add_task
         def task3():
-            utils.add_line_to_file(line1, "/etc/hosts", debug)
+            line = "8.8.8.8    scc.suse.com        scc"
+            utils.add_line_to_file(line, "/etc/hosts", debug)
             if debug: 
-                print(f"Adding line to /etc/hosts: {line1}")
+                print(f"Adding line to /etc/hosts: {line}")
             pass
 
+        @task_manager.add_task 
         def task4():
-            utils.add_line_to_file(line2, "/etc/hosts", debug)
+            line = "8.8.4.4    updates.suse.com    updates"
+            utils.add_line_to_file(line, "/etc/hosts", debug)
             if debug:
-                print(f"Adding line to /etc/hosts: {line2}\n\n")
+                print(f"Adding line to /etc/hosts: {line}\n\n")
             pass
 
-        tasks = [task1,task2,task3,task4]
-        utils.create_alive_bar(bar_title, tasks)
+        utils.create_alive_bar(bar_title, task_manager.tasks)
 
-        print(lab_name + " - [Ready]")
-        print("\nInstructions:")
-        print("- Go to the SUSE Manager WebUI.")
-        print("- Navigate to SUSEManager>Admin>Setup Wizard>Products")
-        print("- Select the 'refresh' button to 'Refresh the product catalog from the SUSE Customer Center'.")
-        print("- Discover any issues, and fix them.")
+        print(f"""{lab_name} - [Ready]
+        
+        Instructions:
+        - Go to the SUSE Manager WebUI.
+        - Navigate to SUSE Manager > Admin > Setup Wizard > Products
+        - Select the 'refresh' button to 'Refresh the product catalog from the SUSE Customer Center'.
+        - Discover any issues, and fix them.""")
     else:
         print(" ")
 
@@ -54,56 +59,67 @@ def lab2(debug=False):
     if utils.query_yes_no("About to execute the scenario: " + lab_name + "\nDo you want to proceed?", default='no'):
         print("")
         bar_title= lab_name + " - [Loading]\n"
+        task_manager = utils.TaskManager()
 
+        @task_manager.add_task
         def task1():
             time.sleep(1)
-            result = subprocess.run(["systemctl", "start", "firewalld"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            command = f"systemctl enable --now firewalld"
+            result = subprocess.run(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             if debug:
+                print(f"Starting and enabling the firewalld service.")
                 print(result.stdout.decode('utf-8'))
                 print(result.stderr.decode('utf-8'))
             pass
 
+        @task_manager.add_task    
         def task2():
-                # check currect rules
+                # check currect rules, if debugging
             if debug:
-                print("Firewalld status before reloading:")
+                print("Firewalld rules reloading:")
                 result_before = subprocess.run(["firewall-cmd", "--permanent", "--direct", "--get-all-rules"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 print(result_before.stdout.decode('utf-8'))
             pass    
 
+        @task_manager.add_task    
         def task3():
-            # Get the IP addresses for scc.suse.com
-            dig_out_result = subprocess.run(["dig", "+short", "scc.suse.com"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            # Get the IP addresses for scc.suse.com, and save in dig_out
+            command = f"dig +short scc.suse.com"
+            dig_out_result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             dig_out = dig_out_result.stdout.decode('utf-8').strip().split("\n")
 
             for ip in dig_out:
                 # Add a rich rule to block traffic to the IP addresses of scc.suse.com
                 if debug:
                     print(f"Blocking IP: {ip}")
-                result = subprocess.run(["firewall-cmd", "--permanent", "--direct", "--add-rule", "ipv4", "filter", "OUTPUT", "0", "-d", ip, "-j", "REJECT"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                command = f"firewall-cmd --permanent --direct --add-rule ipv4 filter OUTPUT 0 -d {ip} -j REJECT"
+                result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 if debug:
                     print(result.stdout.decode('utf-8'))
                     print(result.stderr.decode('utf-8'))
             pass
 
+        @task_manager.add_task    
         def task4():
             # Check rules and reload
-            subprocess.run(["firewall-cmd", "--reload"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            command = f"firewall-cmd --reload"
+            subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
             if debug:
                 print("Firewalld status after reloading:")
-                result_before = subprocess.run(["firewall-cmd", "--permanent", "--direct", "--get-all-rules"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                command = f"firewall-cmd --permanent --direct --get-all-rules"
+                result_before = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 print(result_before.stdout.decode('utf-8'))
             pass
         
-        tasks = [task1,task2,task3,task4]
-        utils.create_alive_bar(bar_title, tasks)
+        utils.create_alive_bar(bar_title, task_manager.tasks)
 
-        print(lab_name + " - [Ready]")
-        print("\nInstructions:")
-        print("- Go to the SUSE Manager WebUI.")
-        print("- Refresh the product catalog from the SUSE Customer Center.")
-        print("- Discover any issues, and fix them.")
+        print(f"""{lab_name} - [Ready]
+        
+        Instructions:
+        - Go to the SUSE Manager WebUI.
+        - Refresh the product catalog from the SUSE Customer Center.
+        - Discover any issues, and fix them.""")
     else:
         print(" ")
 

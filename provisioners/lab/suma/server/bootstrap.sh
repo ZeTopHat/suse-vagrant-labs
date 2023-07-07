@@ -46,8 +46,8 @@ timedatectl set-timezone America/Denver
 
 if [ $DEPLOYMENT == "training" ]; then
   echo "training"
-  mv /tmp/sumalabs /usr/bin/sumalabs
-  chmod 755 /usr/bin/sumalabs
+  #mv /tmp/sumalabs /usr/bin/sumalabs
+  #chmod 755 /usr/bin/sumalabs
   mv /tmp/sumalabs_completion.sh /etc/bash_completion.d/
   mkdir -p /usr/share/rhn/sumalabs/
   echo "sccorguser: '$SCCORGUSER'" >> /usr/share/rhn/sumalabs/conf.yaml
@@ -55,6 +55,10 @@ if [ $DEPLOYMENT == "training" ]; then
   echo "sccemptyuser: '$SCCEMPTYUSER'" >> /usr/share/rhn/sumalabs/conf.yaml
   echo "sccemptypass: '$SCCEMPTYPASS'" >> /usr/share/rhn/sumalabs/conf.yaml
   chmod 755 /usr/share/rhn/sumalabs/conf.yaml
+  cp /tmp/*.py /usr/share/rhn/sumalabs/
+  cp /tmp/zzz-sumalabs.sh /etc/profile.d/
+  zypper in -y python3-pip
+  pip install about-time alive-progress bcrypt cffi cryptography grapheme importlib-metadata Nuitka orderedset paramiko ptyprocess pycparser PyNaCl PyYAML typing_extensions zipp zstandard 
 
 elif [ $DEPLOYMENT == "fulldeploy" ]; then
   echo "fulldeploy"
