@@ -1,6 +1,6 @@
 ---
 box:
-  sle15sp5: "SLES-15-SP5-Vagrant.x86_64"
+  sle15sp5: "SLES15-SP5-Vagrant.x86_64"
   sle15sp4: "SLES-15-SP4-Vagrant.x86_64"
   sle15sp3: "SLES-15-SP3-Vagrant.x86_64"
   sle15sp2: "SLES-15-SP2-Vagrant.x86_64"
@@ -17,7 +17,7 @@ box:
   rhel9: "generic/rhel9"
   oel8: "generic/oracle8"
 boxurl:
-  sle15sp5: "http://download.opensuse.org/repositories/Virtualization:/Appliances:/Images:/SLE-15-SP5/images/boxes/SLES-15-SP5-Vagrant.x86_64.json"
+  sle15sp5: "http://download.opensuse.org/repositories/Virtualization:/Appliances:/Images:/SLE-15-SP5/images/boxes/SLES15-SP5-Vagrant.x86_64.json"
   sle15sp4: "http://download.opensuse.org/repositories/Virtualization:/Appliances:/Images:/SLE-15-SP4/images/boxes/SLES-15-SP4-Vagrant.x86_64.json"
   sle15sp3: "http://download.opensuse.org/repositories/Virtualization:/Appliances:/Images:/SLE-15-SP3/images/boxes/SLES-15-SP3-Vagrant.x86_64.json"
   sle15sp2: "http://download.opensuse.org/repositories/Virtualization:/Appliances:/Images:/SLE-15-SP2/images/boxes/SLES-15-SP2-Vagrant.x86_64.json"
