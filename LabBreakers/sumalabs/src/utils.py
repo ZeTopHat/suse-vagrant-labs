@@ -172,4 +172,11 @@ def shutup():
         os.dup2(old_stderr, 2)
         os.close(old_stdout)
         os.close(old_stderr)
-     
+
+class TaskManager:
+    def __init__(self):
+        self.tasks = []
+
+    def add_task(self, func):
+        self.tasks.append(func)
+        return func
