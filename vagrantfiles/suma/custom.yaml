@@ -11,10 +11,7 @@ network:
   nameserver: "192.168.0.1"
   primarysubnet: "192.168.0"
   secondarysubnet: "192.168.1"
-scc-regisetered:
-  - sumaserver42
-  - sumaserver43
-machines: 
+machines:  
   basic:
     - sumaserver43
     - sles15sp5

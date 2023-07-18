@@ -14,8 +14,8 @@ rsync -avzh /var/cache/ /tmp/data-backup/var/cache/
 rm -rf /var/cache/*
 pvcreate /dev/vdb
 vgcreate sumadata /dev/vdb
-lvcreate -n var_cache -L 15G sumadata
-lvcreate -n var_lib_pgsql -L 55G sumadata
+lvcreate -n var_cache -L 100G sumadata
+lvcreate -n var_lib_pgsql -L 150G sumadata
 lvcreate -n var_spacewalk -l 100%FREE sumadata
 mkfs.ext4 /dev/sumadata/var_cache
 mkfs.ext4 /dev/sumadata/var_lib_pgsql
@@ -26,15 +26,40 @@ echo "/dev/sumadata/var_spacewalk /var/spacewalk ext4 defaults 0 0" >> /etc/fsta
 mount -a
 rsync -avzh /tmp/data-backup/var/cache/ /var/cache/
 rm -rf /tmp/data-backup
-rpm -e --nodeps sles-release
-SUSEConnect -r $SUMAREGCODE -p SUSE-Manager-Server/4.2/x86_64
-SUSEConnect -p sle-module-basesystem/15.3/x86_64
-SUSEConnect -p sle-module-server-applications/15.3/x86_64
-SUSEConnect -p sle-module-web-scripting/15.3/x86_64
-SUSEConnect -p sle-module-suse-manager-server/4.2/x86_64
-SUSEConnect -p sle-module-desktop-applications/15.3/x86_64
-SUSEConnect -p sle-module-development-tools/15.3/x86_64
-SUSEConnect -p sle-module-python2/15.3/x86_64
+
+echo ""
+
+version=$(grep -Po '(?<=VERSION_ID=")[^"]*' /etc/os-release)
+
+if [[ "$version" == "15.4" ]]; then
+  echo "Performing actions for VERSION_ID 15.4"
+  rpm -e --nodeps sles-release
+  SUSEConnect -r $SUMAREGCODE -p SUSE-Manager-Server/4.3/x86_64
+  SUSEConnect -p sle-module-basesystem/15.4/x86_64
+  SUSEConnect -p sle-module-server-applications/15.4/x86_64
+  SUSEConnect -p sle-module-web-scripting/15.4/x86_64
+  SUSEConnect -p sle-module-suse-manager-server/4.3/x86_64
+  SUSEConnect -p sle-module-desktop-applications/15.4/x86_64
+  SUSEConnect -p sle-module-development-tools/15.4/x86_64
+  SUSEConnect -p sle-module-python2/15.4/x86_64
+
+elif [[ "$version" == "15.3" ]]; then
+  # Do something when VERSION_ID is 15.3
+  echo "Performing actions for VERSION_ID 15.3"
+  rpm -e --nodeps sles-release
+  SUSEConnect -r $SUMAREGCODE -p SUSE-Manager-Server/4.2/x86_64
+  SUSEConnect -p sle-module-basesystem/15.3/x86_64
+  SUSEConnect -p sle-module-server-applications/15.3/x86_64
+  SUSEConnect -p sle-module-web-scripting/15.3/x86_64
+  SUSEConnect -p sle-module-suse-manager-server/4.2/x86_64
+  SUSEConnect -p sle-module-desktop-applications/15.3/x86_64
+  SUSEConnect -p sle-module-development-tools/15.3/x86_64
+  SUSEConnect -p sle-module-python2/15.3/x86_64
+else
+  # Do something when VERSION_ID is neither 15.4 nor 15.3
+  echo "Unknown VERSION_ID: $version"
+fi
+
 zypper install -y man man-pages-posix man-pages rsyslog vim-data aaa_base-extras wget zypper-log
 systemctl enable --now rsyslog
 zypper install -y spacecmd spacewalk-utils* salt-bash-completion expect python3-devel
@@ -259,6 +284,9 @@ elif [ $DEPLOYMENT == "fulldeploy-insane" ]; then
   ubuntu-2204-amd64-main-security-amd64\
   ubuntu-2204-amd64-main-updates-amd64\
   ubuntu-22.04-suse-manager-tools-amd64
+
+elif [ $DEPLOYMENT == "basic" ]; then  
+  echo "Deployment: basic"
 
 else
   echo "Deployment not recognized."

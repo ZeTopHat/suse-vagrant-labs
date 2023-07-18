@@ -5,6 +5,7 @@ custom_vars = YAML.load_file("./custom.yaml")
 WD = custom_vars["wheredir"]
 global_vars = YAML.load_file("#{WD}config/global.yaml")
 secret_vars = YAML.load_file("#{WD}config/secret.yaml")
+lab_vars = YAML.load_file("#{WD}config/lab/suma.yaml")
 LABNAME = lab_vars["labname"]
 
 Vagrant.configure("2") do |config|    
@@ -19,7 +20,7 @@ Vagrant.configure("2") do |config|
     trigger.name = "unregister"
     trigger.info = "unregister client"
     trigger.on_error = :continue
-    trigger.only_on = custom_vars["scc-registered"]
+    trigger.only_on = lab_vars["suseconnect-d"]
     trigger.run_remote = {inline: <<-SHELL
       echo "nameserver #{custom_vars["network"]["nameserver"]}" >>/etc/resolv.conf
       if [[ $( SUSEConnect --status | python -c "import sys, json; print(json.load(sys.stdin)[0]['status'])" ) == "Registered" ]];
@@ -89,7 +90,7 @@ Vagrant.configure("2") do |config|
         node.vm.provision "file", source: file, destination: "/tmp/#{File.basename(file)}"
       end
       node.vm.provision "shell" do |s|   
-        s.path = "#{WD}provisioners/lab/#{LABNAME}/#{machine_vars["provisioning"}"
+        s.path = "#{WD}provisioners/lab/#{LABNAME}/#{machine_vars["provisioning"]}"
         s.env = env_vars
         # puts "s.env: #{s.env}" # For s.env debugging.
       end  
