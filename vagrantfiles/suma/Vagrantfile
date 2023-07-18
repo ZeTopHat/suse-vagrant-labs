@@ -33,20 +33,20 @@ Vagrant.configure("2") do |config|
 
   machine_list = custom_vars["machines"][custom_vars["deployment"]]
 
-  client_products = []
-
+  #client_products = []
+  #
   # Add any machine yaml file suma-client-product values 
-  machine_list.each do |machine|
-    file_path = "#{WD}config/machines/#{LABNAME}/#{machine}.yaml"
-    
-    if File.exists?(file_path)
-      yaml_content = YAML.load_file(file_path)
-    
-      if yaml_content.key?('suma-client-product')
-        product_list << yaml_content['suma-client-product']
-      end
-    end
-  end
+  #machine_list.each do |machine|
+  #  file_path = "#{WD}config/machines/#{LABNAME}/#{machine}.yaml"
+  #  
+  #  if File.exists?(file_path)
+  #    yaml_content = YAML.load_file(file_path)
+  #  
+  #    if yaml_content.key?('suma-client-product')
+  #      client_products << yaml_content['suma-client-product']
+  #    end
+  #  end
+  #end
 
   machine_list.each do |machine|
     machine_vars = YAML.safe_load(File.read("#{WD}config/machines/#{LABNAME}/#{machine}.yaml"))  ### Loads all of the machine_vars, secret_vars, and custom_vars values for use in provisioning.
@@ -70,7 +70,7 @@ Vagrant.configure("2") do |config|
     subnet = "#{custom_vars["network"][machine_vars["subnet"]]}"
     env_vars["SUBNET"] = subnet
 
-    env_vars["CLIENTPRODUCTS"] = client_products
+    #env_vars["CLIENTPRODUCTS"] = client_products
 
     ## Vagrant Machine Portion
     config.vm.define machine_vars["short"] do |node|
@@ -92,7 +92,7 @@ Vagrant.configure("2") do |config|
       node.vm.provision "shell" do |s|   
         s.path = "#{WD}provisioners/lab/#{LABNAME}/#{machine_vars["provisioning"]}"
         s.env = env_vars
-        # puts "s.env: #{s.env}" # For s.env debugging.
+        #puts "s.env: #{s.env}" # For s.env debugging.
       end  
     end
   end
