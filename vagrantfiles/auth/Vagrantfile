@@ -216,7 +216,7 @@ Vagrant.configure("2") do |config|
   end
 
   # Windows AD Server 2019, authudc01.labs.suse.com
-  config.vm.define "#{LABNAME}udc01", autostart: custom_vars["extra"] do |windows|
+  config.vm.define "#{LABNAME}udc01", autostart: false do |windows|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}udc01.yaml")
     windows.vm.box = global_vars["box"]["windows2019"]
     windows.vm.box_version = ">= 0"
