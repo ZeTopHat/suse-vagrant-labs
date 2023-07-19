@@ -1,3 +1,4 @@
 ---
 suseconnect-d: ["auth12sp5", "auth15sp4", "authkrb5", "authldap", "auth389"]
+demotedc: ["authudc01"]
 labname: "auth"

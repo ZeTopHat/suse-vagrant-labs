@@ -34,6 +34,14 @@ Vagrant.configure("2") do |config|
     }
   end
 
+  config.trigger.before :destroy do |trigger|
+    trigger.name = "demotedc"
+    trigger.info = "Demote child domain controller to remove child domain."
+    trigger.on_error = :continue
+    trigger.only_on = lab_vars["demotedc"]
+    trigger.run_remote = {path: "#{WD}provisioners/lab/#{LABNAME}/destroy.ps1"}
+  end
+
   
   config.vm.define "#{LABNAME}12sp5" do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}12sp5.yaml")
@@ -204,6 +212,36 @@ Vagrant.configure("2") do |config|
     end
     windows.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}dc01/bootstrap2.ps1"
+    end
+  end
+
+  # Windows AD Server 2019, authudc01.labs.suse.com
+  config.vm.define "#{LABNAME}udc01", autostart: false do |windows|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}udc01.yaml")
+    windows.vm.box = global_vars["box"]["windows2019"]
+    windows.vm.box_version = ">= 0"
+    windows.vm.guest = :windows
+    windows.vm.boot_timeout = 600
+    windows.vm.graceful_halt_timeout = 600
+    windows.vm.hostname = machine_vars["short"]
+    windows.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}"
+    windows.vm.communicator = "winrm"
+    windows.winrm.transport = :plaintext
+    windows.winrm.basic_auth_only = true
+    windows.winrm.ssl_peer_verification = false
+    windows.winrm.port = 55985
+    windows.winrm.username = "Administrator"
+    windows.winrm.password = "vagrant"
+    windows.vm.provider :libvirt do |libvirt, override|
+      libvirt.cpus = 2
+      libvirt.memory = 4096
+      libvirt.machine_virtual_size = 40
+    end
+    windows.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}udc01/bootstrap.ps1"
+    end
+    windows.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}udc01/bootstrap2.ps1"
     end
   end
 
