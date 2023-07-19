@@ -1,3 +1,4 @@
 ---
 suseconnect-d: ["sumaserver", "sumaproxy"]
 labname: "suma"
+requiredsecrets: ["sleregcode", "sumaregcode", "sumaproxyregcode", "sccorguser", "sccorgpass"]

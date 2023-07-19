@@ -16,6 +16,12 @@ Vagrant.configure("2") do |config|
   lab_vars = YAML.load_file("#{WD}config/lab/LABNAME.yaml")
   # Load the labname variable to be used in the rest of the template.
   LABNAME = lab_vars["labname"]
+  # Loop over "requiredsecrets" for the lab and exit if one of the required secrets is not populated in the secret.yaml file.
+  lab_vars["requiredsecrets"].each do |code|
+    if (secret_vars[code.downcase].empty?)
+      abort("Required #{code.downcase} variable has not been filled out in the config/secret.yaml file.")
+    end
+  end
   # Don't sync a files from the current directory to a "/vagrant" folder on the VMs. This is enabled by default in vagrant, but disabled by default in our project.
   config.vm.synced_folder ".", "/vagrant", disabled: true
   # global libvirt parameters for the VMs, if they don't specify individually. The cpu, memory, and disk size are set by the custom.yaml file.
