@@ -1,7 +1,56 @@
-$SUBNET.100 sumaserver.labs.suse.com    sumaserver
-$SUBNET.101 sumaproxy.labs.suse.com     sumaproxy
-$SUBNET.11  client1.labs.suse.com       client1
-$SUBNET.12  client2.labs.suse.com       client2
-$SUBNET.13  client3.labs.suse.com       client3
-$SUBNET.14  client4.labs.suse.com       client4
-$SUBNET.15  major-up.labs.suse.com      major-up
+#
+# hosts         This file describes a number of hostname-to-address
+#               mappings for the TCP/IP subsystem.  It is mostly
+#               used at boot time, when no name servers are running.
+#               On small systems, this file can be used instead of a
+#               "named" name server.
+# Syntax:
+#
+# IP-Address  Full-Qualified-Hostname  Short-Hostname
+#
+
+127.0.0.1       localhost
+
+# special IPv6 addresses
+::1             localhost ipv6-localhost ipv6-loopback
+
+fe00::0         ipv6-localnet
+
+ff00::0         ipv6-mcastprefix
+ff02::1         ipv6-allnodes
+ff02::2         ipv6-allrouters
+ff02::3         ipv6-allhosts
+
+# Vagrant Populated
+$SUBNET.50  alma8.labs.suse.com         alma8
+$SUBNET.51  alma9.labs.suse.com         Alma9
+$SUBNET.52  amazon2.labs.suse.com       amazon2
+$SUBNET.53  centos7.labs.suse.com       centos7
+$SUBNET.54  centos8.labs.suse.com       centos8
+$SUBNET.55  client1.labs.suse.com       client1
+$SUBNET.56  client2.labs.suse.com       client2
+$SUBNET.57  client3.labs.suse.com       client3
+$SUBNET.58  client4.labs.suse.com       client4
+$SUBNET.59  debian10.labs.suse.com      debian10
+$SUBNET.60  debian11.labs.suse.com      debian11
+$SUBNET.61  major-up.labs.suse.com      major-up
+$SUBNET.62  oracle7.labs.suse.com       oracle7
+$SUBNET.63  oracle8.labs.suse.com       oracle8
+$SUBNET.64  oracle9.labs.suse.com       oracle9
+$SUBNET.65  rhel7.labs.suse.com         rhel7
+$SUBNET.66  rhel8.labs.suse.com         rhel8
+$SUBNET.67  rhel9.labs.suse.com         rhel9
+$SUBNET.68  rocky8.labs.suse.com        rocky8
+$SUBNET.69  rocky9.labs.suse.com        rocky9
+$SUBNET.70  sap12sp5.labs.suse.com      sap12sp5
+$SUBNET.71  sap15sp5.labs.suse.com      sap15sp5
+$SUBNET.72  sles12sp5.labs.suse.com     sles12sp5
+$SUBNET.73  sles15sp4.labs.suse.com     sles15sp4
+$SUBNET.74  sles15sp5.labs.suse.com     sles15sp5
+$SUBNET.75  sumaproxy.labs.suse.com     sumaproxy
+$SUBNET.76  sumaproxy1.labs.suse.com    sumaproxy1
+$SUBNET.77  sumaserver.labs.suse.com    sumaserver
+$SUBNET.78  sumaserver1.labs.suse.com   sumaserver1
+$SUBNET.79  ubuntu1804.labs.suse.com    ubuntu1804
+$SUBNET.80  ubuntu2004.labs.suse.com    ubuntu2004
+$SUBNET.81  ubuntu2204.labs.suse.com    ubuntu2204

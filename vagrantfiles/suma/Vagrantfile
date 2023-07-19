@@ -36,13 +36,25 @@ Vagrant.configure("2") do |config|
     }
   end 
 
-  MACHINES = Dir.glob("#{WD}config/machines/#{LABNAME}/*.yaml").map { |filename| File.basename(filename, ".yaml") }
-  
-  MACHINES.each do |machine|
-    machine_vars = YAML.safe_load(File.read("#{WD}config/machines/#{LABNAME}/#{machine}.yaml"), symbolize_names: true)
-    machine_vars = machine_vars.each_with_object({}) { |(k, v), h|  h[k.to_sym] = v }
-    
-    ### Loads all of the machine_vars, secret_vas, and custom_vars, values for use in provisioning.
+  machine_list = custom_vars["machines"][custom_vars["deployment"]]
+
+  #client_products = []
+  #
+  # Add any machine yaml file suma-client-product values 
+  #machine_list.each do |machine|
+  #  file_path = "#{WD}config/machines/#{LABNAME}/#{machine}.yaml"
+  #  
+  #  if File.exists?(file_path)
+  #    yaml_content = YAML.load_file(file_path)
+  #  
+  #    if yaml_content.key?('suma-client-product')
+  #      client_products << yaml_content['suma-client-product']
+  #    end
+  #  end
+  #end
+
+  machine_list.each do |machine|
+    machine_vars = YAML.safe_load(File.read("#{WD}config/machines/#{LABNAME}/#{machine}.yaml"))  ### Loads all of the machine_vars, secret_vars, and custom_vars values for use in provisioning.
     env_vars = {}
     [machine_vars, secret_vars, custom_vars].each do |vars|
       vars.each do |k, v|
@@ -53,37 +65,39 @@ Vagrant.configure("2") do |config|
         end  
         env_vars[env_var_name] = env_var_value
       end
-    end
+    end 
 
     # Variables that interact with the other yaml files. 
     # Also include them as variables for provisioning scripts below.
-    ipaddress = "#{custom_vars["network"][machine_vars[:subnet]]}#{machine_vars[:ipaddress]}"
+    ipaddress = "#{custom_vars["network"][machine_vars["subnet"]]}#{machine_vars["ipaddress"]}"
     env_vars["IPADDRESS"] = ipaddress
 
-    subnet = "#{custom_vars["network"][machine_vars[:subnet]]}"
+    subnet = "#{custom_vars["network"][machine_vars["subnet"]]}"
     env_vars["SUBNET"] = subnet
 
+    #env_vars["CLIENTPRODUCTS"] = client_products
+
     ## Vagrant Machine Portion
-    config.vm.define machine_vars[:short] do |node|
-      node.vm.box = global_vars["box"][machine_vars[:box]]
-      node.vm.box_url = global_vars["boxurl"][machine_vars[:box]]
-      node.vm.hostname = machine_vars[:fqdn]
+    config.vm.define machine_vars["short"] do |node|
+      node.vm.box = global_vars["box"][machine_vars["box"]]
+      node.vm.box_url = global_vars["boxurl"][machine_vars["box"]]
+      node.vm.hostname = machine_vars["fqdn"]
       node.vm.network "private_network", ip: ipaddress, hostname: true
       node.vm.provider :libvirt do |libvirt, override|
-        libvirt.cpus = machine_vars[:cpus]
-        libvirt.memory = machine_vars[:memory]
-        libvirt.storage :file, :size => machine_vars[:datadisk], :type => 'qcow2'
+        libvirt.cpus = machine_vars["cpus"]
+        libvirt.memory = machine_vars["memory"]
+        libvirt.storage :file, :size => machine_vars["datadisk"], :type => 'qcow2'
       end
-      if machine_vars[:public] == "true"
+      if machine_vars["public"] == "true"
         node.vm.network "public_network", dev: custom_vars["network"]["bridgename"], mode: "bridge", type: "bridge"
       end
-      Dir.glob("#{WD}provisioners/lab/#{LABNAME}/#{machine_vars[:files]}/*") do |file|
+      Dir.glob("#{WD}provisioners/lab/#{LABNAME}/#{machine_vars["files"]}/*") do |file|
         node.vm.provision "file", source: file, destination: "/tmp/#{File.basename(file)}"
       end
       node.vm.provision "shell" do |s|   
-        s.path = "#{WD}provisioners/lab/#{LABNAME}/#{machine_vars[:provisioning]}"
+        s.path = "#{WD}provisioners/lab/#{LABNAME}/#{machine_vars["provisioning"]}"
         s.env = env_vars
-        puts "s.env: #{s.env}" # For Debugging the s.env output
+        #puts "s.env: #{s.env}" # For s.env debugging.
       end  
     end
   end
