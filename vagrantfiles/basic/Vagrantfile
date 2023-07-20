@@ -50,7 +50,7 @@ Vagrant.configure("2") do |config|
         "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
-        "NTPSERVER" => machine_vars["ntpserver"]
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
       }
     end
   end
@@ -72,7 +72,7 @@ Vagrant.configure("2") do |config|
         "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
-        "NTPSERVER" => machine_vars["ntpserver"]
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
       }
     end
   end
@@ -92,7 +92,7 @@ Vagrant.configure("2") do |config|
         "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
-        "NTPSERVER" => machine_vars["ntpserver"]
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
       }
     end
   end
@@ -112,7 +112,7 @@ Vagrant.configure("2") do |config|
         "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
-        "NTPSERVER" => machine_vars["ntpserver"]
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
       }
     end
   end
@@ -132,7 +132,7 @@ Vagrant.configure("2") do |config|
         "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
-        "NTPSERVER" => machine_vars["ntpserver"]
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
       }
     end
   end
@@ -152,7 +152,7 @@ Vagrant.configure("2") do |config|
         "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
-        "NTPSERVER" => machine_vars["ntpserver"]
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
       }
     end
   end
@@ -172,7 +172,7 @@ Vagrant.configure("2") do |config|
         "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
-        "NTPSERVER" => machine_vars["ntpserver"]
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
       }
     end
   end
@@ -190,7 +190,7 @@ Vagrant.configure("2") do |config|
         "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
-        "NTPSERVER" => machine_vars["ntpserver"]
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
       }
     end
   end
@@ -208,7 +208,7 @@ Vagrant.configure("2") do |config|
         "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
-        "NTPSERVER" => machine_vars["ntpserver"]
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
       }
     end
   end
@@ -227,7 +227,7 @@ Vagrant.configure("2") do |config|
         "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
-        "NTPSERVER" => machine_vars["ntpserver"]
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
       }
     end
   end
@@ -246,7 +246,7 @@ Vagrant.configure("2") do |config|
         "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
-        "NTPSERVER" => machine_vars["ntpserver"]
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
       }
     end
   end
@@ -265,7 +265,7 @@ Vagrant.configure("2") do |config|
         "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
-        "NTPSERVER" => machine_vars["ntpserver"]
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
       }
     end
   end

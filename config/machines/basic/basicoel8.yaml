@@ -2,4 +2,4 @@
 ipaddress: ".18"
 fqdn: "basicoel8.labs.suse.com"
 short: "basicoel8"
-ntpserver: "192.168.0.1"
+ntpserver: ".1"
