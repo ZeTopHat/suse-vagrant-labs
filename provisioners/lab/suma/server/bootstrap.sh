@@ -95,7 +95,12 @@ elif [ $DEPLOYMENT == "fulldeploy" ]; then
   # Configure First User in webUI
   curl -s -k -X POST https://localhost/rhn/newlogin/CreateFirstUser.do -d "submitted=true" -d "orgName=SUMALABS" -d "login=admin" -d "desiredpassword=sumapass" -d "desiredpasswordConfirm=sumapass" -d "email=lab-noise@labs.suse.com" -d "firstNames=Administrator" -d "lastName=Administrator" -o /dev/null
   
-  sleep 80
+  while [[ $(systemctl is-active spacewalk.target) != "active" ]]; do
+    sleep 5
+  done
+
+  sleep 5
+
   # May already be running from the SUMA setup, but is useful for verification, caching the password, and an example of expect working (hopefully).
   /usr/bin/expect -c "set timeout -1; set username \"admin\"; set password \"sumapass\"; spawn mgr-sync refresh; expect -re \"Login:\" { send \"\$username\r\"; exp_continue } -re \"Password:\" { send \"\$password\r\"; exp_continue } eof"
 
@@ -142,7 +147,12 @@ elif [ $DEPLOYMENT == "fulldeploy-insane" ]; then
   # Configure First User in webUI
   curl -s -k -X POST https://localhost/rhn/newlogin/CreateFirstUser.do -d "submitted=true" -d "orgName=SUMALABS" -d "login=admin" -d "desiredpassword=sumapass" -d "desiredpasswordConfirm=sumapass" -d "email=lab-noise@labs.suse.com" -d "firstNames=Administrator" -d "lastName=Administrator" -o /dev/null
   
-  sleep 80
+  while [[ $(systemctl is-active spacewalk.target) != "active" ]]; do
+    sleep 5
+  done
+
+  sleep 5
+
   # May already be running from the SUMA setup, but is useful for verification, caching the password, and an example of expect working (hopefully).
   /usr/bin/expect -c "set timeout -1; set username \"admin\"; set password \"sumapass\"; spawn mgr-sync refresh; expect -re \"Login:\" { send \"\$username\r\"; exp_continue } -re \"Password:\" { send \"\$password\r\"; exp_continue } eof"
 
@@ -289,8 +299,8 @@ elif [ $DEPLOYMENT == "fulldeploy-insane" ]; then
   ubuntu-2204-amd64-main-updates-amd64\
   ubuntu-22.04-suse-manager-tools-amd64
 
-elif [ $DEPLOYMENT == "basic" ]; then  
-  echo "Deployment: basic"
+elif [ $DEPLOYMENT == "pre-setup43" ]; then  
+  echo "Deployment: pre-setup43"
 
 else
   echo "Deployment not recognized."
