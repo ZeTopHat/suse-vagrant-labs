@@ -62,7 +62,8 @@ Vagrant.configure("2") do |config|
         "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
-        "NTPSERVER" => machine_vars["ntpserver"]
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
       }
     end
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}12sp5/krb5.conf", destination: "/tmp/"
@@ -89,7 +90,8 @@ Vagrant.configure("2") do |config|
         "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
-        "NTPSERVER" => machine_vars["ntpserver"]
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
       }
     end
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15sp4/krb5.conf", destination: "/tmp/"
@@ -116,7 +118,8 @@ Vagrant.configure("2") do |config|
         "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
-        "NTPSERVER" => machine_vars["ntpserver"]
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
       }
     end
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}ldap/config-authldap", destination: "/tmp/"
@@ -149,7 +152,8 @@ Vagrant.configure("2") do |config|
         "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
-        "NTPSERVER" => machine_vars["ntpserver"]
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
       }
     end
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}389/config-auth389", destination: "/tmp/"
@@ -178,7 +182,8 @@ Vagrant.configure("2") do |config|
         "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
-        "NTPSERVER" => machine_vars["ntpserver"]
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
       }
     end
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}krb5/kdc.conf", destination: "/tmp/"
@@ -264,7 +269,8 @@ Vagrant.configure("2") do |config|
         "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
-        "NTPSERVER" => machine_vars["ntpserver"]
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
       }
     end
     rhe.vm.provision "shell" do |s|
