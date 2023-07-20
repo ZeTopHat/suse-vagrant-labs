@@ -7,6 +7,11 @@ global_vars = YAML.load_file("#{WD}config/global.yaml")
 secret_vars = YAML.load_file("#{WD}config/secret.yaml")
 lab_vars = YAML.load_file("#{WD}config/lab/suma.yaml")
 LABNAME = lab_vars["labname"]
+lab_vars["requiredsecrets"].each do |code|
+  if (secret_vars[code.downcase].empty?)
+    abort("Required #{code.downcase} variable has not been filled out in the config/secret.yaml file.")
+  end
+end
 
 Vagrant.configure("2") do |config|    
   config.vm.synced_folder ".", "/vagrant", disabled: true

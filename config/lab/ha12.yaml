@@ -1,3 +1,4 @@
 ---
 suseconnect-d: ["ha12iscsi", "ha12n1", "ha12n2"]
 labname: "ha12"
+requiredsecrets: ["sleregcode", "haregcode"]
