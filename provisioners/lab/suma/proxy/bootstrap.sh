@@ -5,6 +5,8 @@ sed -i 's/rpm.install.excludedocs = yes/rpm.install.excludedocs = no/' /etc/zypp
 sed -i "s/\$SUBNET/${SUBNET}/g" /tmp/hosts
 cp /tmp/hosts /etc/hosts
 
+version=$(grep -Po '(?<=VERSION_ID=")[^"]*' /etc/os-release)
+
 if [[ "$version" == "15.4" ]]; then
   echo "Performing actions for VERSION_ID 15.4"
   rpm -e --nodeps sles-release

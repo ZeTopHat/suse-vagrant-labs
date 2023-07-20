@@ -91,18 +91,55 @@ elif [ $DEPLOYMENT == "fulldeploy" ]; then
   # Run SUMA Setup
   cp /tmp/setup_env.sh /root/setup_env.sh
   /usr/lib/susemanager/bin/mgr-setup -s
+  
+  echo "Configuring the First User"
 
   # Configure First User in webUI
   curl -s -k -X POST https://localhost/rhn/newlogin/CreateFirstUser.do -d "submitted=true" -d "orgName=SUMALABS" -d "login=admin" -d "desiredpassword=sumapass" -d "desiredpasswordConfirm=sumapass" -d "email=lab-noise@labs.suse.com" -d "firstNames=Administrator" -d "lastName=Administrator" -o /dev/null
   
   while [[ $(systemctl is-active spacewalk.target) != "active" ]]; do
-    sleep 5
+    sleep 1
   done
 
-  sleep 5
+  log_file="/var/log/rhn/rhn_web_ui.log"
+  start_pattern="INFO  com.redhat.rhn.manager.content.ContentSyncManager - ContentSyncManager.updateChannelFamilies called"
+  end_pattern="INFO  com.redhat.rhn.manager.content.ContentSyncManager - getAvailableCHannels took"
+  timeout_seconds=60
 
-  # May already be running from the SUMA setup, but is useful for verification, caching the password, and an example of expect working (hopefully).
+  # Function to display logs
+  display_logs() {
+      tail -f "$log_file" | while read -r line; do
+          if [[ $line =~ $1 ]]; then
+              echo "Pattern matched: $line"
+              break
+          fi
+      done
+  }
+
+  # Flag to track if start pattern is found within timeout
+  start_pattern_found=false
+
+  # Display logs when start pattern is matched
+  if display_logs "$start_pattern" & sleep "$timeout_seconds"; then
+      start_pattern_found=true
+  else
+      echo "Start pattern not found within $timeout_seconds seconds. Skipping..."
+  fi
+
+  # Sleep for 5 seconds after start pattern is found
+  if "$start_pattern_found"; then
+      sleep 5
+
+      # Continue monitoring for end pattern
+      if ! display_logs "$end_pattern" & sleep "$timeout_seconds"; then
+          echo "End pattern not found within $timeout_seconds seconds."
+      fi
+  fi
+
+  # May fail, but useful for verification, caching the password, and an example of expect working (hopefully).
   /usr/bin/expect -c "set timeout -1; set username \"admin\"; set password \"sumapass\"; spawn mgr-sync refresh; expect -re \"Login:\" { send \"\$username\r\"; exp_continue } -re \"Password:\" { send \"\$password\r\"; exp_continue } eof"
+
+  sleep 5
 
   # Mirror channels for SLES 15 SP5 
   mgr-sync add channels\
@@ -138,23 +175,60 @@ elif [ $DEPLOYMENT == "fulldeploy" ]; then
 
 
 elif [ $DEPLOYMENT == "fulldeploy-insane" ]; then
-  echo "fulldeploy"
+  echo "fulldeploy-insane"
 
-  # Run SUMA Setup
+    # Run SUMA Setup
   cp /tmp/setup_env.sh /root/setup_env.sh
   /usr/lib/susemanager/bin/mgr-setup -s
+  
+  echo "Configuring the First User"
 
   # Configure First User in webUI
   curl -s -k -X POST https://localhost/rhn/newlogin/CreateFirstUser.do -d "submitted=true" -d "orgName=SUMALABS" -d "login=admin" -d "desiredpassword=sumapass" -d "desiredpasswordConfirm=sumapass" -d "email=lab-noise@labs.suse.com" -d "firstNames=Administrator" -d "lastName=Administrator" -o /dev/null
   
   while [[ $(systemctl is-active spacewalk.target) != "active" ]]; do
-    sleep 5
+    sleep 1
   done
 
-  sleep 5
+  log_file="/var/log/rhn/rhn_web_ui.log"
+  start_pattern="INFO  com.redhat.rhn.manager.content.ContentSyncManager - ContentSyncManager.updateChannelFamilies called"
+  end_pattern="INFO  com.redhat.rhn.manager.content.ContentSyncManager - getAvailableCHannels took"
+  timeout_seconds=60
 
-  # May already be running from the SUMA setup, but is useful for verification, caching the password, and an example of expect working (hopefully).
+  # Function to display logs
+  display_logs() {
+      tail -f "$log_file" | while read -r line; do
+          if [[ $line =~ $1 ]]; then
+              echo "Pattern matched: $line"
+              break
+          fi
+      done
+  }
+
+  # Flag to track if start pattern is found within timeout
+  start_pattern_found=false
+
+  # Display logs when start pattern is matched
+  if display_logs "$start_pattern" & sleep "$timeout_seconds"; then
+      start_pattern_found=true
+  else
+      echo "Start pattern not found within $timeout_seconds seconds. Skipping..."
+  fi
+
+  # Sleep for 5 seconds after start pattern is found
+  if "$start_pattern_found"; then
+      sleep 5
+
+      # Continue monitoring for end pattern
+      if ! display_logs "$end_pattern" & sleep "$timeout_seconds"; then
+          echo "End pattern not found within $timeout_seconds seconds."
+      fi
+  fi
+
+  # May fail, but useful for verification, caching the password, and an example of expect working (hopefully).
   /usr/bin/expect -c "set timeout -1; set username \"admin\"; set password \"sumapass\"; spawn mgr-sync refresh; expect -re \"Login:\" { send \"\$username\r\"; exp_continue } -re \"Password:\" { send \"\$password\r\"; exp_continue } eof"
+
+  sleep 5
 
   # Mirror channels for Proxy 4.3
   mgr-sync add channels\
