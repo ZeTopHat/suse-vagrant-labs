@@ -83,6 +83,10 @@ Vagrant.configure("2") do |config|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}12sp5/bootstrap.sh"
       # This allows for verification of the right machine/script as well as arguments in the provision for a training deployment or a full deployment.
       s.args = "#{LABNAME}12sp5 custom_vars["deployment"]"
+      # Environment variables specific to the machine or lab involved. Often times the SUBNET variable is needed for when IP addresses are set in the provisioning scripts. Additional registration codes are sometimes placed here as well.
+      s.env = {
+        "SUBNET" => custom_vars["network"]["primarysubnet"]
+      }
     end
   end
 
@@ -119,6 +123,10 @@ Vagrant.configure("2") do |config|
       s.path = "#{WD}provisioners/lab/auth/#{LABNAME}15sp4/bootstrap.sh"
       # This allows for verification of the right machine/script as well as arguments in the provision for a training deployment or a full deployment.
       s.args = "#{LABNAME}15sp4 custom_vars["deployment"]"
+      # Environment variables specific to the machine or lab involved. Often times the SUBNET variable is needed for when IP addresses are set in the provisioning scripts. Additional registration codes are sometimes placed here as well.
+      s.env = {
+        "SUBNET" => custom_vars["network"]["primarysubnet"]
+      }
     end
   end
 end

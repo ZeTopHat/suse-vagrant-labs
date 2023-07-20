@@ -2,4 +2,4 @@
 ipaddress: ".27"
 fqdn: "authudc01.us.labs.suse.com"
 short: "authudc01"
-ntpserver: "192.168.0.1"
+ntpserver: ".1"

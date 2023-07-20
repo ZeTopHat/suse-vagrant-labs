@@ -2,4 +2,4 @@
 ipaddress: ".22"
 fqdn: "auth12sp5.labs.suse.com"
 short: "auth12sp5"
-ntpserver: "192.168.0.1"
+ntpserver: ".1"

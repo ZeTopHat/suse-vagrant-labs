@@ -2,4 +2,4 @@
 ipaddress: ".24"
 fqdn: "auth389.labs.suse.com"
 short: "auth389"
-ntpserver: "192.168.0.1"
+ntpserver: ".1"

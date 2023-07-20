@@ -2,5 +2,5 @@
 ipaddress: ".161"
 fqdn: "hana15n1.labs.suse.com"
 short: "hana15n1"
-ntpserver: "192.168.0.1"
+ntpserver: ".1"
 sapproduct: "SLES_SAP/15.4/x86_64"

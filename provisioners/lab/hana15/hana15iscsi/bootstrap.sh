@@ -7,8 +7,8 @@ echo "Deploying ${MACHINE} ${DEPLOY} configurations..."
 
 if [ "$MACHINE" == "hana15iscsi" ]; then
   zypper install -y tgt
-  echo "192.168.0.161 hana15n1.labs.suse.com hana15n1" >>/etc/hosts
-  echo "192.168.0.162 hana15n2.labs.suse.com hana15n2" >>/etc/hosts
+  echo "${SUBNET}.161 hana15n1.labs.suse.com hana15n1" >>/etc/hosts
+  echo "${SUBNET}.162 hana15n2.labs.suse.com hana15n2" >>/etc/hosts
   mkdir /var/lib/hana15iscsi_disks
   dd if=/dev/zero of=/var/lib/hana15iscsi_disks/hana15_disk01.img count=0 bs=1 seek=10G
   dd if=/dev/zero of=/var/lib/hana15iscsi_disks/hana15_disk02.img count=0 bs=1 seek=10G
