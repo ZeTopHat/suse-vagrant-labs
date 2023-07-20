@@ -61,7 +61,7 @@ Vagrant.configure("2") do |config|
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
         "SUBNET" => custom_vars["network"]["primarysubnet"],
-        "NTPSERVER" => machine_vars["ntpserver"]
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
       }
     end
     sle.vm.provision "shell" do |s|
@@ -90,7 +90,7 @@ Vagrant.configure("2") do |config|
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
         "SUBNET" => custom_vars["network"]["primarysubnet"],
-        "NTPSERVER" => machine_vars["ntpserver"]
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
       }
     end
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_ha15_part1.txt", destination: "/tmp/"
@@ -107,6 +107,8 @@ Vagrant.configure("2") do |config|
       s.env = {
         "HAREGCODE" => secret_vars["haregcode"],
         "HAPRODUCT" => machine_vars["haproduct"],
+        "FLOATINGIP1" => "#{custom_vars["network"]["primarysubnet"]}#{lab_vars["floatingip1"]}", 
+        "FLOATINGIP2" => "#{custom_vars["network"]["primarysubnet"]}#{lab_vars["floatingip2"]}",
         "SUBNET" => custom_vars["network"]["primarysubnet"]
       }
     end
@@ -129,7 +131,7 @@ Vagrant.configure("2") do |config|
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
         "SUBNET" => custom_vars["network"]["primarysubnet"],
-        "NTPSERVER" => machine_vars["ntpserver"]
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
       }
     end
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n2/authorized_keys", destination: "/tmp/"
