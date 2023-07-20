@@ -85,8 +85,9 @@ if [ $DEPLOYMENT == "training" ]; then
   zypper in -y python3-pip
   pip install about-time alive-progress bcrypt cffi cryptography grapheme importlib-metadata Nuitka orderedset paramiko ptyprocess pycparser PyNaCl PyYAML typing_extensions zipp zstandard 
 
-elif [ $DEPLOYMENT == "fulldeploy" ]; then
-  echo "fulldeploy"
+elif [[ $DEPLOYMENT == "fulldeploy" || $DEPLOYMENT == "fulldeploy-insane" ]]; then
+
+  echo "$DEPLOYMENT"
 
   # Run SUMA Setup
   cp /tmp/setup_env.sh /root/setup_env.sh
@@ -141,24 +142,172 @@ elif [ $DEPLOYMENT == "fulldeploy" ]; then
 
   sleep 5
 
-  # Mirror channels for SLES 15 SP5 
-  mgr-sync add channels\
-  sle-product-sles15-sp5-pool-x86_64 sle-product-sles15-sp5-updates-x86_64\
-  sle-module-basesystem15-sp5-pool-x86_64 sle-module-basesystem15-sp5-updates-x86_64\
-  sle-module-server-applications15-sp5-pool-x86_64 sle-module-server-applications15-sp5-updates-x86_64\
-  sle-manager-tools15-pool-x86_64-sp5 sle-manager-tools15-updates-x86_64-sp5
+    if [ $DEPLOYMENT == "fulldeploy" ]; then
+      # Mirror channels for SLES 15 SP5 
+      mgr-sync add channels\
+      sle-product-sles15-sp5-pool-x86_64 sle-product-sles15-sp5-updates-x86_64\
+      sle-module-basesystem15-sp5-pool-x86_64 sle-module-basesystem15-sp5-updates-x86_64\
+      sle-module-server-applications15-sp5-pool-x86_64 sle-module-server-applications15-sp5-updates-x86_64\
+      sle-manager-tools15-pool-x86_64-sp5 sle-manager-tools15-updates-x86_64-sp5
 
-  # Mirror channels for Proxy 4.3
-  mgr-sync add channels\
-  sle-product-suse-manager-proxy-4.3-pool-x86_64 sle-product-suse-manager-proxy-4.3-updates-x86_64\
-  sle-module-basesystem15-sp4-pool-x86_64-proxy-4.3 sle-module-basesystem15-sp4-updates-x86_64-proxy-4.3\
-  sle-module-server-applications15-sp4-pool-x86_64-proxy-4.3 sle-module-server-applications15-sp4-updates-x86_64-proxy-4.3\
-  sle-module-suse-manager-proxy-4.3-pool-x86_64 sle-module-suse-manager-proxy-4.3-updates-x86_64\
+      # Mirror channels for Proxy 4.3
+      mgr-sync add channels\
+      sle-product-suse-manager-proxy-4.3-pool-x86_64 sle-product-suse-manager-proxy-4.3-updates-x86_64\
+      sle-module-basesystem15-sp4-pool-x86_64-proxy-4.3 sle-module-basesystem15-sp4-updates-x86_64-proxy-4.3\
+      sle-module-server-applications15-sp4-pool-x86_64-proxy-4.3 sle-module-server-applications15-sp4-updates-x86_64-proxy-4.3\
+      sle-module-suse-manager-proxy-4.3-pool-x86_64 sle-module-suse-manager-proxy-4.3-updates-x86_64\
 
-  # Mirror channels for SLES 12 SP5
-  mgr-sync add channels\
-  sles12-sp5-pool-x86_64 sles12-sp5-updates-x86_64\
-  sle-manager-tools12-pool-x86_64-sp5 sle-manager-tools12-updates-x86_64-sp5
+      # Mirror channels for SLES 12 SP5
+      mgr-sync add channels\
+      sles12-sp5-pool-x86_64 sles12-sp5-updates-x86_64\
+      sle-manager-tools12-pool-x86_64-sp5 sle-manager-tools12-updates-x86_64-sp5
+
+    elif [ $DEPLOYMENT == "fulldeploy-insane" ]; then
+
+        # Mirror channels for Proxy 4.3
+      mgr-sync add channels\
+      sle-product-suse-manager-proxy-4.3-pool-x86_64 sle-product-suse-manager-proxy-4.3-updates-x86_64\
+      sle-module-basesystem15-sp4-pool-x86_64-proxy-4.3 sle-module-basesystem15-sp4-updates-x86_64-proxy-4.3\
+      sle-module-server-applications15-sp4-pool-x86_64-proxy-4.3 sle-module-server-applications15-sp4-updates-x86_64-proxy-4.3\
+      sle-module-suse-manager-proxy-4.3-pool-x86_64 sle-module-suse-manager-proxy-4.3-updates-x86_64\
+
+      # Mirror channels for SLES 15 SP4 
+      mgr-sync add channels\
+      sle-product-sles15-sp4-pool-x86_64 sle-product-sles15-sp4-updates-x86_64\
+      sle-module-basesystem15-sp4-pool-x86_64 sle-module-basesystem15-sp4-updates-x86_64\
+      sle-module-server-applications15-sp4-pool-x86_64 sle-module-server-applications15-sp4-updates-x86_64\
+      sle-manager-tools15-pool-x86_64-sp4 sle-manager-tools15-updates-x86_64-sp4
+
+      # Mirror channels for SLES 15 SP5 
+      mgr-sync add channels\
+      sle-product-sles15-sp5-pool-x86_64 sle-product-sles15-sp5-updates-x86_64\
+      sle-module-basesystem15-sp5-pool-x86_64 sle-module-basesystem15-sp5-updates-x86_64\
+      sle-module-server-applications15-sp5-pool-x86_64 sle-module-server-applications15-sp5-updates-x86_64\
+      sle-manager-tools15-pool-x86_64-sp5 sle-manager-tools15-updates-x86_64-sp5
+
+      # Mirror channels for SLES 12 SP5
+      mgr-sync add channels\
+      sles12-sp5-pool-x86_64 sles12-sp5-updates-x86_64\
+      sle-manager-tools12-pool-x86_64-sp5 sle-manager-tools12-updates-x86_64-sp5
+
+      # Mirror channels for SLES for SAP 12 SP5
+      mgr-sync add channels\
+      sle12-sp5-sap-pool-x86_64 sle-12-sp5-sap-updates-x86_64\
+      sles12-sp5-pool-x86_64-sap sles12-sp5-updates-x86_64-sap\
+      sle-ha12-sp5-pool-x86_64-sap sle-ha12-sp5-updates-x86_64-sap\
+      sle-manager-tools12-pool-x86_64-sap-sp5 sle-manager-tools12-updates-x86_64-sap-sp5\
+
+      # Mirror channels for SLES for SAP 15 SP5
+      mgr-sync add channels\
+      sle-product-sles_sap15-sp5-pool-x86_64 sle-product-sles_sap15-sp5-updates-x86_64\
+      sle-module-basesystem15-sp5-pool-x86_64-sap sle-module-basesystem15-sp5-updates-x86_64-sap\
+      sle-module-desktop-applications15-sp5-pool-x86_64-sap sle-module-desktop-applications15-sp5-updates-x86_64-sap\
+      sle-module-server-applications15-sp5-pool-x86_64-sap sle-module-server-applications15-sp5-updates-x86_64-sap\
+      sle-product-ha15-sp5-pool-x86_64-sap sle-product-ha15-sp5-updates-x86_64-sap\
+      sle-module-sap-applications15-sp5-pool-x86_64 sle-module-sap-applications15-sp5-updates-x86_64\
+      sle-manager-tools15-pool-x86_64-sap-sp5 sle-manager-tools15-updates-x86_64-sap-sp5
+
+      # mirror Channels for Alma8
+      mgr-sync add channels\
+      almalinux8-x86_64 almalinux8-appstream-x86_64\
+      res8-manager-tools-pool-x86_64-alma res8-manager-tools-updates-x86_64-alma
+
+      # mirror Channels for Alma9
+      mgr-sync add channels\
+      almalinux9-x86_64 almalinux9-appstream-x86_64\
+      el9-manager-tools-pool-x86_64-alma el9-manager-tools-updates-x86_64-alma
+
+      # mirror Channels for Amazon2
+      mgr-sync add channels\
+      amazonlinux2-core-x86_64\
+      res-7-suse-manager-tools-x86_64-amazon
+
+      # mirror Channels for centos7
+      mgr-sync add channels\
+      centos7-x86_64 centos7-updates-x86_64\
+      res-7-suse-manager-tools-x86_64-centos7
+
+      # mirror Channels for centos8
+      mgr-sync add channels\
+      centos8-x86_64 centos8-appstream-x86_64\
+      res8-manager-tools-pool-x86_64-centos8 res8-manager-tools-updates-x86_64-centos8
+      
+      # mirror Channels for debian10
+      mgr-sync add channels\
+      debian-10-pool-amd64\
+      debian-10-main-updates-amd64\
+      debian-10-main-security-amd64\
+      debian-10-suse-manager-tools-amd64
+
+      # mirror Channels for debian11
+      mgr-sync add channels\
+      debian-11-pool-amd64\
+      debian-11-main-updates-amd64\
+      debian-11-main-security-amd64\
+      debian-11-suse-manager-tools-amd64
+      
+      # mirror Channels for oracle7
+      mgr-sync add channels\
+      oraclelinux7-x86_64\
+      res-7-suse-manager-tools-x86_64-ol7
+
+      # mirror Channels for oracle8
+      mgr-sync add channels\
+      oraclelinux8-x86_64 oraclelinux8-appstream-x86_64\
+      res8-manager-tools-pool-x86_64-ol8 res8-manager-tools-updates-x86_64-ol8
+
+      # mirror Channels for oracle9
+      mgr-sync add channels\
+      oraclelinux9-x86_64 oraclelinux9-appstream-x86_64\
+      el9-manager-tools-pool-x86_64-ol9 el9-manager-tools-updates-x86_64-ol9
+
+      # mirror Channels for rhel7
+      mgr-sync add channels\
+      res7-x86_64 rhel-x86_64-server-7\
+      res7-suse-manager-tools-x86_64
+
+      # mirror Channels for rhel8
+      mgr-sync add channels\
+      rhel8-pool-x86_64\
+      res-8-updates-x86_64 res-as-8-updates-x86_64 res-cb-8-updates-x86_64\
+      res8-manager-tools-pool-x86_64 res8-manager-tools-updates-x86_64
+
+      # mirror Channels for rhel9
+      mgr-sync add channels\
+      el9-pool-x86_64\
+      sll-9-updates-x86_64 sll-as-9-updates-x86_64 sll-cb-9-updates-x86_64\
+      el9-manager-tools-pool-x86_64 el9-manager-tools-updates-x86_64
+
+      # mirror Channels for rocky8
+      mgr-sync add channels\
+      rockylinux-8-x86_64 rockylinux-8-appstream-x86_64\
+      res8-manager-tools-pool-x86_64-rocky res8-manager-tools-updates-x86_64-rocky
+
+      # mirror Channels for rocky9
+      mgr-sync add channels\
+      rockylinux-9-x86_64 rockylinux-9-appstream-x86_64\
+      el9-manager-tools-pool-x86_64-rocky el9-manager-tools-updates-x86_64-rocky
+      
+      # mirror Channels for ubuntu1804
+      mgr-sync add channels\
+      ubuntu-18.04-pool-amd64\
+      ubuntu-18.04-suse-manager-tools-amd64
+
+      # mirror Channels for ubuntu2004
+      mgr-sync add channels\
+      ubuntu-2004-amd64-main-amd64\
+      ubuntu-2004-amd64-main-security-amd64\
+      ubuntu-2004-amd64-main-updates-amd64\
+      ubuntu-20.04-suse-manager-tools-amd64
+
+      # mirror Channels for ubuntu2204
+      mgr-sync add channels\
+      ubuntu-2204-amd64-main-amd64\
+      ubuntu-2204-amd64-main-security-amd64\
+      ubuntu-2204-amd64-main-updates-amd64\
+      ubuntu-22.04-suse-manager-tools-amd64
+
+    fi
 
   ### TODO, Add autobootstrapping ###
   
@@ -172,206 +321,6 @@ elif [ $DEPLOYMENT == "fulldeploy" ]; then
   # Probably best to provision salt conf files on client, then you just have to accept, or autoaccept can be configured.
   # Altenatievly, can use spacecmd to bootstrap, but tricky because you'd have to wait until reposync is done. 
   # spacecmd -u admin -p sumapass -- system_bootstrap -H "" -u "root" -P "linux" -a "1-sles15sp5"
-
-
-elif [ $DEPLOYMENT == "fulldeploy-insane" ]; then
-  echo "fulldeploy-insane"
-
-    # Run SUMA Setup
-  cp /tmp/setup_env.sh /root/setup_env.sh
-  /usr/lib/susemanager/bin/mgr-setup -s
-  
-  echo "Configuring the First User"
-
-  # Configure First User in webUI
-  curl -s -k -X POST https://localhost/rhn/newlogin/CreateFirstUser.do -d "submitted=true" -d "orgName=SUMALABS" -d "login=admin" -d "desiredpassword=sumapass" -d "desiredpasswordConfirm=sumapass" -d "email=lab-noise@labs.suse.com" -d "firstNames=Administrator" -d "lastName=Administrator" -o /dev/null
-  
-  while [[ $(systemctl is-active spacewalk.target) != "active" ]]; do
-    sleep 1
-  done
-
-  log_file="/var/log/rhn/rhn_web_ui.log"
-  start_pattern="INFO  com.redhat.rhn.manager.content.ContentSyncManager - ContentSyncManager.updateChannelFamilies called"
-  end_pattern="INFO  com.redhat.rhn.manager.content.ContentSyncManager - getAvailableCHannels took"
-  timeout_seconds=60
-
-  # Function to display logs
-  display_logs() {
-      tail -f "$log_file" | while read -r line; do
-          if [[ $line =~ $1 ]]; then
-              echo "Pattern matched: $line"
-              break
-          fi
-      done
-  }
-
-  # Flag to track if start pattern is found within timeout
-  start_pattern_found=false
-
-  # Display logs when start pattern is matched
-  if display_logs "$start_pattern" & sleep "$timeout_seconds"; then
-      start_pattern_found=true
-  else
-      echo "Start pattern not found within $timeout_seconds seconds. Skipping..."
-  fi
-
-  # Sleep for 5 seconds after start pattern is found
-  if "$start_pattern_found"; then
-      sleep 5
-
-      # Continue monitoring for end pattern
-      if ! display_logs "$end_pattern" & sleep "$timeout_seconds"; then
-          echo "End pattern not found within $timeout_seconds seconds."
-      fi
-  fi
-
-  # May fail, but useful for verification, caching the password, and an example of expect working (hopefully).
-  /usr/bin/expect -c "set timeout -1; set username \"admin\"; set password \"sumapass\"; spawn mgr-sync refresh; expect -re \"Login:\" { send \"\$username\r\"; exp_continue } -re \"Password:\" { send \"\$password\r\"; exp_continue } eof"
-
-  sleep 5
-
-  # Mirror channels for Proxy 4.3
-  mgr-sync add channels\
-  sle-product-suse-manager-proxy-4.3-pool-x86_64 sle-product-suse-manager-proxy-4.3-updates-x86_64\
-  sle-module-basesystem15-sp4-pool-x86_64-proxy-4.3 sle-module-basesystem15-sp4-updates-x86_64-proxy-4.3\
-  sle-module-server-applications15-sp4-pool-x86_64-proxy-4.3 sle-module-server-applications15-sp4-updates-x86_64-proxy-4.3\
-  sle-module-suse-manager-proxy-4.3-pool-x86_64 sle-module-suse-manager-proxy-4.3-updates-x86_64\
-
-  # Mirror channels for SLES 15 SP4 
-  mgr-sync add channels\
-  sle-product-sles15-sp4-pool-x86_64 sle-product-sles15-sp4-updates-x86_64\
-  sle-module-basesystem15-sp4-pool-x86_64 sle-module-basesystem15-sp4-updates-x86_64\
-  sle-module-server-applications15-sp4-pool-x86_64 sle-module-server-applications15-sp4-updates-x86_64\
-  sle-manager-tools15-pool-x86_64-sp4 sle-manager-tools15-updates-x86_64-sp4
-
-  # Mirror channels for SLES 15 SP5 
-  mgr-sync add channels\
-  sle-product-sles15-sp5-pool-x86_64 sle-product-sles15-sp5-updates-x86_64\
-  sle-module-basesystem15-sp5-pool-x86_64 sle-module-basesystem15-sp5-updates-x86_64\
-  sle-module-server-applications15-sp5-pool-x86_64 sle-module-server-applications15-sp5-updates-x86_64\
-  sle-manager-tools15-pool-x86_64-sp5 sle-manager-tools15-updates-x86_64-sp5
-
-  # Mirror channels for SLES 12 SP5
-  mgr-sync add channels\
-  sles12-sp5-pool-x86_64 sles12-sp5-updates-x86_64\
-  sle-manager-tools12-pool-x86_64-sp5 sle-manager-tools12-updates-x86_64-sp5
-
-  # Mirror channels for SLES for SAP 12 SP5
-  mgr-sync add channels\
-  sle12-sp5-sap-pool-x86_64 sle-12-sp5-sap-updates-x86_64\
-  sles12-sp5-pool-x86_64-sap sles12-sp5-updates-x86_64-sap\
-  sle-ha12-sp5-pool-x86_64-sap sle-ha12-sp5-updates-x86_64-sap\
-  sle-manager-tools12-pool-x86_64-sap-sp5 sle-manager-tools12-updates-x86_64-sap-sp5\
-
-  # Mirror channels for SLES for SAP 15 SP5
-  mgr-sync add channels\
-  sle-product-sles_sap15-sp5-pool-x86_64 sle-product-sles_sap15-sp5-updates-x86_64\
-  sle-module-basesystem15-sp5-pool-x86_64-sap sle-module-basesystem15-sp5-updates-x86_64-sap\
-  sle-module-desktop-applications15-sp5-pool-x86_64-sap sle-module-desktop-applications15-sp5-updates-x86_64-sap\
-  sle-module-server-applications15-sp5-pool-x86_64-sap sle-module-server-applications15-sp5-updates-x86_64-sap\
-  sle-product-ha15-sp5-pool-x86_64-sap sle-product-ha15-sp5-updates-x86_64-sap\
-  sle-module-sap-applications15-sp5-pool-x86_64 sle-module-sap-applications15-sp5-updates-x86_64\
-  sle-manager-tools15-pool-x86_64-sap-sp5 sle-manager-tools15-updates-x86_64-sap-sp5
-
-  # mirror Channels for Alma8
-  mgr-sync add channels\
-  almalinux8-x86_64 almalinux8-appstream-x86_64\
-  res8-manager-tools-pool-x86_64-alma res8-manager-tools-updates-x86_64-alma
-
-  # mirror Channels for Alma9
-  mgr-sync add channels\
-  almalinux9-x86_64 almalinux9-appstream-x86_64\
-  el9-manager-tools-pool-x86_64-alma el9-manager-tools-updates-x86_64-alma
-
-  # mirror Channels for Amazon2
-  mgr-sync add channels\
-  amazonlinux2-core-x86_64\
-  res-7-suse-manager-tools-x86_64-amazon
-
-  # mirror Channels for centos7
-  mgr-sync add channels\
-  centos7-x86_64 centos7-updates-x86_64\
-  res-7-suse-manager-tools-x86_64-centos7
-
-  # mirror Channels for centos8
-  mgr-sync add channels\
-  centos8-x86_64 centos8-appstream-x86_64\
-  res8-manager-tools-pool-x86_64-centos8 res8-manager-tools-updates-x86_64-centos8
-  
-  # mirror Channels for debian10
-  mgr-sync add channels\
-  debian-10-pool-amd64\
-  debian-10-main-updates-amd64\
-  debian-10-main-security-amd64\
-  debian-10-suse-manager-tools-amd64
-
-  # mirror Channels for debian11
-  mgr-sync add channels\
-  debian-11-pool-amd64\
-  debian-11-main-updates-amd64\
-  debian-11-main-security-amd64\
-  debian-11-suse-manager-tools-amd64
-  
-  # mirror Channels for oracle7
-  mgr-sync add channels\
-  oraclelinux7-x86_64\
-  res-7-suse-manager-tools-x86_64-ol7
-
-  # mirror Channels for oracle8
-  mgr-sync add channels\
-  oraclelinux8-x86_64 oraclelinux8-appstream-x86_64\
-  res8-manager-tools-pool-x86_64-ol8 res8-manager-tools-updates-x86_64-ol8
-
-  # mirror Channels for oracle9
-  mgr-sync add channels\
-  oraclelinux9-x86_64 oraclelinux9-appstream-x86_64\
-  el9-manager-tools-pool-x86_64-ol9 el9-manager-tools-updates-x86_64-ol9
-
-  # mirror Channels for rhel7
-  mgr-sync add channels\
-  res7-x86_64 rhel-x86_64-server-7\
-  res7-suse-manager-tools-x86_64
-
-  # mirror Channels for rhel8
-  mgr-sync add channels\
-  rhel8-pool-x86_64\
-  res-8-updates-x86_64 res-as-8-updates-x86_64 res-cb-8-updates-x86_64\
-  res8-manager-tools-pool-x86_64 res8-manager-tools-updates-x86_64
-
-  # mirror Channels for rhel9
-  mgr-sync add channels\
-  el9-pool-x86_64\
-  sll-9-updates-x86_64 sll-as-9-updates-x86_64 sll-cb-9-updates-x86_64\
-  el9-manager-tools-pool-x86_64 el9-manager-tools-updates-x86_64
-
-  # mirror Channels for rocky8
-  mgr-sync add channels\
-  rockylinux-8-x86_64 rockylinux-8-appstream-x86_64\
-  res8-manager-tools-pool-x86_64-rocky res8-manager-tools-updates-x86_64-rocky
-
-  # mirror Channels for rocky9
-  mgr-sync add channels\
-  rockylinux-9-x86_64 rockylinux-9-appstream-x86_64\
-  el9-manager-tools-pool-x86_64-rocky el9-manager-tools-updates-x86_64-rocky
-  
-  # mirror Channels for ubuntu1804
-  mgr-sync add channels\
-  ubuntu-18.04-pool-amd64\
-  ubuntu-18.04-suse-manager-tools-amd64
-
-  # mirror Channels for ubuntu2004
-  mgr-sync add channels\
-  ubuntu-2004-amd64-main-amd64\
-  ubuntu-2004-amd64-main-security-amd64\
-  ubuntu-2004-amd64-main-updates-amd64\
-  ubuntu-20.04-suse-manager-tools-amd64
-
-  # mirror Channels for ubuntu2204
-  mgr-sync add channels\
-  ubuntu-2204-amd64-main-amd64\
-  ubuntu-2204-amd64-main-security-amd64\
-  ubuntu-2204-amd64-main-updates-amd64\
-  ubuntu-22.04-suse-manager-tools-amd64
 
 elif [ $DEPLOYMENT == "pre-setup43" ]; then  
   echo "Deployment: pre-setup43"
