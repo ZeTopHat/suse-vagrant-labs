@@ -23,7 +23,7 @@ ff02::3         ipv6-allhosts
 
 # Vagrant Populated
 $SUBNET.50  alma8.labs.suse.com         alma8
-$SUBNET.51  alma9.labs.suse.com         Alma9
+$SUBNET.51  alma9.labs.suse.com         alma9
 $SUBNET.52  amazon2.labs.suse.com       amazon2
 $SUBNET.53  centos7.labs.suse.com       centos7
 $SUBNET.54  centos8.labs.suse.com       centos8
