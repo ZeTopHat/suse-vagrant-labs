@@ -10,10 +10,10 @@ if [ "$MACHINE" == "auth12sp5" ]; then
     echo "training"
   elif [ "$DEPLOY" == "fulldeploy" ]; then
     zypper install -y krb5-client samba-client samba-libs samba-winbind openldap2-client cyrus-sasl-gssapi adcli sssd sssd-ldap sssd-ad sssd-tools
-    echo "server 192.168.0.26 iburst" >>/etc/ntp.conf
+    echo "server ${SUBNET}.26 iburst" >>/etc/ntp.conf
     sed -r -i 's/^NTPD_FORCE_SYNC_ON_STARTUP.*$/NTPD_FORCE_SYNC_ON_STARTUP="yes"/' /etc/sysconfig/ntp
     sed -r -i 's/^NTPD_FORCE_SYNC_HWCLOCK_ON_STARTUP.*$/NTPD_FORCE_SYNC_HWCLOCK_ON_STARTUP="yes"/' /etc/sysconfig/ntp
-    systemctl stop ntpd; ntpdate 192.168.0.26; systemctl start ntpd; systemctl enable ntpd
+    systemctl stop ntpd; ntpdate ${SUBNET}.26; systemctl start ntpd; systemctl enable ntpd
     mv /etc/krb5.conf{,.orig}
     mv /tmp/krb5.conf /etc/krb5.conf
     chown root:root /etc/krb5.conf
@@ -30,7 +30,7 @@ if [ "$MACHINE" == "auth12sp5" ]; then
     sed -r -i 's/^search.*$//' /etc/resolv.conf
     sed -r -i 's/^nameserver.*$//' /etc/resolv.conf
     echo "search labs.suse.com" >>/etc/resolv.conf
-    echo "nameserver 192.168.0.26" >>/etc/resolv.conf
+    echo "nameserver ${SUBNET}.26" >>/etc/resolv.conf
     # need to add net-config steps here
     net ads join -U Administrator%vagrant
     pam-config -a --mkhomedir --winbind

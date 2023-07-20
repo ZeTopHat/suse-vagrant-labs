@@ -67,6 +67,9 @@ Vagrant.configure("2") do |config|
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}iscsi/bootstrap.sh"
       s.args = "#{LABNAME}iscsi #{custom_vars["deployment"]}"
+      s.env = {
+        "SUBNET" => custom_vars["network"]["primarysubnet"]
+      }
     end
   end
 
@@ -104,6 +107,7 @@ Vagrant.configure("2") do |config|
       s.env = {
         "HAREGCODE" => secret_vars["haregcode"],
         "HAPRODUCT" => machine_vars["haproduct"],
+        "SUBNET" => custom_vars["network"]["primarysubnet"]
       }
     end
   end
@@ -137,6 +141,7 @@ Vagrant.configure("2") do |config|
       s.env = {
         "HAREGCODE" => secret_vars["haregcode"],
         "HAPRODUCT" => machine_vars["haproduct"],
+        "SUBNET" => custom_vars["network"]["primarysubnet"]
       }
     end
   end

@@ -2,4 +2,4 @@
 ipaddress: ".26"
 fqdn: "authdc01.labs.suse.com"
 short: "authdc01"
-ntpserver: "192.168.0.1"
+ntpserver: ".1"

@@ -6,7 +6,7 @@ DEPLOY=$2
 echo "Deploying ${MACHINE} ${DEPLOY} configurations..."
 
 if [ "$MACHINE" == "authldap" ]; then
-    echo "192.168.0.21 authkrb5.labs.suse.com authkrb5" >>/etc/hosts
+    echo "${SUBNET}.21 authkrb5.labs.suse.com authkrb5" >>/etc/hosts
     # ssl/tls section
     mkdir /root/certs/
     mv /tmp/{config-ca,config-authldap} /root/certs/
