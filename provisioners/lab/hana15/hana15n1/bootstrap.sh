@@ -47,7 +47,12 @@ if [ "$MACHINE" == "hana15n1" ]; then
     echo "softdog" > /etc/modules-load.d/watchdog.conf
     systemctl restart systemd-modules-load
     rescan-scsi-bus.sh
-    crm cluster init -s $(fdisk -l 2>/dev/null | grep "1 GiB" | awk '{print $2}' | cut -c 1-8) -i eth1 -y
+    until fdisk -l 2>/dev/null | grep " 1 GiB" ; do
+      echo "The iscsi SBD device is not yet available. Sleeping 10 seconds.."
+      sleep 10
+    done
+    echo "The iscsi SBD device $(fdisk -l 2>/dev/null | grep ' 1 GiB' | awk '{print $2}' | cut -c 1-8) was found! Continuing.."
+    crm cluster init -s $(fdisk -l 2>/dev/null | grep " 1 GiB" | awk '{print $2}' | cut -c 1-8) -i eth1 -y
     saptune solution apply HANA
     saptune service takeover
     saptune service enablestart
@@ -58,7 +63,13 @@ if [ "$MACHINE" == "hana15n1" ]; then
     echo "$(blkid | grep vdb1 | awk '{print $2}' | sed -e 's/\"//g') /hana xfs defaults 0 0" >>/etc/fstab
     mount -a
     echo "hxeadm ALL=(ALL) NOPASSWD: /usr/sbin/crm_attribute -n hana_hxe_site_srHook_*" >> /etc/sudoers
-    echo "Running join on ha15n2 now that the node is ready for it."
+    until ssh hana15n2 sbd -d $(fdisk -l 2>/dev/null | grep " 1 GiB" | awk '{print $2}' | cut -c 1-8) dump 2>/dev/null; do
+      echo "The SBD device is not readable yet on hana15n2. Rescanning scsi bus.."
+      ssh hana15n2 rescan-scsi-bus.sh
+      ssh hana15n2 systemctl restart iscsi
+      sleep 10
+    done
+    echo "Running join on hana15n2 now that the node is ready for it."
     ssh hana15n2 rescan-scsi-bus.sh
     ssh hana15n2 crm cluster join -y -i eth1 -c hana15n1
     /opt/hdblcm --hdbinst_server_import_content=off --batch --configfile=/tmp/install.rsp

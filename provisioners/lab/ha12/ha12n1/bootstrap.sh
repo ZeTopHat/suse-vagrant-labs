@@ -40,11 +40,22 @@ if [ "$MACHINE" == "ha12n1" ]; then
     sleep 30;
     echo "softdog" > /etc/modules-load.d/watchdog.conf
     systemctl restart systemd-modules-load
-    crm cluster init -s $(fdisk -l 2>/dev/null | grep "1 GiB" | awk '{print $2}' | cut -c 1-8) -i eth1 -y
+    until fdisk -l 2>/dev/null | grep " 1 GiB" ; do
+      echo "The iscsi SBD device is not yet available. Sleeping 10 seconds.."
+      sleep 10
+    done
+    echo "The iscsi SBD device $(fdisk -l 2>/dev/null | grep ' 1 GiB' | awk '{print $2}' | cut -c 1-8) was found! Continuing.."
+    crm cluster init -s $(fdisk -l 2>/dev/null | grep " 1 GiB" | awk '{print $2}' | cut -c 1-8) -i eth1 -y
     mkdir /shared
     mkdir /data
     mkdir -p /exports/data2
     systemctl enable nfsserver
+    until ssh ha12n2 sbd -d $(fdisk -l 2>/dev/null | grep " 1 GiB" | awk '{print $2}' | cut -c 1-8) dump 2>/dev/null; do
+      echo "The SBD device is not readable yet on ha12n2. Rescanning scsi bus.."
+      ssh ha12n2 rescan-scsi-bus.sh
+      ssh ha12n2 systemctl restart iscsi
+      sleep 10
+    done
     echo "Running join on ha12n2 now that the node is ready for it."
     ssh ha12n2 crm cluster join -y -i eth1 -c ha12n1
     crm configure load update /tmp/crm_ha12_part1.txt
