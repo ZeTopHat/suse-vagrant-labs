@@ -6,7 +6,7 @@ if [ "$ENVIRONMENT" == "SLE12" ]; then
   echo "Deploying common SLE 12 configurations..."
   SUSEConnect -r $SLEREGCODE
   sed -i 's/rpm.install.excludedocs = yes/rpm.install.excludedocs = no/' /etc/zypp/zypp.conf
-  zypper install -y --force ntp man man-pages-posix man-pages rsyslog aaa_base-extras wget zypper-log bash-doc $(for i in $(rpm -qa); do rpm -q -s $i | grep "not installed" | grep -E "man" >/dev/null; if [[ "$?" == "0" ]]; then echo $i; fi;  done)
+  zypper install -y --force ntp man man-pages-posix man-pages rsyslog aaa_base-extras wget zypper-log bash-doc logrotate $(for i in $(rpm -qa); do rpm -q -s $i | grep "not installed" | grep -E "man" >/dev/null; if [[ "$?" == "0" ]]; then echo $i; fi;  done)
   mandb -c >/dev/null 2>&1 &
   echo "server $NTPSERVER iburst" >>/etc/ntp.conf
   systemctl restart ntpd
@@ -16,7 +16,7 @@ elif [ "$ENVIRONMENT" == "SLE15" ]; then
   echo "Deploying common SLE 15 configurations..."
   SUSEConnect -r $SLEREGCODE
   sed -i 's/rpm.install.excludedocs = yes/rpm.install.excludedocs = no/' /etc/zypp/zypp.conf
-  zypper install -y --force chrony man man-pages-posix man-pages rsyslog aaa_base-extras wget zypper-log bash-doc $(for i in $(rpm -qa); do rpm -q -s $i | grep "not installed" | grep -E "man" >/dev/null; if [[ "$?" == "0" ]]; then echo $i; fi;  done)
+  zypper install -y --force chrony man man-pages-posix man-pages rsyslog aaa_base-extras wget zypper-log bash-doc logrotate $(for i in $(rpm -qa); do rpm -q -s $i | grep "not installed" | grep -E "man" >/dev/null; if [[ "$?" == "0" ]]; then echo $i; fi;  done)
   mandb -c >/dev/null 2>&1 &
   echo "maxdistance 16.0" >>/etc/chrony.conf
   echo "server $NTPSERVER" >>/etc/chrony.conf
@@ -26,7 +26,7 @@ elif [ "$ENVIRONMENT" == "SLE15" ]; then
 elif [ "$ENVIRONMENT" == "LEAP42" ]; then
   echo "Deploying common LEAP 42 configurations..."
   sed -i 's/rpm.install.excludedocs = yes/rpm.install.excludedocs = no/' /etc/zypp/zypp.conf
-  zypper install -y --force ntp man man-pages-posix man-pages rsyslog aaa_base-extras wget zypper-log bash-doc $(for i in $(rpm -qa); do rpm -q -s $i | grep "not installed" | grep -E "man" >/dev/null; if [[ "$?" == "0" ]]; then echo $i; fi;  done)
+  zypper install -y --force ntp man man-pages-posix man-pages rsyslog aaa_base-extras wget zypper-log bash-doc logrotate $(for i in $(rpm -qa); do rpm -q -s $i | grep "not installed" | grep -E "man" >/dev/null; if [[ "$?" == "0" ]]; then echo $i; fi;  done)
   mandb -c >/dev/null 2>&1 &
   echo "server $NTPSERVER iburst" >>/etc/ntp.conf
   systemctl restart ntpd
@@ -35,7 +35,7 @@ elif [ "$ENVIRONMENT" == "LEAP42" ]; then
 elif [ "$ENVIRONMENT" == "LEAP15" ]; then
   echo "Deploying common LEAP 15 configurations..."
   sed -i 's/rpm.install.excludedocs = yes/rpm.install.excludedocs = no/' /etc/zypp/zypp.conf
-  zypper install -y --force chrony man man-pages-posix man-pages rsyslog aaa_base-extras wget zypper-log bash-doc $(for i in $(rpm -qa); do rpm -q -s $i | grep "not installed" | grep -E "man" >/dev/null; if [[ "$?" == "0" ]]; then echo $i; fi;  done)
+  zypper install -y --force chrony man man-pages-posix man-pages rsyslog aaa_base-extras wget zypper-log bash-doc logrotate $(for i in $(rpm -qa); do rpm -q -s $i | grep "not installed" | grep -E "man" >/dev/null; if [[ "$?" == "0" ]]; then echo $i; fi;  done)
   mandb -c >/dev/null 2>&1 &
   echo "maxdistance 16.0" >>/etc/chrony.conf
   echo "server $NTPSERVER" >>/etc/chrony.conf
