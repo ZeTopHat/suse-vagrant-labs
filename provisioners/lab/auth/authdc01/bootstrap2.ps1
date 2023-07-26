@@ -1,6 +1,8 @@
 Write-Host "Attempting to create DNS zone... This may take several minutes."
 $zoneCreated = $false
 $subnet = "$Env:SUBNET"
+$dcip = "$Env:DCIP"
+$dcip = $dcip -replace "\."
 $ipaddress = $subnet + '.0/24'
 while (!$zoneCreated) {
     try {
@@ -17,5 +19,5 @@ $thirdO = ([version] "$subnet").Build
 $secondO = ([version] "$subnet").Minor
 $firstO = ([version] "$subnet").Major
 $zonename = "$thirdO" + "." + "$secondO" + "." + "$firstO" + ".in-addr.arpa"
-add-dnsserverresourcerecordptr -ZoneName $zonename -Name '26' -PTRDomainName 'authdc01.labs.suse.com.'
+add-dnsserverresourcerecordptr -ZoneName $zonename -Name $dcip -PTRDomainName 'authdc01.labs.suse.com.'
 Write-Host "Configuration complete."

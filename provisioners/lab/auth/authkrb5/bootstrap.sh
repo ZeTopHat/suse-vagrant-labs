@@ -6,7 +6,7 @@ DEPLOY=$2
 echo "Deploying ${MACHINE} ${DEPLOY} configurations..."
 
 if [ "$MACHINE" == "authkrb5" ]; then
-  echo "${SUBNET}.23 authldap.labs.suse.com authldap" >>/etc/hosts
+  echo "${SUBNET}${LDAPIP} authldap.labs.suse.com authldap" >>/etc/hosts
   if [ "$DEPLOY" == "training" ]; then
     echo "training"
   elif [ "$DEPLOY" == "fulldeploy" ]; then
