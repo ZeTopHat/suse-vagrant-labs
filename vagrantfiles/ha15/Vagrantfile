@@ -44,6 +44,8 @@ Vagrant.configure("2") do |config|
   # As of 08/31/22, package tgt-1.0.74-150400.1.4 on 15 SP4 causes NOP and firmware connection issues. When I installed the tgt-1.0.60-2.22 available on 15 SP1-SP3 the issue resolved.
   config.vm.define "#{LABNAME}iscsi" do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}iscsi.yaml")
+    n1_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n1.yaml")
+    n2_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n2.yaml")
     sle.vm.box = global_vars["box"]["sle15sp3"]
     sle.vm.box_url = global_vars["boxurl"]["sle15sp3"]
     sle.vm.hostname = machine_vars["fqdn"]
@@ -68,7 +70,9 @@ Vagrant.configure("2") do |config|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}iscsi/bootstrap.sh"
       s.args = "#{LABNAME}iscsi #{custom_vars["deployment"]}"
       s.env = {
-        "SUBNET" => custom_vars["network"]["primarysubnet"]
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "N1IP" => n1_vars["ipaddress"],
+        "N2IP" => n2_vars["ipaddress"]
       }
     end
   end
@@ -76,6 +80,8 @@ Vagrant.configure("2") do |config|
   # HA15 Cluster Node 1
   config.vm.define "#{LABNAME}n1" do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n1.yaml")
+    iscsi_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}iscsi.yaml")
+    n2_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n2.yaml")
     sle.vm.box = global_vars["box"]["sle15sp4"]
     sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
     sle.vm.hostname = machine_vars["fqdn"]
@@ -111,7 +117,9 @@ Vagrant.configure("2") do |config|
         "HAPRODUCT" => machine_vars["haproduct"],
         "FLOATINGIP1" => "#{custom_vars["network"]["primarysubnet"]}#{lab_vars["floatingip1"]}", 
         "FLOATINGIP2" => "#{custom_vars["network"]["primarysubnet"]}#{lab_vars["floatingip2"]}",
-        "SUBNET" => custom_vars["network"]["primarysubnet"]
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "ISCSIIP" => iscsi_vars["ipaddress"],
+        "N2IP" => n2_vars["ipaddress"]
       }
     end
   end
@@ -119,6 +127,8 @@ Vagrant.configure("2") do |config|
   # HA15 Cluster Node 2
   config.vm.define "#{LABNAME}n2" do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n2.yaml")
+    iscsi_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}iscsi.yaml")
+    n1_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n1.yaml")
     sle.vm.box = global_vars["box"]["sle15sp4"]
     sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
     sle.vm.hostname = machine_vars["fqdn"]
@@ -147,7 +157,9 @@ Vagrant.configure("2") do |config|
       s.env = {
         "HAREGCODE" => secret_vars["haregcode"],
         "HAPRODUCT" => machine_vars["haproduct"],
-        "SUBNET" => custom_vars["network"]["primarysubnet"]
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "ISCSIIP" => iscsi_vars["ipaddress"],
+        "N1IP" => n1_vars["ipaddress"]
       }
     end
   end
