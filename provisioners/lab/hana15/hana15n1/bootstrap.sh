@@ -27,15 +27,15 @@ if [ "$MACHINE" == "hana15n1" ]; then
   chown root:root /root/.ssh/id_rsa.pub
   zypper install -y open-iscsi lsscsi cron
   zypper install -y -t pattern ha_sles sap-hana
-  echo "${SUBNET}.162 hana15n2.labs.suse.com hana15n2" >>/etc/hosts
-  echo "${SUBNET}.160 hana15iscsi.labs.suse.com hana15iscsi" >>/etc/hosts
+  echo "${SUBNET}${N2IP} hana15n2.labs.suse.com hana15n2" >>/etc/hosts
+  echo "${SUBNET}${ISCSIIP} hana15iscsi.labs.suse.com hana15iscsi" >>/etc/hosts
   echo "InitiatorName=iqn.2022-08.com.suse.labs.hana15n1:initiator01" >/etc/iscsi/initiatorname.iscsi
   echo "node.session.auth.authmethod = CHAP" >>/etc/iscsi/iscsid.conf
   echo "node.session.auth.username = username" >>/etc/iscsi/iscsid.conf
   echo "node.session.auth.password = password" >>/etc/iscsi/iscsid.conf
   sed -i 's/node.startup = manual/node.startup = automatic/g' /etc/iscsi/iscsid.conf 
   systemctl enable --now iscsi iscsid
-  iscsiadm -m discovery -t sendtargets -p ${SUBNET}.160
+  iscsiadm -m discovery -t sendtargets -p ${SUBNET}${ISCSIIP}
   iscsiadm --mode node --target iqn.2022-08.com.suse.labs.hana15iscsi:hana15 --portal hana15iscsi.labs.suse.com:3260 -o new
   systemctl restart iscsi iscsid
   if [ "$DEPLOY" == "training" ]; then

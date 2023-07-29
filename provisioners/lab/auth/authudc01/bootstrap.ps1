@@ -6,7 +6,8 @@ $secured2 = ConvertTo-SecureString 'vagrant' -AsPlainText -Force
 $username = "LABS\Administrator"
 $credentials = New-Object System.Management.Automation.PSCredential -ArgumentList $username, $secured2
 $subnet = "$Env:SUBNET"
-$ipaddress = $subnet + '.26'
+$dcip = "$Env:DCIP"
+$ipaddress = $subnet + $dcip
 Set-DNSClientServerAddress "Ethernet" -ServerAddresses ($ipaddress)
 Set-DNSClientServerAddress "Ethernet 2" -ServerAddresses ($ipaddress)
 Install-ADDSDomain -ADPrepCredential $credentials -Credential $credentials -NewDomainName 'us' -ParentDomainName 'labs.suse.com' -DomainType 'ChildDomain' -ReplicationSourceDC 'authdc01.labs.suse.com' -InstallDNS -CreateDnsDelegation -DnsDelegationCredential $credentials -SafeModeAdministratorPassword $secured -SkipPreChecks -Force

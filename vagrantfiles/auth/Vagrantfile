@@ -50,6 +50,7 @@ Vagrant.configure("2") do |config|
   
   config.vm.define "#{LABNAME}12sp5" do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}12sp5.yaml")
+    dc_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}dc01.yaml")
     sle.vm.box = global_vars["box"]["sle12sp5"]
     sle.vm.box_url = global_vars["boxurl"]["sle12sp5"]
     sle.vm.hostname = machine_vars["fqdn"]
@@ -72,7 +73,8 @@ Vagrant.configure("2") do |config|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}12sp5/bootstrap.sh"
       s.args = "#{LABNAME}12sp5 #{custom_vars["deployment"]}"
       s.env = {
-        "SUBNET" => custom_vars["network"]["primarysubnet"]
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "DCIP" => dc_vars["ipaddress"]
       }
     end
   end
@@ -80,6 +82,7 @@ Vagrant.configure("2") do |config|
   # 15 Auth Client
   config.vm.define "#{LABNAME}15sp4" do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}15sp4.yaml")
+    dc_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}dc01.yaml")
     sle.vm.box = global_vars["box"]["sle15sp4"]
     sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
     sle.vm.hostname = machine_vars["fqdn"]
@@ -102,7 +105,8 @@ Vagrant.configure("2") do |config|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15sp4/bootstrap.sh"
       s.args = "#{LABNAME}15sp4 #{custom_vars["deployment"]}"
       s.env = {
-        "SUBNET" => custom_vars["network"]["primarysubnet"]
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "DCIP" => dc_vars["ipaddress"]
       }
     end
   end
@@ -110,6 +114,7 @@ Vagrant.configure("2") do |config|
   # OpenLDAP2 Server
   config.vm.define "#{LABNAME}ldap" do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}ldap.yaml")
+    krb5_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}krb5.yaml")
     sle.vm.box = global_vars["box"]["sle12sp5"]
     sle.vm.box_url = global_vars["boxurl"]["sle12sp5"]
     sle.vm.hostname = machine_vars["fqdn"]
@@ -138,7 +143,8 @@ Vagrant.configure("2") do |config|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}ldap/bootstrap.sh"
       s.args = "#{LABNAME}ldap #{custom_vars["deployment"]}"
       s.env = {
-        "SUBNET" => custom_vars["network"]["primarysubnet"]
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "KRB5IP" => krb5_vars["ipaddress"]
       }
     end
   end
@@ -178,6 +184,7 @@ Vagrant.configure("2") do |config|
   # Kerberos Server
   config.vm.define "#{LABNAME}krb5" do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}krb5.yaml")
+    ldap_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}ldap.yaml")
     sle.vm.box = global_vars["box"]["sle15sp4"]
     sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
     sle.vm.hostname = machine_vars["fqdn"]
@@ -200,7 +207,8 @@ Vagrant.configure("2") do |config|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}krb5/bootstrap.sh"
       s.args = "#{LABNAME}krb5 #{custom_vars["deployment"]}"
       s.env = {
-        "SUBNET" => custom_vars["network"]["primarysubnet"]
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "LDAPIP" => ldap_vars["ipaddress"]
       }
     end
   end
@@ -233,7 +241,8 @@ Vagrant.configure("2") do |config|
     windows.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}dc01/bootstrap2.ps1"
       s.env = {
-        "SUBNET" => custom_vars["network"]["primarysubnet"]
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "DCIP" => machine_vars["ipaddress"]
       }
     end
   end
@@ -241,6 +250,7 @@ Vagrant.configure("2") do |config|
   # Windows AD Server 2019, authudc01.labs.suse.com
   config.vm.define "#{LABNAME}udc01", autostart: false do |windows|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}udc01.yaml")
+    dc_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}dc01.yaml")
     windows.vm.box = global_vars["box"]["windows2019"]
     windows.vm.box_version = ">= 0"
     windows.vm.guest = :windows
@@ -263,7 +273,8 @@ Vagrant.configure("2") do |config|
     windows.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}udc01/bootstrap.ps1"
       s.env = {
-        "SUBNET" => custom_vars["network"]["primarysubnet"]
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "DCIP" => dc_vars["ipaddress"]
       }
     end
     windows.vm.provision "shell" do |s|

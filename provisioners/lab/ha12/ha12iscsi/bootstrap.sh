@@ -7,8 +7,8 @@ echo "Deploying ${MACHINE} ${DEPLOY} configurations..."
 
 if [ "$MACHINE" == "ha12iscsi" ]; then
   zypper install -y tgt
-  echo "${SUBNET}.121 ha12n1.labs.suse.com ha12n1" >>/etc/hosts
-  echo "${SUBNET}.122 ha12n2.labs.suse.com ha12n2" >>/etc/hosts
+  echo "${SUBNET}${N1IP} ha12n1.labs.suse.com ha12n1" >>/etc/hosts
+  echo "${SUBNET}${N2IP} ha12n2.labs.suse.com ha12n2" >>/etc/hosts
   mkdir /var/lib/ha12iscsi_disks
   dd if=/dev/zero of=/var/lib/ha12iscsi_disks/ha12_disk01.img count=0 bs=1 seek=10G
   dd if=/dev/zero of=/var/lib/ha12iscsi_disks/ha12_disk02.img count=0 bs=1 seek=10G

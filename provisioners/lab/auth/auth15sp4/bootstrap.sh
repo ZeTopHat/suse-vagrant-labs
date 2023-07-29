@@ -14,7 +14,7 @@ if [ "$MACHINE" == "auth15sp4" ]; then
   elif [ "$DEPLOY" == "fulldeploy" ]; then
     zypper install -y krb5-client adcli sssd sssd-ldap sssd-ad sssd-tools openldap2-client cyrus-sasl-gssapi samba-client samba-libs samba-winbind
     echo "maxdistance 16.0" >>/etc/chrony.conf
-    echo "server ${SUBNET}.26" >>/etc/chrony.conf
+    echo "server ${SUBNET}${DCIP}" >>/etc/chrony.conf
     systemctl start chronyd && systemctl enable chronyd && chronyc makestep
     mv /etc/krb5.conf{,.orig}
     mv /tmp/krb5.conf /etc/krb5.conf
@@ -31,7 +31,7 @@ if [ "$MACHINE" == "auth15sp4" ]; then
     sed -r -i 's/^search.*$//' /etc/resolv.conf
     sed -r -i 's/^nameserver.*$//' /etc/resolv.conf
     echo "search labs.suse.com" >>/etc/resolv.conf
-    echo "nameserver ${SUBNET}.26" >>/etc/resolv.conf
+    echo "nameserver ${SUBNET}${DCIP}" >>/etc/resolv.conf
     # need to add net-config changes
     echo "vagrant" | adcli join -D labs.suse.com -U Administrator --stdin-password
     pam-config -a --mkhomedir --sss

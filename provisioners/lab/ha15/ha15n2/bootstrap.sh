@@ -20,15 +20,15 @@ if [ "$MACHINE" == "ha15n2" ]; then
   chown root:root /root/.ssh/id_rsa.pub
   zypper install -y open-iscsi lsscsi cron xfsprogs nfs-kernel-server nfs-client
   zypper install -y -t pattern ha_sles
-  echo "${SUBNET}.151 ha15n1.labs.suse.com ha15n1" >>/etc/hosts
-  echo "${SUBNET}.150 ha15iscsi.labs.suse.com ha15iscsi" >>/etc/hosts
+  echo "${SUBNET}${N1IP} ha15n1.labs.suse.com ha15n1" >>/etc/hosts
+  echo "${SUBNET}${ISCSIIP} ha15iscsi.labs.suse.com ha15iscsi" >>/etc/hosts
   echo "InitiatorName=iqn.2022-08.com.suse.labs.ha15n2:initiator02" >/etc/iscsi/initiatorname.iscsi
   echo "node.session.auth.authmethod = CHAP" >>/etc/iscsi/iscsid.conf
   echo "node.session.auth.username = username" >>/etc/iscsi/iscsid.conf
   echo "node.session.auth.password = password" >>/etc/iscsi/iscsid.conf
   sed -i 's/node.startup = manual/node.startup = automatic/g' /etc/iscsi/iscsid.conf 
   systemctl enable --now iscsi iscsid
-  iscsiadm -m discovery -t sendtargets -p ${SUBNET}.150
+  iscsiadm -m discovery -t sendtargets -p ${SUBNET}${ISCSIIP}
   iscsiadm --mode node --target iqn.2022-08.com.suse.labs.ha15iscsi:ha15 --portal ha15iscsi.labs.suse.com:3260 -o new
   systemctl restart iscsi iscsid
   # these need to be done after iscsi and softdog to avoid issues when the kernel updates

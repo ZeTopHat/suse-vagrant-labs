@@ -7,8 +7,8 @@ echo "Deploying ${MACHINE} ${DEPLOY} configurations..."
 
 if [ "$MACHINE" == "ha15iscsi" ]; then
   zypper install -y tgt
-  echo "${SUBNET}.151 ha15n1.labs.suse.com ha15n1" >>/etc/hosts
-  echo "${SUBNET}.152 ha15n2.labs.suse.com ha15n2" >>/etc/hosts
+  echo "${SUBNET}${N1IP} ha15n1.labs.suse.com ha15n1" >>/etc/hosts
+  echo "${SUBNET}${N2IP} ha15n2.labs.suse.com ha15n2" >>/etc/hosts
   mkdir /var/lib/ha15iscsi_disks
   dd if=/dev/zero of=/var/lib/ha15iscsi_disks/ha15_disk01.img count=0 bs=1 seek=10G
   dd if=/dev/zero of=/var/lib/ha15iscsi_disks/ha15_disk02.img count=0 bs=1 seek=10G
