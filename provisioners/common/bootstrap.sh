@@ -47,12 +47,16 @@ elif [ "$ENVIRONMENT" == "RHE8" ]; then
   sed -i 's/enabled=1/enabled=0/' /etc/yum.repos.d/epel.repo
   dnf clean all
   mv /etc/dnf/protected.d/redhat-release.conf /root/
-  # curl -Sks https://suma-mainlab-1.gtslab.prv.suse.com/pub/bootstrap/bootstrap-res8.sh | /bin/bash
+  # curl -Sks https://<SUMASERVER>/pub/bootstrap/bootstrap-res8.sh | /bin/bash
   # After accepting key in suma we want a "dnf install screen" and then a "dnf update"
 elif [ "$ENVIRONMENT" == "OE8" ]; then
   hostnamectl set-hostname $FQDN
-  # curl -Sks https://suma-mainlab-1.gtslab.prv.suse.com/pub/bootstrap/bootstrap-res8.sh | /bin/bash
+  # curl -Sks https://<SUMASERVER>/pub/bootstrap/bootstrap-oel8.sh | /bin/bash
   # After accepting key in suma we want a "dnf install screen" and then a "dnf update"
+elif [ "$ENVIRONMENT" == "OE6" ]; then
+  hostname $FQDN
+  # curl -Sks https://<SUMASERVER>/pub/bootstrap/bootstrap-oel6.sh | /bin/bash
+  # After accepting key in suma we want a "yum install screen" and then a "yum update"
 else
   echo "Environment not recognized."
 fi
