@@ -16,6 +16,7 @@ box:
   rhel7: "generic/rhel7"
   rhel8: "generic/rhel8"
   rhel9: "generic/rhel9"
+  oel6: "generic/oracle6"
   oel7: "generic/oracle7"
   oel8: "generic/oracle8"
   oel9: "generic/oracle9"
