@@ -1,0 +1,6 @@
+---
+ipaddress: ".172"
+fqdn: "s4hana02.labs.suse.com"
+short: "s4hana02"
+ntpserver: ".1"
+sapproduct: "SLES_SAP/15.4/x86_64"

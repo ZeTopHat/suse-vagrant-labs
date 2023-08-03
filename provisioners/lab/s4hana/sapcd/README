@@ -1,0 +1,5 @@
+This Directory needs to be populated with a valid extracted SAP S4 HANA CD.
+
+Example:
+
+# rsync -ahP rabble.suse.cloud::rabble/iso/sap/NW75andS4HANA/sapcd/ provisioners/lab/s4hana/sapcd/
