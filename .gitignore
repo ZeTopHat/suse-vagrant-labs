@@ -4,3 +4,5 @@ config/secret.yaml
 .build/
 provisioners/lab/hana15/hanaiso/*
 !provisioners/lab/hana15/hanaiso/README
+provisioners/lab/s4hana/sapcd/*
+!provisioners/lab/s4hana/sapcd/README

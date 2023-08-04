@@ -1,0 +1,18 @@
+primitive rsc_fs_S4H_ERS10 Filesystem \
+	params device="/dev/sdb1" directory="/usr/sap/S4H/ERS10" fstype=xfs \
+	op start timeout=60s interval=0 \
+	op stop timeout=60s interval=0 \
+	op monitor interval=20s timeout=40s
+primitive rsc_ip_S4H_ERS10 IPaddr2 \
+	params ip=FLOATINGIP2 \
+	op monitor interval=10s timeout=20s
+primitive rsc_sap_S4H_ERS10 SAPInstance \
+	operations $id=rsc_sap_S4H_ERS10-operations \
+	op start interval=0 timeout=180 \
+	op monitor interval=11 timeout=60 on_fail=restart \
+	params InstanceName=S4H_ERS10_ns4ers \
+	START_PROFILE="/usr/sap/S4H/SYS/profile/S4H_ERS10_s4hers" \
+	AUTOMATIC_RECOVER=false  IS_ERS=true \
+	meta priority=1000
+
+group grp_S4H_ERS10 rsc_ip_S4H_ERS10 rsc_fs_S4H_ERS10 rsc_sap_S4H_ERS10

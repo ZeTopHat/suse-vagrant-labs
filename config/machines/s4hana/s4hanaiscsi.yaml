@@ -1,0 +1,5 @@
+---
+ipaddress: ".170"
+fqdn: "s4hanaiscsi.labs.suse.com"
+short: "s4hanaiscsi"
+ntpserver: ".1"

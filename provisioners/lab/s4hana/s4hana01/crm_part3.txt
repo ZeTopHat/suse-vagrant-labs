@@ -1,0 +1,4 @@
+colocation col_sap_S4H_no_both -5000: grp_S4H_ERS10 grp_S4H_ASCS00 
+## ENSA1 ## location loc_sap_S4H_failover_to_ers rsc_sap_S4H_ASCS00 \
+## ENSA1 ##    rule 2200: runs_ers_S4H eq 1
+order ord_sap_S4H_first_start_ascs Optional: rsc_sap_S4H_ASCS00:start rsc_sap_S4H_ERS10:stop symmetrical=false
