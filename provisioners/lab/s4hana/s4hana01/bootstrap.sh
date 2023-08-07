@@ -81,10 +81,10 @@ if [ "$MACHINE" == "s4hana01" ]; then
     mv /tmp/ascs /s4hconfigs/
     mv /tmp/ers /s4hconfigs/
     chown -R root:sapinst /s4hconfigs
-    /sapcd/SWPM/sapinst SAPINST_SKIP_ERRORSTEP=true SAPINST_USE_HOSTNAME=s4hascs SAPINST_INIT_LOGDIR=/ascs_install/ SAPINST_SECUDIR=/ers_install/ SAPINST_CWD=/ascs_install/ SAPINST_INPUT_PARAMETERS_URL=/s4hconfigs/ascs/inifile.params SAPINST_EXECUTE_PRODUCT_ID=NW_ABAP_ASCS:S4HANA1909.CORE.HDB.ABAPHA SAPINST_SKIP_DIALOGS=true
+    /sapcd/SWPM/sapinst SAPINST_SKIP_ERRORSTEP=true SAPINST_USE_HOSTNAME=s4hascs SAPINST_INIT_LOGDIR=/ascs_install/ SAPINST_SECUDIR=/ers_install/ SAPINST_CWD=/ascs_install/ SAPINST_INPUT_PARAMETERS_URL=/s4hconfigs/ascs/inifile.params SAPINST_EXECUTE_PRODUCT_ID=NW_ABAP_ASCS:S4HANA1909.CORE.HDB.ABAPHA SAPINST_SKIP_DIALOGS=true SAPINST_START_GUI=false SAPINST_START_GUISERVER=false
     rm -rf /tmp/sapinst_instdir
     ip addr add dev eth1 ${FLOATINGIP2}/24
-    /sapcd/SWPM/sapinst SAPINST_SKIP_ERRORSTEP=true SAPINST_USE_HOSTNAME=s4hers SAPINST_INIT_LOGDIR=/ers_install/ SAPINST_SECUDIR=/ers_install/ SAPINST_CWD=/ers_install/ SAPINST_INPUT_PARAMETERS_URL=/s4hconfigs/ers/inifile.params SAPINST_EXECUTE_PRODUCT_ID=NW_ERS:S4HANA1909.CORE.HDB.ABAPHA SAPINST_SKIP_DIALOGS=true
+    /sapcd/SWPM/sapinst SAPINST_SKIP_ERRORSTEP=true SAPINST_USE_HOSTNAME=s4hers SAPINST_INIT_LOGDIR=/ers_install/ SAPINST_SECUDIR=/ers_install/ SAPINST_CWD=/ers_install/ SAPINST_INPUT_PARAMETERS_URL=/s4hconfigs/ers/inifile.params SAPINST_EXECUTE_PRODUCT_ID=NW_ERS:S4HANA1909.CORE.HDB.ABAPHA SAPINST_SKIP_DIALOGS=true SAPINST_START_GUI=false SAPINST_START_GUISERVER=false
     rsync -ahP /usr/sap/sapservices s4hana02:/usr/sap/sapservices
     rsync -ahP /etc/services s4hana02:/etc/services
     rsync -ahP /home/s4hadm/.cshrc s4hana02:/home/s4hadm/
