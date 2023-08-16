@@ -1,5 +1,5 @@
 primitive fs-data Filesystem \
-        params directory="/data" fstype=xfs device="/dev/sdb1" \
+        params directory="/data" fstype=xfs device="FSDATA" \
         op start timeout=60s interval=0 \
         op stop timeout=60s interval=0 \
         op monitor interval=20s timeout=40s

@@ -1,5 +1,5 @@
 primitive nfs-fs Filesystem \
-        params device="/dev/sdb2" directory="/exports/data2" fstype=ext4 \
+        params device="NFSFS" directory="/exports/data2" fstype=ext4 \
         op start timeout=60s interval=0 \
         op stop timeout=60s interval=0 \
         op monitor timeout=40s interval=20s
@@ -20,3 +20,4 @@ primitive nfs-vip IPaddr2 \
 group g-nfs nfs-fs nfs-data2 nfs-vip
 
 colocation nfs-mount-not-with-export -inf: nfs-mount:Started g-nfs:Started
+order export-then-nfs-mount Mandatory: g-nfs nfs-mount
