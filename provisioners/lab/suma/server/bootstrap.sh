@@ -331,3 +331,6 @@ fi
 
 sh -c 'echo root:sumapass | chpasswd'
 echo "Finished deploying suma_server ${DEPLOYMENT} configurations."
+
+echo -e "SUSE Manager IP Addresses\n---"
+ip a |grep "inet " | grep -v 127 | awk '{print $2}' | rev | cut -c 4- | rev
