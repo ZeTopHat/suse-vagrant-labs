@@ -1,5 +1,5 @@
 primitive rsc_fs_S4H_ASCS00 Filesystem \
-	params device="/dev/sda1" directory="/usr/sap/S4H/ASCS00" fstype=xfs \
+	params device="ASCSDATA" directory="/usr/sap/S4H/ASCS00" fstype=xfs \
 	op start timeout=60s interval=0 \
 	op stop timeout=60s interval=0 \
 	op monitor interval=20s timeout=40s

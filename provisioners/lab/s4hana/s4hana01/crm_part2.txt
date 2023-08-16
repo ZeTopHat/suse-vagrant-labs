@@ -1,5 +1,5 @@
 primitive rsc_fs_S4H_ERS10 Filesystem \
-	params device="/dev/sdb1" directory="/usr/sap/S4H/ERS10" fstype=xfs \
+	params device="ERSDATA" directory="/usr/sap/S4H/ERS10" fstype=xfs \
 	op start timeout=60s interval=0 \
 	op stop timeout=60s interval=0 \
 	op monitor interval=20s timeout=40s

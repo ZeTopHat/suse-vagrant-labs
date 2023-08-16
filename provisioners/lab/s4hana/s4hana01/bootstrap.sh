@@ -53,8 +53,10 @@ if [ "$MACHINE" == "s4hana01" ]; then
       echo "The iscsi SBD device is not yet available. Sleeping 10 seconds.."
       sleep 10
     done
-    echo "The iscsi SBD device $(fdisk -l 2>/dev/null | grep ' 1 GiB' | awk '{print $2}' | cut -c 1-8) was found! Continuing.."
-    crm cluster init -s $(fdisk -l 2>/dev/null | grep " 1 GiB" | awk '{print $2}' | cut -c 1-8) -i eth1 -y
+    DEV=$(fdisk -l 2>/dev/null | grep ' 1 GiB' | awk '{print $2}' | cut -c 1-8 | sed 's/\/dev\///' )
+    BYID=$(ls -l /dev/disk/by-id/ | grep "$DEV" | head -1 | awk '{print $9}' | sed 's/^/\/dev\/disk\/by-id\//' )
+    echo "The iscsi SBD device ${BYID} was found! Continuing.."
+    crm cluster init -s ${BYID} -i eth1 -y
     saptune solution apply S4HANA-APPSERVER
     saptune service takeover
     saptune service enablestart
@@ -93,7 +95,7 @@ if [ "$MACHINE" == "s4hana01" ]; then
     echo 'service/halib_cluster_connector = /usr/bin/sap_suse_cluster_connector' >> /usr/sap/S4H/SYS/profile/S4H_ASCS00_s4hascs
     echo 'service/halib = $(DIR_CT_RUN)/saphascriptco.so' >> /usr/sap/S4H/SYS/profile/S4H_ERS10_s4hers
     echo 'service/halib_cluster_connector = /usr/bin/sap_suse_cluster_connector' >> /usr/sap/S4H/SYS/profile/S4H_ERS10_s4hers
-    until ssh s4hana02 sbd -d $(fdisk -l 2>/dev/null | grep " 1 GiB" | awk '{print $2}' | cut -c 1-8) dump 2>/dev/null; do
+    until ssh s4hana02 sbd -d ${BYID} dump 2>/dev/null; do
       echo "The SBD device is not readable yet on s4hana02. Rescanning scsi bus.."
       ssh s4hana02 rescan-scsi-bus.sh
       ssh s4hana02 systemctl restart iscsi
@@ -103,8 +105,12 @@ if [ "$MACHINE" == "s4hana01" ]; then
     ssh s4hana02 rescan-scsi-bus.sh
     ssh s4hana02 crm cluster join -y -i eth1 -c s4hana01
     sed -i "s/FLOATINGIP1/${FLOATINGIP1}/" /tmp/crm_part1.txt
+    ASCSDATA=$(ls -l /dev/disk/by-id/ | grep "$(fdisk -l | grep '10 GiB' | awk '{print $2}' | head -1 | tr -d \: | sed 's/\/dev\///' )1" | head -1 | awk '{print $9}' | sed 's/^/\\\/dev\\\/disk\\\/by-id\\\//' )
+    sed -i "s/ASCSDATA/${ASCSDATA}/" /tmp/crm_part1.txt
     crm configure load update /tmp/crm_part1.txt
     sed -i "s/FLOATINGIP2/${FLOATINGIP2}/" /tmp/crm_part2.txt
+    ERSDATA=$(ls -l /dev/disk/by-id/ | grep "$(fdisk -l | grep '10 GiB' | awk '{print $2}' | tail -1 | tr -d \: | sed 's/\/dev\///' )1" | head -1 | awk '{print $9}' | sed 's/^/\\\/dev\\\/disk\\\/by-id\\\//' )
+    sed -i "s/ERSDATA/${ERSDATA}/" /tmp/crm_part2.txt
     crm configure load update /tmp/crm_part2.txt
     crm configure load update /tmp/crm_part3.txt
     usermod -a -G haclient s4hadm
