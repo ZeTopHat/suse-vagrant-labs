@@ -8,6 +8,8 @@ $credentials = New-Object System.Management.Automation.PSCredential -ArgumentLis
 $subnet = "$Env:SUBNET"
 $dcip = "$Env:DCIP"
 $ipaddress = $subnet + $dcip
-Set-DNSClientServerAddress "Ethernet" -ServerAddresses ($ipaddress)
-Set-DNSClientServerAddress "Ethernet 2" -ServerAddresses ($ipaddress)
+$interface1 = Get-DNSClientServerAddress | Where-Object AddressFamily -Like 2 | select InterfaceAlias -First 1 -ExpandProperty InterfaceAlias
+$interface2 = Get-DNSClientServerAddress | Where-Object AddressFamily -Like 2 | select InterfaceAlias -First 2 -ExpandProperty InterfaceAlias | select -Last 1
+Set-DNSClientServerAddress $interface1 -ServerAddresses ($ipaddress)
+Set-DNSClientServerAddress $interface2 -ServerAddresses ($ipaddress)
 Install-ADDSDomain -ADPrepCredential $credentials -Credential $credentials -NewDomainName 'us' -ParentDomainName 'labs.suse.com' -DomainType 'ChildDomain' -ReplicationSourceDC 'authdc01.labs.suse.com' -InstallDNS -CreateDnsDelegation -DnsDelegationCredential $credentials -SafeModeAdministratorPassword $secured -SkipPreChecks -Force
