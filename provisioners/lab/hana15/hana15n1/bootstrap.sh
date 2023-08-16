@@ -51,8 +51,10 @@ if [ "$MACHINE" == "hana15n1" ]; then
       echo "The iscsi SBD device is not yet available. Sleeping 10 seconds.."
       sleep 10
     done
-    echo "The iscsi SBD device $(fdisk -l 2>/dev/null | grep ' 1 GiB' | awk '{print $2}' | cut -c 1-8) was found! Continuing.."
-    crm cluster init -s $(fdisk -l 2>/dev/null | grep " 1 GiB" | awk '{print $2}' | cut -c 1-8) -i eth1 -y
+    DEV=$(fdisk -l 2>/dev/null | grep ' 1 GiB' | awk '{print $2}' | cut -c 1-8 | sed 's/\/dev\///' )
+    BYID=$(ls -l /dev/disk/by-id/ | grep "$DEV" | head -1 | awk '{print $9}' | sed 's/^/\/dev\/disk\/by-id\//' )
+    echo "The iscsi SBD device ${BYID} was found! Continuing.."
+    crm cluster init -s ${BYID} -i eth1 -y
     saptune solution apply HANA
     saptune service takeover
     saptune service enablestart
@@ -63,7 +65,7 @@ if [ "$MACHINE" == "hana15n1" ]; then
     echo "$(blkid | grep vdb1 | awk '{print $2}' | sed -e 's/\"//g') /hana xfs defaults 0 0" >>/etc/fstab
     mount -a
     echo "hxeadm ALL=(ALL) NOPASSWD: /usr/sbin/crm_attribute -n hana_hxe_site_srHook_*" >> /etc/sudoers
-    until ssh hana15n2 sbd -d $(fdisk -l 2>/dev/null | grep " 1 GiB" | awk '{print $2}' | cut -c 1-8) dump 2>/dev/null; do
+    until ssh hana15n2 sbd -d ${BYID} dump 2>/dev/null; do
       echo "The SBD device is not readable yet on hana15n2. Rescanning scsi bus.."
       ssh hana15n2 rescan-scsi-bus.sh
       ssh hana15n2 systemctl restart iscsi
