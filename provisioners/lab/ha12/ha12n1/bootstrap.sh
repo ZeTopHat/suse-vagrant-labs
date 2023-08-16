@@ -44,13 +44,15 @@ if [ "$MACHINE" == "ha12n1" ]; then
       echo "The iscsi SBD device is not yet available. Sleeping 10 seconds.."
       sleep 10
     done
-    echo "The iscsi SBD device $(fdisk -l 2>/dev/null | grep ' 1 GiB' | awk '{print $2}' | cut -c 1-8) was found! Continuing.."
-    crm cluster init -s $(fdisk -l 2>/dev/null | grep " 1 GiB" | awk '{print $2}' | cut -c 1-8) -i eth1 -y
+    DEV=$(fdisk -l 2>/dev/null | grep ' 1 GiB' | awk '{print $2}' | cut -c 1-8 | sed 's/\/dev\///' )
+    BYID=$(ls -l /dev/disk/by-id/ | grep "$DEV" | head -1 | awk '{print $9}' | sed 's/^/\/dev\/disk\/by-id\//' )
+    echo "The iscsi SBD device ${BYID} was found! Continuing.."
+    crm cluster init -s ${BYID} -i eth1 -y
     mkdir /shared
     mkdir /data
     mkdir -p /exports/data2
     systemctl enable nfsserver
-    until ssh ha12n2 sbd -d $(fdisk -l 2>/dev/null | grep " 1 GiB" | awk '{print $2}' | cut -c 1-8) dump 2>/dev/null; do
+    until ssh ha12n2 sbd -d ${BYID} dump 2>/dev/null; do
       echo "The SBD device is not readable yet on ha12n2. Rescanning scsi bus.."
       ssh ha12n2 rescan-scsi-bus.sh
       ssh ha12n2 systemctl restart iscsi
@@ -64,12 +66,16 @@ if [ "$MACHINE" == "ha12n1" ]; then
     ssh ha12n2 rescan-scsi-bus.sh
     mkfs.xfs /dev/sdb1
     sed -i "s/FLOATINGIP1/${FLOATINGIP1}/" /tmp/crm_ha12_part3.txt
+    FSDATA=$(ls -l /dev/disk/by-id/ | grep "sdb1" | head -1 | awk '{print $9}' | sed 's/^/\\\/dev\\\/disk\\\/by-id\\\//' )
+    sed -i "s/FSDATA/${FSDATA}/" /tmp/crm_ha12_part3.txt
     crm configure load update /tmp/crm_ha12_part3.txt
     sleep 5
     mkfs.ext4 /dev/sdb2
     systemctl enable --now nfsserver
     ssh ha12n2 systemctl enable --now nfsserver
     sed -i "s/FLOATINGIP2/${FLOATINGIP2}/" /tmp/crm_ha12_part4.txt
+    NFSFS=$(ls -l /dev/disk/by-id/ | grep "sdb2" | head -1 | awk '{print $9}' | sed 's/^/\\\/dev\\\/disk\\\/by-id\\\//' )
+    sed -i "s/NFSFS/${NFSFS}/" /tmp/crm_ha12_part4.txt
     crm configure load update /tmp/crm_ha12_part4.txt
     sleep 5
     pvcreate /dev/sda
