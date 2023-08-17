@@ -334,3 +334,7 @@ echo "Finished deploying suma_server ${DEPLOYMENT} configurations."
 
 echo -e "SUSE Manager IP Addresses\n---"
 ip a |grep "inet " | grep -v 127 | awk '{print $2}' | rev | cut -c 4- | rev
+
+echo -e "Passwords\n---\nsuma - root:sumapass | admin:sumapass"
+echo -e "proxy - root:proxypass"
+echo -e "clients - root:linux"
