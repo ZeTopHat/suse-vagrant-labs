@@ -22,7 +22,7 @@ box:
   oel9: "generic/oracle9"
   alma8: "generic/alma8"
   alma9: "generic/alma9"
-  amazon2: "bento/amazonlinux-2"
+  amazon2: "nixwei/amazon-linux-2"
   centos7: "generic/centos7"
   centos8: "generic/centos8"
   debian10: "generic/debian10"
