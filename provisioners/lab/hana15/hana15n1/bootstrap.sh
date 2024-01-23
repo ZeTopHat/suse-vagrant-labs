@@ -86,7 +86,6 @@ if [ "$MACHINE" == "hana15n1" ]; then
     /opt/hdblcm --hdbinst_server_import_content=off --batch --configfile=/tmp/install.rsp
     /usr/sap/HXE/HDB00/exe/hdbsql -p SuSE1234 -u SYSTEM -d SYSTEMDB "BACKUP DATA FOR FULL SYSTEM USING FILE ('backup')"
     su - hxeadm -c 'hdbnsutil -sr_enable --name=hana15n1'
-    su - hxeadm -c 'HDB start'
     rsync -zahP /hana/shared/HXE/global/security/rsecssfs/ hana15n2:/hana/shared/HXE/global/security/rsecssfs/
     ssh hana15n2 "su - hxeadm -c 'HDB stop'"
     ssh hana15n2 "su - hxeadm -c 'hdbnsutil -sr_register --remoteHost=hana15n1 --remoteInstance=00 --replicationMode=syncmem --operationMode=delta_datashipping --name=hana15n2'"
