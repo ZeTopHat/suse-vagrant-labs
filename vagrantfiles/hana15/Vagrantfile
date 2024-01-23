@@ -50,7 +50,7 @@ Vagrant.configure("2") do |config|
     sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
     sle.vm.provider :libvirt do |libvirt, override|
       libvirt.cpus = 2
-      libvirt.machine_virtual_size = 40
+      libvirt.memory = 4096
     end
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/common/bootstrap.sh"

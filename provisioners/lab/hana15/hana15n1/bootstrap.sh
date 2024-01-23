@@ -6,6 +6,9 @@ DEPLOY=$2
 echo "Deploying ${MACHINE} ${DEPLOY} configurations..."
 
 if [ "$MACHINE" == "hana15n1" ]; then
+  # Specifying older version of suseconnect-ng until this internal bug is resolved: https://bugzilla.suse.com/show_bug.cgi?id=1218649
+  zypper install -y --oldpackage suseconnect-ng-1.1.0~git2.f42b4b2a060e-150400.3.13.1
+  SUSEConnect --de-register
   SUSEConnect --cleanup
   rpm -e --nodeps sles-release
   SUSEConnect -p $SAPPRODUCT -r $SAPREGCODE
@@ -26,7 +29,9 @@ if [ "$MACHINE" == "hana15n1" ]; then
   chown root:root /root/.ssh/id_rsa
   chown root:root /root/.ssh/id_rsa.pub
   zypper install -y open-iscsi lsscsi cron
-  zypper install -y -t pattern ha_sles sap-hana
+  zypper install -y -t pattern ha_sles sap-hana sap_server
+  # Specifying older version of SAPHanaSR until this internal bug is resolved: https://bugzilla.suse.com/show_bug.cgi?id=1219071
+  zypper install -y saptune SAPHanaSR-0.162.1-150000.4.31.1 sapstartsrv-resource-agents sapwmp sap-suse-cluster-connector supportutils-plugin-ha-sap
   echo "${SUBNET}${N2IP} hana15n2.labs.suse.com hana15n2" >>/etc/hosts
   echo "${SUBNET}${ISCSIIP} hana15iscsi.labs.suse.com hana15iscsi" >>/etc/hosts
   echo "InitiatorName=iqn.2022-08.com.suse.labs.hana15n1:initiator01" >/etc/iscsi/initiatorname.iscsi
@@ -54,7 +59,10 @@ if [ "$MACHINE" == "hana15n1" ]; then
     DEV=$(fdisk -l 2>/dev/null | grep ' 1 GiB' | awk '{print $2}' | cut -c 1-8 | sed 's/\/dev\///' )
     BYID=$(ls -l /dev/disk/by-id/ | grep "$DEV" | head -1 | awk '{print $9}' | sed 's/^/\/dev\/disk\/by-id\//' )
     echo "The iscsi SBD device ${BYID} was found! Continuing.."
-    crm cluster init -s ${BYID} -i eth1 -y
+    until crm cluster init -s ${BYID} -i eth1 -y; do
+      echo "Cluster inited failed.. Sleeping 10 seconds.."
+      sleep 10
+    done
     saptune solution apply HANA
     saptune service takeover
     saptune service enablestart
@@ -65,6 +73,7 @@ if [ "$MACHINE" == "hana15n1" ]; then
     echo "$(blkid | grep vdb1 | awk '{print $2}' | sed -e 's/\"//g') /hana xfs defaults 0 0" >>/etc/fstab
     mount -a
     echo "hxeadm ALL=(ALL) NOPASSWD: /usr/sbin/crm_attribute -n hana_hxe_site_srHook_*" >> /etc/sudoers
+    echo "hxeadm ALL=(ALL) NOPASSWD: /usr/sbin/SAPHanaSR-hookHelper *" >> /etc/sudoers
     until ssh hana15n2 sbd -d ${BYID} dump 2>/dev/null; do
       echo "The SBD device is not readable yet on hana15n2. Rescanning scsi bus.."
       ssh hana15n2 rescan-scsi-bus.sh
@@ -77,6 +86,7 @@ if [ "$MACHINE" == "hana15n1" ]; then
     /opt/hdblcm --hdbinst_server_import_content=off --batch --configfile=/tmp/install.rsp
     /usr/sap/HXE/HDB00/exe/hdbsql -p SuSE1234 -u SYSTEM -d SYSTEMDB "BACKUP DATA FOR FULL SYSTEM USING FILE ('backup')"
     su - hxeadm -c 'hdbnsutil -sr_enable --name=hana15n1'
+    su - hxeadm -c 'HDB start'
     rsync -zahP /hana/shared/HXE/global/security/rsecssfs/ hana15n2:/hana/shared/HXE/global/security/rsecssfs/
     ssh hana15n2 "su - hxeadm -c 'HDB stop'"
     ssh hana15n2 "su - hxeadm -c 'hdbnsutil -sr_register --remoteHost=hana15n1 --remoteInstance=00 --replicationMode=syncmem --operationMode=delta_datashipping --name=hana15n2'"
