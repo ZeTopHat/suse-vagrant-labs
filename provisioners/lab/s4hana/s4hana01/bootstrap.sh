@@ -6,6 +6,9 @@ DEPLOY=$2
 echo "Deploying ${MACHINE} ${DEPLOY} configurations..."
 
 if [ "$MACHINE" == "s4hana01" ]; then
+  # Specifying older version of suseconnect-ng until this internal bug is resolved: https://bugzilla.suse.com/show_bug.cgi?id=1218649
+  zypper install -y --oldpackage suseconnect-ng-1.1.0~git2.f42b4b2a060e-150400.3.13.1
+  SUSEConnect --de-register
   SUSEConnect --cleanup
   rpm -e --nodeps sles-release
   SUSEConnect -p $SAPPRODUCT -r $SAPREGCODE
@@ -25,8 +28,9 @@ if [ "$MACHINE" == "s4hana01" ]; then
   chown root:root /root/.ssh/authorized_keys
   chown root:root /root/.ssh/id_rsa
   chown root:root /root/.ssh/id_rsa.pub
-  zypper install -y open-iscsi lsscsi cron nfs-client sap-suse-cluster-connector
-  zypper install -y -t pattern ha_sles sap-nw
+  zypper install -y open-iscsi lsscsi cron nfs-client
+  zypper install -y saptune SAPHanaSR sapstartsrv-resource-agents sapwmp sap-suse-cluster-connector supportutils-plugin-ha-sap
+  zypper install -y -t pattern ha_sles sap-nw sap_server
   echo "${SUBNET}${N2IP} s4hana02.labs.suse.com s4hana02" >>/etc/hosts
   echo "${SUBNET}${ISCSIIP} s4hanaiscsi.labs.suse.com s4hanaiscsi" >>/etc/hosts
   echo "${FLOATINGIP1} s4hascs" >>/etc/hosts
@@ -56,7 +60,10 @@ if [ "$MACHINE" == "s4hana01" ]; then
     DEV=$(fdisk -l 2>/dev/null | grep ' 1 GiB' | awk '{print $2}' | cut -c 1-8 | sed 's/\/dev\///' )
     BYID=$(ls -l /dev/disk/by-id/ | grep "$DEV" | head -1 | awk '{print $9}' | sed 's/^/\/dev\/disk\/by-id\//' )
     echo "The iscsi SBD device ${BYID} was found! Continuing.."
-    crm cluster init -s ${BYID} -i eth1 -y
+    until crm cluster init -s ${BYID} -i eth1 -y; do
+      echo "Cluster inited failed.. Sleeping 10 seconds.."
+      sleep 10
+    done
     saptune solution apply S4HANA-APPSERVER
     saptune service takeover
     saptune service enablestart
@@ -91,9 +98,9 @@ if [ "$MACHINE" == "s4hana01" ]; then
     rsync -ahP /etc/services s4hana02:/etc/services
     rsync -ahP /home/s4hadm/.cshrc s4hana02:/home/s4hadm/
     rsync -ahP /home/s4hadm/.sapenv* s4hana02:/home/s4hadm/
-    echo 'service/halib = $(DIR_CT_RUN)/saphascriptco.so' >> /usr/sap/S4H/SYS/profile/S4H_ASCS00_s4hascs
+    echo 'service/halib = $(DIR_EXECUTABLE)/saphascriptco.so' >> /usr/sap/S4H/SYS/profile/S4H_ASCS00_s4hascs
     echo 'service/halib_cluster_connector = /usr/bin/sap_suse_cluster_connector' >> /usr/sap/S4H/SYS/profile/S4H_ASCS00_s4hascs
-    echo 'service/halib = $(DIR_CT_RUN)/saphascriptco.so' >> /usr/sap/S4H/SYS/profile/S4H_ERS10_s4hers
+    echo 'service/halib = $(DIR_EXECUTABLE)/saphascriptco.so' >> /usr/sap/S4H/SYS/profile/S4H_ERS10_s4hers
     echo 'service/halib_cluster_connector = /usr/bin/sap_suse_cluster_connector' >> /usr/sap/S4H/SYS/profile/S4H_ERS10_s4hers
     until ssh s4hana02 sbd -d ${BYID} dump 2>/dev/null; do
       echo "The SBD device is not readable yet on s4hana02. Rescanning scsi bus.."
