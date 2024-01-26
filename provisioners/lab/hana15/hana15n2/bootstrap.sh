@@ -6,6 +6,9 @@ DEPLOY=$2
 echo "Deploying ${MACHINE} ${DEPLOY} configurations..."
 
 if [ "$MACHINE" == "hana15n2" ]; then
+  # Specifying older version of suseconnect-ng until this internal bug is resolved: https://bugzilla.suse.com/show_bug.cgi?id=1218649
+  zypper install -y --oldpackage suseconnect-ng-1.1.0~git2.f42b4b2a060e-150400.3.13.1
+  SUSEConnect --de-register
   SUSEConnect --cleanup
   rpm -e --nodeps sles-release
   SUSEConnect -p $SAPPRODUCT -r $SAPREGCODE
@@ -26,7 +29,9 @@ if [ "$MACHINE" == "hana15n2" ]; then
   chown root:root /root/.ssh/id_rsa
   chown root:root /root/.ssh/id_rsa.pub
   zypper install -y open-iscsi lsscsi cron
-  zypper install -y -t pattern ha_sles sap-hana
+  zypper install -y -t pattern ha_sles sap-hana sap_server
+  # Specifying older version of SAPHanaSR until this internal bug is resolved: https://bugzilla.suse.com/show_bug.cgi?id=1219071
+  zypper install -y saptune SAPHanaSR-0.162.1-150000.4.31.1 sapstartsrv-resource-agents sapwmp sap-suse-cluster-connector supportutils-plugin-ha-sap
   echo "${SUBNET}${N1IP} hana15n1.labs.suse.com hana15n1" >>/etc/hosts
   echo "${SUBNET}${ISCSIIP} hana15iscsi.labs.suse.com hana15iscsi" >>/etc/hosts
   echo "InitiatorName=iqn.2022-08.com.suse.labs.hana15n2:initiator02" >/etc/iscsi/initiatorname.iscsi
@@ -51,6 +56,7 @@ if [ "$MACHINE" == "hana15n2" ]; then
     echo "$(blkid | grep vdb1 | awk '{print $2}' | sed -e 's/\"//g') /hana xfs defaults 0 0" >>/etc/fstab
     mount -a
     echo "hxeadm ALL=(ALL) NOPASSWD: /usr/sbin/crm_attribute -n hana_hxe_site_srHook_*" >> /etc/sudoers
+    echo "hxeadm ALL=(ALL) NOPASSWD: /usr/sbin/SAPHanaSR-hookHelper *" >> /etc/sudoers
     saptune solution apply HANA
     saptune service takeover
     saptune service enablestart
