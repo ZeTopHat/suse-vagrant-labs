@@ -1,1 +1,1 @@
-vagrantfiles/auth/Vagrantfile
+vagrantfiles/basic/Vagrantfile
