@@ -80,11 +80,11 @@ Vagrant.configure("2") do |config|
   end
 
   # 15 Auth Client
-  config.vm.define "#{LABNAME}15sp4" do |sle|
-    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}15sp4.yaml")
+  config.vm.define "#{LABNAME}15sp5" do |sle|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}15sp5.yaml")
     dc_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}dc01.yaml")
-    sle.vm.box = global_vars["box"]["sle15sp4"]
-    sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
+    sle.vm.box = global_vars["box"]["sle15sp5"]
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp5"]
     sle.vm.hostname = machine_vars["fqdn"]
     sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
     sle.vm.provision "shell" do |s|
@@ -98,12 +98,12 @@ Vagrant.configure("2") do |config|
         "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
       }
     end
-    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15sp4/krb5.conf", destination: "/tmp/"
-    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15sp4/smb.conf", destination: "/tmp/"
-    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15sp4/sssd.conf", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15sp5/krb5.conf", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15sp5/smb.conf", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15sp5/sssd.conf", destination: "/tmp/"
     sle.vm.provision "shell" do |s|
-      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15sp4/bootstrap.sh"
-      s.args = "#{LABNAME}15sp4 #{custom_vars["deployment"]}"
+      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15sp5/bootstrap.sh"
+      s.args = "#{LABNAME}15sp5 #{custom_vars["deployment"]}"
       s.env = {
         "SUBNET" => custom_vars["network"]["primarysubnet"],
         "DCIP" => dc_vars["ipaddress"]
@@ -152,8 +152,8 @@ Vagrant.configure("2") do |config|
   # 389 Directory Server
   config.vm.define "#{LABNAME}389" do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}389.yaml")
-    sle.vm.box = global_vars["box"]["sle15sp4"]
-    sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
+    sle.vm.box = global_vars["box"]["sle15sp5"]
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp5"]
     sle.vm.hostname = machine_vars["fqdn"]
     sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
     sle.vm.provision "shell" do |s|
@@ -185,8 +185,8 @@ Vagrant.configure("2") do |config|
   config.vm.define "#{LABNAME}krb5" do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}krb5.yaml")
     ldap_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}ldap.yaml")
-    sle.vm.box = global_vars["box"]["sle15sp4"]
-    sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
+    sle.vm.box = global_vars["box"]["sle15sp5"]
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp5"]
     sle.vm.hostname = machine_vars["fqdn"]
     sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
     sle.vm.provision "shell" do |s|

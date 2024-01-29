@@ -81,8 +81,8 @@ Vagrant.configure("2") do |config|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n1.yaml")
     iscsi_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}iscsi.yaml")
     n2_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n2.yaml")
-    sle.vm.box = global_vars["box"]["sle15sp4"]
-    sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
+    sle.vm.box = global_vars["box"]["sle15sp5"]
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp5"]
     sle.vm.hostname = machine_vars["fqdn"]
     sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
     if ! (custom_vars["network"]["bridgename"].empty?)
@@ -128,8 +128,8 @@ Vagrant.configure("2") do |config|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n2.yaml")
     iscsi_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}iscsi.yaml")
     n1_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n1.yaml")
-    sle.vm.box = global_vars["box"]["sle15sp4"]
-    sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
+    sle.vm.box = global_vars["box"]["sle15sp5"]
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp5"]
     sle.vm.hostname = machine_vars["fqdn"]
     sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
     if ! (custom_vars["network"]["bridgename"].empty?)

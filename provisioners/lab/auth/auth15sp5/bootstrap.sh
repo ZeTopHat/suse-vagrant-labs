@@ -5,7 +5,7 @@ DEPLOY=$2
 
 echo "Deploying ${MACHINE} ${DEPLOY} configurations..."
 
-if [ "$MACHINE" == "auth15sp4" ]; then
+if [ "$MACHINE" == "auth15sp5" ]; then
   if [ "$DEPLOY" == "training" ]; then
     groupadd labcoat >/dev/null 2>&1
     useradd -G labcoat -s /bin/bash -m -d /home/scientist scientist >/dev/null 2>&1
