@@ -3,7 +3,7 @@ Install-WindowsFeature -Name "AD-Domain-Services" -IncludeManagementTools
 Write-Host "Configuring and starting AD services.."
 $secured = ConvertTo-SecureString 'Windows2016' -AsPlainText -Force
 $secured2 = ConvertTo-SecureString 'vagrant' -AsPlainText -Force
-$username = "LABS\Administrator"
+$username = "labs.suse.com\Administrator"
 $credentials = New-Object System.Management.Automation.PSCredential -ArgumentList $username, $secured2
 $subnet = "$Env:SUBNET"
 $dcip = "$Env:DCIP"
