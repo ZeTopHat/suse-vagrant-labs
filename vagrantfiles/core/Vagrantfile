@@ -1,0 +1,99 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  unless File.exist?("./custom.yaml")
+    abort("Required ./custom.yaml file does not exist. Consult vagrantfiles/custom.yaml for reference.")
+  end
+  custom_vars = YAML.load_file("./custom.yaml")
+  WD = custom_vars["wheredir"]
+  global_vars = YAML.load_file("#{WD}config/global.yaml")
+  if File.exist?("./secret.yaml")
+    secret_vars = YAML.load_file("./secret.yaml")
+  elsif File.exist?("#{WD}config/secret.yaml")
+    secret_vars = YAML.load_file("#{WD}config/secret.yaml")
+  else
+    abort("The required ./secret.yaml or #{WD}config/secret.yaml file does not exist. Consult #{WD}config/secret_example.yaml for reference.")
+  end
+  lab_vars = YAML.load_file("#{WD}config/lab/core.yaml")
+  LABNAME = lab_vars["labname"]
+  lab_vars["requiredsecrets"].each do |code|
+    if (secret_vars[code.downcase].empty?)
+      abort("Required #{code.downcase} variable has not been filled out in the secret.yaml file.")
+    end
+  end
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.provider :libvirt do |libvirt, override|
+    libvirt.cpus = custom_vars["libvirt"]["cpus"]
+    libvirt.memory = custom_vars["libvirt"]["memory"]
+    libvirt.machine_virtual_size = custom_vars["libvirt"]["machine_virtual_size"]
+  end
+
+  config.trigger.before :destroy do |trigger|
+    trigger.name = "unregister"
+    trigger.info = "unregister client"
+    trigger.on_error = :continue
+    trigger.only_on = lab_vars["suseconnect-d"]
+    trigger.run_remote = {inline: <<-SHELL
+      echo "nameserver #{custom_vars["network"]["nameserver"]}" >>/etc/resolv.conf
+      if [[ $( SUSEConnect --status | python -c "import sys, json; print(json.load(sys.stdin)[0]['status'])" ) == "Registered" ]];
+      then
+        SUSEConnect -d;
+      fi
+    SHELL
+    }
+  end
+
+  config.vm.define "#{LABNAME}01" do |sle|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}01.yaml")
+    sle.vm.box = global_vars["box"]["sle15sp5"]
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp5"]
+    sle.vm.hostname = machine_vars["fqdn"]
+    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/common/bootstrap.sh"
+      s.args = "SLE15"
+      s.env = {
+        "SLEREGCODE" => secret_vars["sleregcode"],
+        "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
+        "FQDN" => machine_vars["fqdn"],
+        "SHORT" => machine_vars["short"],
+        "NTPSERVER" => machine_vars["ntpserver"]
+      }
+    end
+    #sle.vm.provision "shell" do |s|
+    #  s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}01/bootstrap.sh"
+    #  s.args = "#{LABNAME}01 custom_vars["deployment"]"
+    #  s.env = {
+    #    "SUBNET" => custom_vars["network"]["primarysubnet"]
+    #  }
+    #end
+  end
+
+  config.vm.define "#{LABNAME}02" do |sle|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}02.yaml")
+    sle.vm.box = global_vars["box"]["sle15sp5"]
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp5"]
+    sle.vm.hostname = machine_vars["fqdn"]
+    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/common/bootstrap.sh"
+      s.args = "SLE15"
+      s.env = {
+        "SLEREGCODE" => secret_vars["sleregcode"],
+        "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
+        "FQDN" => machine_vars["fqdn"],
+        "SHORT" => machine_vars["short"],
+        "NTPSERVER" => machine_vars["ntpserver"]
+      }
+    end
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}02/bootstrap.sh"
+      s.args = "#{LABNAME}02 #{custom_vars["deployment"]}"
+      s.env = {
+        "SUBNET" => custom_vars["network"]["primarysubnet"]
+      }
+    end
+  end
+end
+
