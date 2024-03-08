@@ -47,7 +47,7 @@ elif [ "$ENVIRONMENT" == "RHE8" ]; then
   sed -i 's/enabled=1/enabled=0/' /etc/yum.repos.d/epel.repo
   dnf clean all
   mv /etc/dnf/protected.d/redhat-release.conf /root/
-  # curl -Sks https://<SUMASERVER>/pub/bootstrap/bootstrap-res8.sh | /bin/bash
+  # curl -Sks https://<SUMASERVER>/pub/bootstrap/bootstrap-rhel88.sh | /bin/bash
   # After accepting key in suma we want a "dnf install screen" and then a "dnf update"
 elif [ "$ENVIRONMENT" == "OE8" ]; then
   hostnamectl set-hostname $FQDN

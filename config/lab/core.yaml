@@ -1,0 +1,4 @@
+---
+suseconnect-d: ["core01", "core02"]
+labname: "core"
+requiredsecrets: ["sleregcode"]

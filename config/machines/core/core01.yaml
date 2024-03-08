@@ -1,0 +1,5 @@
+---
+ipaddress: ".31"
+fqdn: "core01.labs.suse.com"
+short: "core01"
+ntpserver: ".1"
