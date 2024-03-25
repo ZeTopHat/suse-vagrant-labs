@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Replace the 3 asterisks with the password -->
+<Passwords>
+    <root_password><![CDATA[vagrant]]></root_password>
+    <sapadm_password><![CDATA[SuSE1234]]></sapadm_password>
+    <master_password><![CDATA[SuSE1234]]></master_password>
+    <sapadm_password><![CDATA[SuSE1234]]></sapadm_password>
+    <password><![CDATA[SuSE1234]]></password>
+    <system_user_password><![CDATA[SuSE1234]]></system_user_password>
+    <lss_user_password><![CDATA[SuSE1234]]></lss_user_password>
+    <lss_backup_password><![CDATA[SuSE1234]]></lss_backup_password>
+    <streaming_cluster_manager_password><![CDATA[SuSE1234]]></streaming_cluster_manager_password>
+    <ase_user_password><![CDATA[SuSE1234]]></ase_user_password>
+    <org_manager_password><![CDATA[SuSE1234]]></org_manager_password>
+</Passwords>
