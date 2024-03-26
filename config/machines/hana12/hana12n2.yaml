@@ -1,0 +1,6 @@
+---
+ipaddress: ".182"
+fqdn: "hana12n2.labs.suse.com"
+short: "hana12n2"
+ntpserver: ".1"
+sapproduct: "SLES_SAP/12.5/x86_64"

@@ -1,0 +1,5 @@
+---
+ipaddress: ".180"
+fqdn: "hana12iscsi.labs.suse.com"
+short: "hana12iscsi"
+ntpserver: ".1"
