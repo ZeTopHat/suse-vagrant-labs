@@ -9,6 +9,10 @@ version=$(grep -Po '(?<=VERSION_ID=")[^"]*' /etc/os-release)
 
 if [[ "$version" == "15.4" ]]; then
   echo "Performing actions for VERSION_ID 15.4"
+  SUSEConnect -r $SLEREGCODE
+  zypper install -y --oldpackage suseconnect-ng-1.1.0~git2.f42b4b2a060e-150400.3.13.1
+  SUSEConnect --de-register
+  SUSEConnect --cleanup
   rpm -e --nodeps sles-release
   SUSEConnect -r $SUMAPROXYREGCODE -p SUSE-Manager-Proxy/4.3/x86_64
   SUSEConnect -p sle-module-basesystem/15.4/x86_64
