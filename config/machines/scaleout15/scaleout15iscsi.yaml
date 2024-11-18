@@ -1,0 +1,5 @@
+---
+ipaddress: ".190"
+fqdn: "scaleout15iscsi.labs.suse.com"
+short: "scaleout15iscsi"
+ntpserver: ".1"

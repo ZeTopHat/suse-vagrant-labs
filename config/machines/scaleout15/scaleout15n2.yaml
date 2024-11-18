@@ -1,0 +1,6 @@
+---
+ipaddress: ".192"
+fqdn: "scaleout15n2.labs.suse.com"
+short: "scaleout15n2"
+ntpserver: ".1"
+sapproduct: "SLES_SAP/15.4/x86_64"

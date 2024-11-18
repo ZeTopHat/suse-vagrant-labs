@@ -1,0 +1,409 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  unless File.exist?("./custom.yaml")
+    abort("Required ./custom.yaml file does not exist. Consult vagrantfiles/custom.yaml for reference.")
+  end
+  custom_vars = YAML.load_file("./custom.yaml")
+  WD = custom_vars["wheredir"]
+  global_vars = YAML.load_file("#{WD}config/global.yaml")
+  if File.exist?("./secret.yaml")
+    secret_vars = YAML.load_file("./secret.yaml")
+  elsif File.exist?("#{WD}config/secret.yaml")
+    secret_vars = YAML.load_file("#{WD}config/secret.yaml")
+  else
+    abort("The required ./secret.yaml or #{WD}config/secret.yaml file does not exist. Consult #{WD}config/secret_example.yaml for reference.")
+  end
+  lab_vars = YAML.load_file("#{WD}config/lab/scaleout15.yaml")
+  LABNAME = lab_vars["labname"]
+  lab_vars["requiredsecrets"].each do |code|
+    if (secret_vars[code.downcase].empty?)
+      abort("Required #{code.downcase} variable has not been filled out in the secret.yaml file.")
+    end
+  end
+  if Dir.entries("#{WD}provisioners/lab/#{LABNAME}/hanaiso/").size <= 3
+    abort("The #{WD}provisioners/lab/#{LABNAME}/hanaiso/ directory has not been populated with HANA media.")
+  end
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  host_cpu_count = `nproc`.to_i
+  if host_cpu_count < 16
+    abort("Host system is required to have at least 16 processors to deploy this lab. Found: #{host_cpu_count}")
+  end
+  host_memory = `grep MemTotal /proc/meminfo | awk '{print $2}'`.to_i
+  if host_memory < 6710864
+    abort("Host system is required to have at least 64GB of RAM to deploy this lab. Found: #{host_memory}K")
+  end
+  config.vm.provider :libvirt do |libvirt, override|
+    libvirt.cpus = custom_vars["libvirt"]["cpus"]
+    libvirt.memory = custom_vars["libvirt"]["memory"]
+    libvirt.machine_virtual_size = custom_vars["libvirt"]["machine_virtual_size"]
+    libvirt.storage :file, size: "200G"
+  end
+
+  config.trigger.before :destroy do |trigger|
+    trigger.name = "unregister"
+    trigger.info = "unregister client"
+    trigger.on_error = :continue
+    trigger.only_on = lab_vars["suseconnect-d"]
+    trigger.run_remote = {inline: <<-SHELL
+      echo "nameserver #{custom_vars["network"]["nameserver"]}" >>/etc/resolv.conf
+      if [[ $( SUSEConnect --status | python -c "import sys, json; print(json.load(sys.stdin)[0]['status'])" ) == "Registered" ]];
+      then
+        SUSEConnect -d;
+      fi
+    SHELL
+    }
+  end
+
+  # ISCSI Server
+  config.vm.define "#{LABNAME}iscsi" do |sle|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}iscsi.yaml")
+    n1_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n1.yaml")
+    n2_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n2.yaml")
+    n3_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n3.yaml")
+    n4_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n4.yaml")
+    n5_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n5.yaml")
+    n6_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n6.yaml")
+    sle.vm.box = global_vars["box"]["sle15sp5"]
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp5"]
+    sle.vm.hostname = machine_vars["fqdn"]
+    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
+    sle.vm.provider :libvirt do |libvirt, override|
+      libvirt.cpus = 2
+      libvirt.memory = 4096
+    end
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/common/bootstrap.sh"
+      s.args = "SLE15"
+      s.env = {
+        "SLEREGCODE" => secret_vars["sleregcode"],
+        "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
+        "FQDN" => machine_vars["fqdn"],
+        "SHORT" => machine_vars["short"],
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
+      }
+    end
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}iscsi/bootstrap.sh"
+      s.args = "#{LABNAME}iscsi #{custom_vars["deployment"]}"
+      s.env = {
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "N1IP" => n1_vars["ipaddress"],
+        "N2IP" => n2_vars["ipaddress"],
+        "N3IP" => n3_vars["ipaddress"],
+        "N4IP" => n4_vars["ipaddress"],
+        "N5IP" => n5_vars["ipaddress"],
+        "N6IP" => n6_vars["ipaddress"]
+      }
+    end
+  end
+
+  # HA15 Cluster Node 1
+  config.vm.define "#{LABNAME}n1" do |sle|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n1.yaml")
+    iscsi_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}iscsi.yaml")
+    n2_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n2.yaml")
+    n3_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n3.yaml")
+    n4_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n4.yaml")
+    n5_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n5.yaml")
+    n6_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n6.yaml")
+    sle.vm.box = global_vars["box"]["sle15sp4"]
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
+    sle.vm.hostname = machine_vars["fqdn"]
+    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
+    if ! (custom_vars["network"]["bridgename"].empty?)
+      sle.vm.network "public_network", dev: custom_vars["network"]["bridgename"], mode: "bridge", type: "bridge"
+    end
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/common/bootstrap.sh"
+      s.args = "SLE15"
+      s.env = {
+        "SLEREGCODE" => secret_vars["sleregcode"],
+        "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
+        "FQDN" => machine_vars["fqdn"],
+        "SHORT" => machine_vars["short"],
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
+      }
+    end
+    sle.vm.synced_folder "#{WD}provisioners/lab/#{LABNAME}/hanaiso/", "/opt/", type: "rsync"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_scaleout15_part1.txt", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_scaleout15_part2.txt", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_scaleout15_part3.txt", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_scaleout15_part4.txt", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_scaleout15_part5.txt", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/authorized_keys", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/id_rsa", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/id_rsa.pub", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/global.ini", destination: "/tmp/custom/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/install.rsp", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/install.rsp.xml", destination: "/tmp/"
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/bootstrap.sh"
+      s.args = "#{LABNAME}n1 #{custom_vars["deployment"]}"
+      s.env = {
+        "SAPREGCODE" => secret_vars["sapregcode"],
+        "SAPPRODUCT" => machine_vars["sapproduct"],
+        "FLOATINGIP1" => "#{custom_vars["network"]["primarysubnet"]}#{lab_vars["floatingip1"]}", 
+        "FLOATINGIP2" => "#{custom_vars["network"]["primarysubnet"]}#{lab_vars["floatingip2"]}", 
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "ISCSIIP" => iscsi_vars["ipaddress"],
+        "N1IP" => machine_vars["ipaddress"],
+        "N2IP" => n2_vars["ipaddress"],
+        "N3IP" => n3_vars["ipaddress"],
+        "N4IP" => n4_vars["ipaddress"],
+        "N5IP" => n5_vars["ipaddress"],
+        "N6IP" => n6_vars["ipaddress"]
+      }
+    end
+  end
+
+  # HA15 Cluster Node 2
+  config.vm.define "#{LABNAME}n2" do |sle|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n2.yaml")
+    iscsi_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}iscsi.yaml")
+    n1_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n1.yaml")
+    n3_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n3.yaml")
+    n4_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n4.yaml")
+    n5_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n5.yaml")
+    n6_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n6.yaml")
+    sle.vm.box = global_vars["box"]["sle15sp4"]
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
+    sle.vm.hostname = machine_vars["fqdn"]
+    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
+    if ! (custom_vars["network"]["bridgename"].empty?)
+      sle.vm.network "public_network", dev: custom_vars["network"]["bridgename"], mode: "bridge", type: "bridge"
+    end
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/common/bootstrap.sh"
+      s.args = "SLE15"
+      s.env = {
+        "SLEREGCODE" => secret_vars["sleregcode"],
+        "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
+        "FQDN" => machine_vars["fqdn"],
+        "SHORT" => machine_vars["short"],
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
+      }
+    end
+    sle.vm.synced_folder "#{WD}provisioners/lab/#{LABNAME}/hanaiso/", "/opt/", type: "rsync"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n2/authorized_keys", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n2/id_rsa", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n2/id_rsa.pub", destination: "/tmp/"
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n2/bootstrap.sh"
+      s.args = "#{LABNAME}n2 #{custom_vars["deployment"]}"
+      s.env = {
+        "SAPREGCODE" => secret_vars["sapregcode"],
+        "SAPPRODUCT" => machine_vars["sapproduct"],
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "ISCSIIP" => iscsi_vars["ipaddress"],
+        "N1IP" => n1_vars["ipaddress"],
+        "N2IP" => machine_vars["ipaddress"],
+        "N3IP" => n3_vars["ipaddress"],
+        "N4IP" => n4_vars["ipaddress"],
+        "N5IP" => n5_vars["ipaddress"],
+        "N6IP" => n6_vars["ipaddress"]
+      }
+    end
+  end
+
+  # HA15 Cluster Node 3
+  config.vm.define "#{LABNAME}n3" do |sle|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n3.yaml")
+    iscsi_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}iscsi.yaml")
+    n1_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n1.yaml")
+    n2_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n2.yaml")
+    n4_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n4.yaml")
+    n5_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n5.yaml")
+    n6_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n6.yaml")
+    sle.vm.box = global_vars["box"]["sle15sp4"]
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
+    sle.vm.hostname = machine_vars["fqdn"]
+    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
+    if ! (custom_vars["network"]["bridgename"].empty?)
+      sle.vm.network "public_network", dev: custom_vars["network"]["bridgename"], mode: "bridge", type: "bridge"
+    end
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/common/bootstrap.sh"
+      s.args = "SLE15"
+      s.env = {
+        "SLEREGCODE" => secret_vars["sleregcode"],
+        "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
+        "FQDN" => machine_vars["fqdn"],
+        "SHORT" => machine_vars["short"],
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
+      }
+    end
+    sle.vm.synced_folder "#{WD}provisioners/lab/#{LABNAME}/hanaiso/", "/opt/", type: "rsync"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n3/authorized_keys", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n3/id_rsa", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n3/id_rsa.pub", destination: "/tmp/"
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n3/bootstrap.sh"
+      s.args = "#{LABNAME}n3 #{custom_vars["deployment"]}"
+      s.env = {
+        "SAPREGCODE" => secret_vars["sapregcode"],
+        "SAPPRODUCT" => machine_vars["sapproduct"],
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "ISCSIIP" => iscsi_vars["ipaddress"],
+        "N1IP" => n1_vars["ipaddress"],
+        "N2IP" => n2_vars["ipaddress"],
+        "N3IP" => machine_vars["ipaddress"],
+        "N4IP" => n4_vars["ipaddress"],
+        "N5IP" => n5_vars["ipaddress"],
+        "N6IP" => n6_vars["ipaddress"]
+      }
+    end
+  end
+
+  # HA15 Cluster Node 4
+  config.vm.define "#{LABNAME}n4" do |sle|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n4.yaml")
+    iscsi_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}iscsi.yaml")
+    n1_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n1.yaml")
+    n2_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n2.yaml")
+    n3_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n3.yaml")
+    n5_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n5.yaml")
+    n6_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n6.yaml")
+    sle.vm.box = global_vars["box"]["sle15sp4"]
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
+    sle.vm.hostname = machine_vars["fqdn"]
+    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
+    if ! (custom_vars["network"]["bridgename"].empty?)
+      sle.vm.network "public_network", dev: custom_vars["network"]["bridgename"], mode: "bridge", type: "bridge"
+    end
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/common/bootstrap.sh"
+      s.args = "SLE15"
+      s.env = {
+        "SLEREGCODE" => secret_vars["sleregcode"],
+        "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
+        "FQDN" => machine_vars["fqdn"],
+        "SHORT" => machine_vars["short"],
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
+      }
+    end
+    sle.vm.synced_folder "#{WD}provisioners/lab/#{LABNAME}/hanaiso/", "/opt/", type: "rsync"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n4/authorized_keys", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n4/id_rsa", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n4/id_rsa.pub", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n4/global.ini", destination: "/tmp/custom/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n4/install.rsp", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n4/install.rsp.xml", destination: "/tmp/"
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n4/bootstrap.sh"
+      s.args = "#{LABNAME}n4 #{custom_vars["deployment"]}"
+      s.env = {
+        "SAPREGCODE" => secret_vars["sapregcode"],
+        "SAPPRODUCT" => machine_vars["sapproduct"],
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "ISCSIIP" => iscsi_vars["ipaddress"],
+        "N1IP" => n1_vars["ipaddress"],
+        "N2IP" => n2_vars["ipaddress"],
+        "N3IP" => n3_vars["ipaddress"],
+        "N4IP" => machine_vars["ipaddress"],
+        "N5IP" => n5_vars["ipaddress"],
+        "N6IP" => n6_vars["ipaddress"]
+      }
+    end
+  end
+
+  # HA15 Cluster Node 5
+  config.vm.define "#{LABNAME}n5" do |sle|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n5.yaml")
+    iscsi_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}iscsi.yaml")
+    n1_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n1.yaml")
+    n2_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n2.yaml")
+    n3_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n3.yaml")
+    n4_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n4.yaml")
+    n6_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n6.yaml")
+    sle.vm.box = global_vars["box"]["sle15sp4"]
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
+    sle.vm.hostname = machine_vars["fqdn"]
+    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
+    if ! (custom_vars["network"]["bridgename"].empty?)
+      sle.vm.network "public_network", dev: custom_vars["network"]["bridgename"], mode: "bridge", type: "bridge"
+    end
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/common/bootstrap.sh"
+      s.args = "SLE15"
+      s.env = {
+        "SLEREGCODE" => secret_vars["sleregcode"],
+        "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
+        "FQDN" => machine_vars["fqdn"],
+        "SHORT" => machine_vars["short"],
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
+      }
+    end
+    sle.vm.synced_folder "#{WD}provisioners/lab/#{LABNAME}/hanaiso/", "/opt/", type: "rsync"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n5/authorized_keys", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n5/id_rsa", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n5/id_rsa.pub", destination: "/tmp/"
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n5/bootstrap.sh"
+      s.args = "#{LABNAME}n5 #{custom_vars["deployment"]}"
+      s.env = {
+        "SAPREGCODE" => secret_vars["sapregcode"],
+        "SAPPRODUCT" => machine_vars["sapproduct"],
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "ISCSIIP" => iscsi_vars["ipaddress"],
+        "N1IP" => n1_vars["ipaddress"],
+        "N2IP" => n2_vars["ipaddress"],
+        "N3IP" => n3_vars["ipaddress"],
+        "N4IP" => n4_vars["ipaddress"],
+        "N5IP" => machine_vars["ipaddress"],
+        "N6IP" => n6_vars["ipaddress"]
+      }
+    end
+  end
+
+  # HA15 Cluster Node 6
+  config.vm.define "#{LABNAME}n6" do |sle|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n6.yaml")
+    iscsi_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}iscsi.yaml")
+    n1_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n1.yaml")
+    n2_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n2.yaml")
+    n3_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n3.yaml")
+    n4_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n4.yaml")
+    n5_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n5.yaml")
+    sle.vm.box = global_vars["box"]["sle15sp4"]
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
+    sle.vm.hostname = machine_vars["fqdn"]
+    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
+    if ! (custom_vars["network"]["bridgename"].empty?)
+      sle.vm.network "public_network", dev: custom_vars["network"]["bridgename"], mode: "bridge", type: "bridge"
+    end
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/common/bootstrap.sh"
+      s.args = "SLE15"
+      s.env = {
+        "SLEREGCODE" => secret_vars["sleregcode"],
+        "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
+        "FQDN" => machine_vars["fqdn"],
+        "SHORT" => machine_vars["short"],
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
+      }
+    end
+    sle.vm.synced_folder "#{WD}provisioners/lab/#{LABNAME}/hanaiso/", "/opt/", type: "rsync"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n6/authorized_keys", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n6/id_rsa", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n6/id_rsa.pub", destination: "/tmp/"
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n6/bootstrap.sh"
+      s.args = "#{LABNAME}n6 #{custom_vars["deployment"]}"
+      s.env = {
+        "SAPREGCODE" => secret_vars["sapregcode"],
+        "SAPPRODUCT" => machine_vars["sapproduct"],
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "ISCSIIP" => iscsi_vars["ipaddress"],
+        "N1IP" => n1_vars["ipaddress"],
+        "N2IP" => n2_vars["ipaddress"],
+        "N3IP" => n3_vars["ipaddress"],
+        "N4IP" => n4_vars["ipaddress"],
+        "N5IP" => n5_vars["ipaddress"],
+        "N6IP" => machine_vars["ipaddress"]
+      }
+    end
+  end
+end
+
