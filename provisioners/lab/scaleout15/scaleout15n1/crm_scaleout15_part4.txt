@@ -1,0 +1,6 @@
+colocation col_saphana_ip_HXE_HDB00 2000: rsc_ip_HXE_HDB00:Started msl_SAPHanaCon_HXE_HDB00:Master                                                                                       
+colocation col_saphana_ip_ro_HXE_HDB00 2000: rsc_ip_ro_HXE_HDB00:Started msl_SAPHanaCon_HXE_HDB00:Slave
+order ord_SAPHana_HXE_HDB00 Mandatory: cln_SAPHanaTopology_HXE_HDB00 msl_SAPHanaCon_HXE_HDB00
+location loc_ip_ro_not_master_HXE_HDB00 rsc_ip_ro_HXE_HDB00 rule -inf: hana_hxe_roles ne master1:master:worker:master
+#location SAPHanaCon_not_on_majority_maker msl_SAPHanaCon_HXE_HDB00 -inf: scaleout15n6
+#location SAPHanaTopology_not_on_majority_maker cln_SAPHanaTopology_HXE_HDB00 -inf: scaleout15n6

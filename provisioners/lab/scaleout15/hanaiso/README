@@ -1,0 +1,5 @@
+This Directory needs to be populated with a valid extracted HANA ISO.
+
+Example:
+
+# rsync -ahP rabble.suse.cloud::rabble/iso/sap/hana/SAP_HANA_DATABASE_053_20SPS05/ provisioners/lab/scaleout15/hanaiso/
