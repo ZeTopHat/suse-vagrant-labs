@@ -29,7 +29,6 @@ if [ "$MACHINE" == "auth389" ]; then
     dsconf auth389 config replace nsslapd-security=on && dsconf auth389 config replace nsslapd-dynamic-plugins=on
     dsconf auth389 plugin memberof enable && dsconf auth389 plugin memberof set --scope dc=auth389,dc=suse,dc=com
     dsconf auth389 plugin memberof fixup -f '(objectClass=*)' dc=auth389,dc=suse,dc=com
-    dsconf auth389 security ca-certificate add --file /root/certs/ca.pem --name 'SUSE_LABS'
     dsctl auth389 tls import-server-key-cert /root/certs/auth389.pem /root/certs/auth389.key
     cp /root/certs/ca.pem /etc/pki/trust/anchors/ca.pem && update-ca-certificates && dsctl auth389 restart
     mkdir /etc/ssl/auth389 && cp /root/certs/ca.pem /etc/ssl/auth389/ && c_rehash /etc/ssl/auth389/
