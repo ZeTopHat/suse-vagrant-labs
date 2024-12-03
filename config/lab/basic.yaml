@@ -1,4 +1,4 @@
 ---
-suseconnect-d: ["basic12sp5", "basic12sp4", "basic15sp5", "basic15sp4", "basic15sp3", "basic15sp2", "basic15sp1"]
+suseconnect-d: ["basic12sp5", "basic12sp4", "basic15sp6", "basic15sp5", "basic15sp4", "basic15sp3", "basic15sp2", "basic15sp1"]
 labname: "basic"
 requiredsecrets: ["sleregcode"]

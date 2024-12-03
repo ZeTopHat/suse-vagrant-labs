@@ -1,0 +1,5 @@
+---
+ipaddress: ".8"
+fqdn: "basic15sp6.labs.suse.com"
+short: "basic15sp6"
+ntpserver: ".1"
