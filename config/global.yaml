@@ -1,5 +1,6 @@
 ---
 box:
+  sle15sp6: "SLE-15-SP6-Vagrant.x86_64"
   sle15sp5: "SLES15-SP5-Vagrant.x86_64"
   sle15sp4: "SLES-15-SP4-Vagrant.x86_64"
   sle15sp3: "SLES-15-SP3-Vagrant.x86_64"
@@ -33,6 +34,7 @@ box:
   ubuntu2004: "generic/ubuntu2004"
   ubuntu2204: "generic/ubuntu2204"
 boxurl:
+  sle15sp6: "http://collective.suse.cloud/vagrant/virtualization/Vagrant:/SLE-15-SP6/images/boxes/SLE-15-SP6-Vagrant.x86_64.json"
   sle15sp5: "http://download.opensuse.org/repositories/Virtualization:/Appliances:/Images:/SLE-15-SP5/images/boxes/SLES15-SP5-Vagrant.x86_64.json"
   sle15sp4: "http://download.opensuse.org/repositories/Virtualization:/Appliances:/Images:/SLE-15-SP4/images/boxes/SLES-15-SP4-Vagrant.x86_64.json"
   sle15sp3: "http://download.opensuse.org/repositories/Virtualization:/Appliances:/Images:/SLE-15-SP3/images/boxes/SLES-15-SP3-Vagrant.x86_64.json"
