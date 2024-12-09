@@ -14,6 +14,7 @@ box:
   leap15sp4: "opensuse/Leap-15.4.x86_64"
   leap42sp3: "generic/opensuse42"
   windows2019: "peru/windows-server-2019-standard-x64-eval"
+  windows2022: "peru/windows-server-2022-standard-x64-eval"
   rhel7: "generic/rhel7"
   rhel8: "generic/rhel8"
   rhel9: "generic/rhel9"
