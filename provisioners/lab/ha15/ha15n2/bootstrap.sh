@@ -40,7 +40,7 @@ if [ "$MACHINE" == "ha15n2" ]; then
     echo "softdog" > /etc/modules-load.d/watchdog.conf
     systemctl restart systemd-modules-load
     sed -i 's/use_lvmlockd = 0/use_lvmlockd = 1/' /etc/lvm/lvm.conf
-    systemctl enable --now lvmlockd
+    systemctl enable lvmlockd
     mkdir /shared
     mkdir /data
   else
