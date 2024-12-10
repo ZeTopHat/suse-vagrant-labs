@@ -6,17 +6,15 @@ DEPLOY=$2
 echo "Deploying ${MACHINE} ${DEPLOY} configurations..."
 
 if [ "$MACHINE" == "s4hana01" ]; then
-  # Specifying older version of suseconnect-ng until this internal bug is resolved: https://bugzilla.suse.com/show_bug.cgi?id=1218649
-  zypper install -y --oldpackage suseconnect-ng-1.1.0~git2.f42b4b2a060e-150400.3.13.1
   SUSEConnect --de-register
   SUSEConnect --cleanup
   rpm -e --nodeps sles-release
   SUSEConnect -p $SAPPRODUCT -r $SAPREGCODE
-  SUSEConnect -p sle-module-basesystem/15.4/x86_64
-  SUSEConnect -p sle-module-desktop-applications/15.4/x86_64
-  SUSEConnect -p sle-module-server-applications/15.4/x86_64
-  SUSEConnect -p sle-ha/15.4/x86_64 -r $SAPREGCODE
-  SUSEConnect -p sle-module-sap-applications/15.4/x86_64
+  SUSEConnect -p sle-module-basesystem/15.6/x86_64
+  SUSEConnect -p sle-module-desktop-applications/15.6/x86_64
+  SUSEConnect -p sle-module-server-applications/15.6/x86_64
+  SUSEConnect -p sle-ha/15.6/x86_64 -r $SAPREGCODE
+  SUSEConnect -p sle-module-sap-applications/15.6/x86_64
   echo "StrictHostKeyChecking no" >>/etc/ssh/ssh_config
   mkdir /root/.ssh
   chmod 700 /root/.ssh
@@ -29,7 +27,7 @@ if [ "$MACHINE" == "s4hana01" ]; then
   chown root:root /root/.ssh/id_rsa
   chown root:root /root/.ssh/id_rsa.pub
   zypper install -y open-iscsi lsscsi cron nfs-client
-  zypper install -y saptune SAPHanaSR sapstartsrv-resource-agents sapwmp sap-suse-cluster-connector supportutils-plugin-ha-sap
+  zypper install -y saptune SAPHanaSR sapstartsrv-resource-agents sap-suse-cluster-connector supportutils-plugin-ha-sap
   zypper install -y -t pattern ha_sles sap-nw sap_server
   echo "${SUBNET}${N2IP} s4hana02.labs.suse.com s4hana02" >>/etc/hosts
   echo "${SUBNET}${ISCSIIP} s4hanaiscsi.labs.suse.com s4hanaiscsi" >>/etc/hosts
@@ -74,13 +72,13 @@ if [ "$MACHINE" == "s4hana01" ]; then
     echo "s4hanaiscsi:/exports/S4H/sapmnt /sapmnt nfs4 defaults 0 0" >>/etc/fstab
     echo "s4hanaiscsi:/exports/S4H/SYS /usr/sap/S4H/SYS nfs4 defaults 0 0" >>/etc/fstab
     mount -a
-    parted --script $(fdisk -l | grep "10 GiB" | awk '{print $2}' | head -1 | tr -d \:) mklabel gpt mkpart primary 1MiB 9.9GiB
-    parted --script $(fdisk -l | grep "10 GiB" | awk '{print $2}' | tail -1 | tr -d \:) mklabel gpt mkpart primary 1MiB 9.9GiB
+    parted --script $(fdisk -l 2>/dev/null | grep "10 GiB" | awk '{print $2}' | head -1 | tr -d \:) mklabel gpt mkpart primary 1MiB 9.9GiB
+    parted --script $(fdisk -l 2>/dev/null | grep "10 GiB" | awk '{print $2}' | tail -1 | tr -d \:) mklabel gpt mkpart primary 1MiB 9.9GiB
     rescan-scsi-bus.sh
-    mkfs.xfs $(fdisk -l | grep "10 GiB" | awk '{print $2}' | head -1 | tr -d \:)1
-    mkfs.xfs $(fdisk -l | grep "10 GiB" | awk '{print $2}' | tail -1 | tr -d \:)1
-    mount $(fdisk -l | grep "10 GiB" | awk '{print $2}' | head -1 | tr -d \:)1 /usr/sap/S4H/ASCS00
-    mount $(fdisk -l | grep "10 GiB" | awk '{print $2}' | tail -1 | tr -d \:)1 /usr/sap/S4H/ERS10
+    mkfs.xfs $(fdisk -l 2>/dev/null | grep "10 GiB" | awk '{print $2}' | head -1 | tr -d \:)1
+    mkfs.xfs $(fdisk -l 2>/dev/null | grep "10 GiB" | awk '{print $2}' | tail -1 | tr -d \:)1
+    mount $(fdisk -l 2>/dev/null | grep "10 GiB" | awk '{print $2}' | head -1 | tr -d \:)1 /usr/sap/S4H/ASCS00
+    mount $(fdisk -l 2>/dev/null | grep "10 GiB" | awk '{print $2}' | tail -1 | tr -d \:)1 /usr/sap/S4H/ERS10
     sysctl net.ipv4.tcp_keepalive_time=120
     ip addr add dev eth1 ${FLOATINGIP1}/24
     groupadd -g 1002 sapinst
@@ -112,11 +110,11 @@ if [ "$MACHINE" == "s4hana01" ]; then
     ssh s4hana02 rescan-scsi-bus.sh
     ssh s4hana02 crm cluster join -y -i eth1 -c s4hana01
     sed -i "s/FLOATINGIP1/${FLOATINGIP1}/" /tmp/crm_part1.txt
-    ASCSDATA=$(ls -l /dev/disk/by-id/ | grep "$(fdisk -l | grep '10 GiB' | awk '{print $2}' | head -1 | tr -d \: | sed 's/\/dev\///' )1" | head -1 | awk '{print $9}' | sed 's/^/\\\/dev\\\/disk\\\/by-id\\\//' )
+    ASCSDATA=$(ls -l /dev/disk/by-id/ | grep "$(fdisk -l 2>/dev/null | grep '10 GiB' | awk '{print $2}' | head -1 | tr -d \: | sed 's/\/dev\///' )1" | head -1 | awk '{print $9}' | sed 's/^/\\\/dev\\\/disk\\\/by-id\\\//' )
     sed -i "s/ASCSDATA/${ASCSDATA}/" /tmp/crm_part1.txt
     crm configure load update /tmp/crm_part1.txt
     sed -i "s/FLOATINGIP2/${FLOATINGIP2}/" /tmp/crm_part2.txt
-    ERSDATA=$(ls -l /dev/disk/by-id/ | grep "$(fdisk -l | grep '10 GiB' | awk '{print $2}' | tail -1 | tr -d \: | sed 's/\/dev\///' )1" | head -1 | awk '{print $9}' | sed 's/^/\\\/dev\\\/disk\\\/by-id\\\//' )
+    ERSDATA=$(ls -l /dev/disk/by-id/ | grep "$(fdisk -l 2>/dev/null | grep '10 GiB' | awk '{print $2}' | tail -1 | tr -d \: | sed 's/\/dev\///' )1" | head -1 | awk '{print $9}' | sed 's/^/\\\/dev\\\/disk\\\/by-id\\\//' )
     sed -i "s/ERSDATA/${ERSDATA}/" /tmp/crm_part2.txt
     crm configure load update /tmp/crm_part2.txt
     crm configure load update /tmp/crm_part3.txt
