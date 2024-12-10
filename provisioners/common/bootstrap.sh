@@ -23,7 +23,6 @@ elif [ "$ENVIRONMENT" == "SLE15" ]; then
     zypper rm -y kernel-default-base
   fi
   zypper install -y --force chrony man man-pages-posix man-pages aaa_base-extras wget zypper-log bash-doc $(for i in $(rpm -qa); do rpm -q -s $i | grep "not installed" | grep -E "man" >/dev/null; if [[ "$?" == "0" ]]; then echo $i; fi;  done)
-  mandb >/dev/null 2>&1
   mandb -c >/dev/null 2>&1 &
   echo "maxdistance 16.0" >>/etc/chrony.conf
   echo "server $NTPSERVER" >>/etc/chrony.conf
