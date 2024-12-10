@@ -6,17 +6,15 @@ DEPLOY=$2
 echo "Deploying ${MACHINE} ${DEPLOY} configurations..."
 
 if [ "$MACHINE" == "s4hana02" ]; then
-  # Specifying older version of suseconnect-ng until this internal bug is resolved: https://bugzilla.suse.com/show_bug.cgi?id=1218649
-  zypper install -y --oldpackage suseconnect-ng-1.1.0~git2.f42b4b2a060e-150400.3.13.1
   SUSEConnect --de-register
   SUSEConnect --cleanup
   rpm -e --nodeps sles-release
   SUSEConnect -p $SAPPRODUCT -r $SAPREGCODE
-  SUSEConnect -p sle-module-basesystem/15.4/x86_64
-  SUSEConnect -p sle-module-desktop-applications/15.4/x86_64
-  SUSEConnect -p sle-module-server-applications/15.4/x86_64
-  SUSEConnect -p sle-ha/15.4/x86_64 -r $SAPREGCODE
-  SUSEConnect -p sle-module-sap-applications/15.4/x86_64
+  SUSEConnect -p sle-module-basesystem/15.6/x86_64
+  SUSEConnect -p sle-module-desktop-applications/15.6/x86_64
+  SUSEConnect -p sle-module-server-applications/15.6/x86_64
+  SUSEConnect -p sle-ha/15.6/x86_64 -r $SAPREGCODE
+  SUSEConnect -p sle-module-sap-applications/15.6/x86_64
   echo "StrictHostKeyChecking no" >>/etc/ssh/ssh_config
   mkdir /root/.ssh
   chmod 700 /root/.ssh
@@ -29,7 +27,7 @@ if [ "$MACHINE" == "s4hana02" ]; then
   chown root:root /root/.ssh/id_rsa
   chown root:root /root/.ssh/id_rsa.pub
   zypper install -y open-iscsi lsscsi cron nfs-client
-  zypper install -y saptune SAPHanaSR sapstartsrv-resource-agents sapwmp sap-suse-cluster-connector supportutils-plugin-ha-sap
+  zypper install -y saptune SAPHanaSR sapstartsrv-resource-agents sap-suse-cluster-connector supportutils-plugin-ha-sap
   zypper install -y -t pattern ha_sles sap-nw sap_server
   echo "${SUBNET}${N1IP} s4hana01.labs.suse.com s4hana01" >>/etc/hosts
   echo "${SUBNET}${ISCSIIP} s4hanaiscsi.labs.suse.com s4hanaiscsi" >>/etc/hosts

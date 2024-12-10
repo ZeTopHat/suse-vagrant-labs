@@ -39,7 +39,7 @@ Vagrant.configure("2") do |config|
     trigger.only_on = lab_vars["suseconnect-d"]
     trigger.run_remote = {inline: <<-SHELL
       echo "nameserver #{custom_vars["network"]["nameserver"]}" >>/etc/resolv.conf
-      if [[ $( SUSEConnect --status | python -c "import sys, json; print(json.load(sys.stdin)[0]['status'])" ) == "Registered" ]];
+      if [[ $( SUSEConnect --status | python3 -c "import sys, json; print(json.load(sys.stdin)[0]['status'])" ) == "Registered" ]];
       then
         SUSEConnect -d;
       fi
@@ -52,8 +52,8 @@ Vagrant.configure("2") do |config|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}iscsi.yaml")
     n1_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}01.yaml")
     n2_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}02.yaml")
-    sle.vm.box = global_vars["box"]["sle15sp5"]
-    sle.vm.box_url = global_vars["boxurl"]["sle15sp5"]
+    sle.vm.box = global_vars["box"]["sle15sp6"]
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp6"]
     sle.vm.hostname = machine_vars["fqdn"]
     sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
     sle.vm.provider :libvirt do |libvirt, override|
@@ -88,8 +88,8 @@ Vagrant.configure("2") do |config|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}01.yaml")
     iscsi_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}iscsi.yaml")
     n2_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}02.yaml")
-    sle.vm.box = global_vars["box"]["sle15sp4"]
-    sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
+    sle.vm.box = global_vars["box"]["sle15sp6"]
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp6"]
     sle.vm.hostname = machine_vars["fqdn"]
     sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
     if ! (custom_vars["network"]["bridgename"].empty?)
@@ -134,8 +134,8 @@ Vagrant.configure("2") do |config|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}02.yaml")
     iscsi_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}iscsi.yaml")
     n1_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}01.yaml")
-    sle.vm.box = global_vars["box"]["sle15sp4"]
-    sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
+    sle.vm.box = global_vars["box"]["sle15sp6"]
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp6"]
     sle.vm.hostname = machine_vars["fqdn"]
     sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
     if ! (custom_vars["network"]["bridgename"].empty?)
