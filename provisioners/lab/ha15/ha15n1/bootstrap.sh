@@ -51,7 +51,7 @@ if [ "$MACHINE" == "ha15n1" ]; then
     echo "The iscsi SBD device ${BYID} was found! Continuing.."
     crm cluster init -s ${BYID} -i eth1 -y
     sed -i 's/use_lvmlockd = 0/use_lvmlockd = 1/' /etc/lvm/lvm.conf
-    systemctl enable --now lvmlockd
+    systemctl enable lvmlockd
     mkdir /shared
     mkdir /data
     mkdir -p /exports/data2
