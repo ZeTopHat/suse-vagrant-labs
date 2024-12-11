@@ -178,5 +178,45 @@ Vagrant.configure("2") do |config|
       }
     end
   end
+  
+  # K3S Cluster prepped with trento
+  config.vm.define "#{LABNAME}trento", autostart: false do |sle|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}trento.yaml")
+    n1_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n1.yaml")
+    n2_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n2.yaml")
+    sle.vm.box = global_vars["box"]["sle15sp6"]
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp6"]
+    sle.vm.hostname = machine_vars["fqdn"]
+    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
+    if ! (custom_vars["network"]["bridgename"].empty?)
+      sle.vm.network "public_network", dev: custom_vars["network"]["bridgename"], mode: "bridge", type: "bridge"
+    end
+    sle.vm.provider :libvirt do |libvirt, override|
+      libvirt.cpus = 4
+      libvirt.memory = 4096
+      libvirt.machine_virtual_size = 80
+    end
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/common/bootstrap.sh"
+      s.args = "SLE15"
+      s.env = {
+        "SLEREGCODE" => secret_vars["sleregcode"],
+        "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
+        "FQDN" => machine_vars["fqdn"],
+        "SHORT" => machine_vars["short"],
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
+      }
+    end
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}trento/bootstrap.sh"
+      s.args = "#{LABNAME}trento #{custom_vars["deployment"]}"
+      s.env = {
+        "SAPREGCODE" => secret_vars["sapregcode"],
+        "SAPPRODUCT" => machine_vars["sapproduct"],
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "N1IP" => n1_vars["ipaddress"],
+        "N2IP" => n2_vars["ipaddress"]
+      }
+    end
+  end
 end
-
