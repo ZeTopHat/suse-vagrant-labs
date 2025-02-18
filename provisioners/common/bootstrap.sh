@@ -29,6 +29,14 @@ elif [ "$ENVIRONMENT" == "SLE15" ]; then
   systemctl restart chronyd
   systemctl enable chronyd
   echo "$IPADDRESS $FQDN $SHORT" >>/etc/hosts
+elif [ "$ENVIRONMENT" == "MICRO5" ]; then
+  echo "Deploying common Micro 5 configurations..."
+  echo "$IPADDRESS $FQDN $SHORT" >>/etc/hosts
+  nmcli con add type ethernet ifname eth1 con-name eth1 ipv4.addresses ${IPADDRESS}/24 ipv4.method manual
+  nmcli con mod eth1 ipv4.gateway ${SUBNET}.1
+  nmcli con mod eth1 ipv4.dns ${SUBNET}.1
+  nmcli con up eth1
+  transactional-update register -r $MICROREGCODE
 elif [ "$ENVIRONMENT" == "LEAP42" ]; then
   echo "Deploying common LEAP 42 configurations..."
   sed -i 's/rpm.install.excludedocs = yes/rpm.install.excludedocs = no/' /etc/zypp/zypp.conf
