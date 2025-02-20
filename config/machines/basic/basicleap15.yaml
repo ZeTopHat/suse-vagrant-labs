@@ -1,0 +1,5 @@
+---
+ipaddress: ".19"
+fqdn: "basicleap15.labs.suse.com"
+short: "basicleap15"
+ntpserver: ".1"
