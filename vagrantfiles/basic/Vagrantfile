@@ -72,9 +72,6 @@ Vagrant.configure("2") do |config|
   config.vm.define "#{LABNAME}12sp4" do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}12sp4.yaml")
     sle.vm.box = global_vars["box"]["sle12sp4"]
-    # This json file currently has a bug where you need to run the following command after the first failure (when it's pulled the box and files down):
-    # sed -i 's/"42"/42/g' ~/.vagrant.d/boxes/SLES-12-SP4-Vagrant.x86_64/12.4.2.2/libvirt/metadata.json
-    # If the vagrant box name or version number has been changed, those will have to be adjusted
     sle.vm.box_url = global_vars["boxurl"]["sle12sp4"]
     sle.vm.hostname = machine_vars["fqdn"]
     sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
