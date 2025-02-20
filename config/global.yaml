@@ -6,6 +6,7 @@ box:
   sle15sp3: "SLE-15-SP3-Vagrant.x86_64"
   sle15sp2: "SLE-15-SP2-Vagrant.x86_64"
   sle15sp1: "SLE-15-SP1-Vagrant.x86_64"
+  sle15: "SLE-15-Vagrant.x86_64"
   sle12sp5: "SLE-12-SP5-Vagrant.x86_64"
   sle12sp4: "SLE-12-SP4-Vagrant.x86_64"
   micro5: "SLE-Micro-5.5-Vagrant.x86_64"
