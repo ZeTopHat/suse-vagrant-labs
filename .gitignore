@@ -5,6 +5,8 @@ secret.yaml
 .build/
 provisioners/lab/hana15/hanaiso/*
 !provisioners/lab/hana15/hanaiso/README
+provisioners/lab/scaleout15/hanaiso/*
+!provisioners/lab/scaleout15/hanaiso/README
 provisioners/lab/hana12/hanaiso/*
 !provisioners/lab/hana12/hanaiso/README
 provisioners/lab/s4hana/sapcd/*
