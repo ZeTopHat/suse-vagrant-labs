@@ -36,6 +36,11 @@ elif [ "$ENVIRONMENT" == "MICRO5" ]; then
   nmcli con mod eth1 ipv4.gateway ${SUBNET}.1
   nmcli con mod eth1 ipv4.dns ${SUBNET}.1
   nmcli con up eth1
+  if ip link show eth2 > /dev/null 2>&1; then
+    nmcli con add type ethernet ifname eth2 con-name eth2 ipv4.method auto
+    nmcli con up eth2
+    echo "eth2 found and configured with DHCP."
+  fi
   transactional-update register -r $MICROREGCODE
 elif [ "$ENVIRONMENT" == "LEAP42" ]; then
   echo "Deploying common LEAP 42 configurations..."
