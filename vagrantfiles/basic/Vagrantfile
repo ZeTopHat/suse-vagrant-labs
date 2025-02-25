@@ -96,6 +96,19 @@ Vagrant.configure("2") do |config|
     sle.vm.box_url = global_vars["boxurl"]["micro5"]
     sle.vm.hostname = machine_vars["fqdn"]
     sle.vm.network "private_network", type: "dhcp", auto_config: false
+    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", type: "dhcp", auto_config: false
+    ## Uncomment for SUMA 5 Container Deployment
+    #sle.vm.network "public_network", dev: custom_vars["network"]["bridgename"], mode: "bridge", type: "bridge", auto_config: false
+    #sle.vm.provider :libvirt do |libvirt, override|
+    #  libvirt.cpus = 2
+    #  libvirt.memory = 16384
+    #  libvirt.machine_virtual_size = 200
+    #end
+    ## After vagrant up of basicmicro5: 
+    ## transactional-update register -p SUSE-Manager-Server/5.0/x86_64 -r <SUMA REG CODE>
+    ## reboot  # After system reboots log back in and then:
+    ## mgradm install podman basicmicro5.labs.suse.com
+    #
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/common/bootstrap.sh"
       s.args = "MICRO5"
