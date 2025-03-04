@@ -4,7 +4,7 @@ deployment: "fulldeploy"
 extra: false
 libvirt:
   cpus: 4
-  memory: 10240
+  memory: 16384
   machine_virtual_size: 42
 network:
   bridgename: "br0"
