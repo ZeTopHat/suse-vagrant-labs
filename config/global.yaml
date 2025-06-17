@@ -1,5 +1,6 @@
 ---
 box:
+  sle15sp7: "SLE-15-SP7-Vagrant.x86_64"
   sle15sp6: "SLE-15-SP6-Vagrant.x86_64"
   sle15sp5: "SLE-15-SP5-Vagrant.x86_64"
   sle15sp4: "SLE-15-SP4-Vagrant.x86_64"
@@ -36,6 +37,7 @@ box:
   alma8: "Alma-8.x86_64"
   alma9: "Alma-9.x86_64"
 boxurl:
+  sle15sp7: "http://rabble.suse.cloud/vagrant/SLE-15-SP7/SLE-15-SP7-Vagrant.x86_64.json"
   sle15sp6: "http://rabble.suse.cloud/vagrant/SLE-15-SP6/SLE-15-SP6-Vagrant.x86_64.json"
   sle15sp5: "http://rabble.suse.cloud/vagrant/SLE-15-SP5/SLE-15-SP5-Vagrant.x86_64.json"
   sle15sp4: "http://rabble.suse.cloud/vagrant/SLE-15-SP4/SLE-15-SP4-Vagrant.x86_64.json"
