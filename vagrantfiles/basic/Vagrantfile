@@ -123,6 +123,27 @@ Vagrant.configure("2") do |config|
     end
   end
 
+  # SLE 15 SP7 Server
+  config.vm.define "#{LABNAME}15sp7" do |sle|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}15sp7.yaml")
+    sle.vm.box = global_vars["box"]["sle15sp7"]
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp7"]
+    sle.vm.hostname = machine_vars["fqdn"]
+    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/common/bootstrap.sh"
+      s.args = "SLE15"
+      s.env = {
+        "SLEREGCODE" => secret_vars["sleregcode"],
+        "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
+        "FQDN" => machine_vars["fqdn"],
+        "SHORT" => machine_vars["short"],
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
+      }
+    end
+  end
+
   # SLE 15 SP6 Server
   config.vm.define "#{LABNAME}15sp6" do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}15sp6.yaml")
