@@ -6,17 +6,15 @@ DEPLOY=$2
 echo "Deploying ${MACHINE} ${DEPLOY} configurations..."
 
 if [ "$MACHINE" == "scaleout15n3" ]; then
-  # Specifying older version of suseconnect-ng until this internal bug is resolved: https://bugzilla.suse.com/show_bug.cgi?id=1218649
-  zypper install -y --oldpackage suseconnect-ng-1.1.0~git2.f42b4b2a060e-150400.3.13.1
   SUSEConnect --de-register
   SUSEConnect --cleanup
   rpm -e --nodeps sles-release
   SUSEConnect -p $SAPPRODUCT -r $SAPREGCODE
-  SUSEConnect -p sle-module-basesystem/15.4/x86_64
-  SUSEConnect -p sle-module-desktop-applications/15.4/x86_64
-  SUSEConnect -p sle-module-server-applications/15.4/x86_64
-  SUSEConnect -p sle-ha/15.4/x86_64 -r $SAPREGCODE
-  SUSEConnect -p sle-module-sap-applications/15.4/x86_64
+  SUSEConnect -p sle-module-basesystem/15.5/x86_64
+  SUSEConnect -p sle-module-desktop-applications/15.5/x86_64
+  SUSEConnect -p sle-module-server-applications/15.5/x86_64
+  SUSEConnect -p sle-ha/15.5/x86_64 -r $SAPREGCODE
+  SUSEConnect -p sle-module-sap-applications/15.5/x86_64
   echo "StrictHostKeyChecking no" >>/etc/ssh/ssh_config
   mkdir /root/.ssh
   chmod 700 /root/.ssh
@@ -30,7 +28,7 @@ if [ "$MACHINE" == "scaleout15n3" ]; then
   chown root:root /root/.ssh/id_rsa.pub
   zypper install -y open-iscsi lsscsi cron nfs-client
   zypper install -y -t pattern ha_sles sap-hana sap_server
-  zypper install -y saptune SAPHanaSR-ScaleOut SAPHanaSR-ScaleOut-doc ClusterTools2 sapstartsrv-resource-agents sapwmp sap-suse-cluster-connector supportutils-plugin-ha-sap
+  zypper install -y saptune SAPHanaSR-ScaleOut SAPHanaSR-ScaleOut-doc ClusterTools2 sapstartsrv-resource-agents sap-suse-cluster-connector supportutils-plugin-ha-sap
   echo "${SUBNET}${N1IP} scaleout15n1.labs.suse.com scaleout15n1" >>/etc/hosts
   echo "${SUBNET}${N2IP} scaleout15n2.labs.suse.com scaleout15n2" >>/etc/hosts
   echo "${SUBNET}${N4IP} scaleout15n4.labs.suse.com scaleout15n4" >>/etc/hosts
