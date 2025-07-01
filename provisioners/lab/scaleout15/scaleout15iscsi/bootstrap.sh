@@ -33,9 +33,10 @@ if [ "$MACHINE" == "scaleout15iscsi" ]; then
   systemctl enable tgtd
   parted /dev/vdb mklabel gpt
   parted /dev/vdb mkpart primary xfs 1MiB 204799MiB
+  partprobe /dev/vdb
   mkdir /var/lib/exports
   mkfs -t xfs /dev/vdb1
-  echo "$(blkid | grep vdb1 | awk '{print $2}' | sed -e 's/\"//g') /var/lib/exports xfs defaults 0 0" >>/etc/fstab
+  echo "/dev/vdb1 /var/lib/exports xfs defaults 0 0" >>/etc/fstab
   mount -a
   mkdir /var/lib/exports/hanaexport1
   mkdir /var/lib/exports/hanaexport2
