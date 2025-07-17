@@ -89,6 +89,28 @@ Vagrant.configure("2") do |config|
     end
   end
 
+  # SLE Micro 6.1 Server
+  config.vm.define "#{LABNAME}micro6" do |sle|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}micro6.yaml")
+    sle.vm.box = global_vars["box"]["micro6"]
+    sle.vm.box_url = global_vars["boxurl"]["micro6"]
+    sle.vm.hostname = machine_vars["fqdn"]
+    sle.vm.network "private_network", type: "dhcp", auto_config: false
+    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", type: "dhcp", auto_config: false
+    sle.vm.provision "shell" do |s|
+      s.path = "#{WD}provisioners/common/bootstrap.sh"
+      s.args = "MICRO5"
+      s.env = {
+        "MICROREGCODE" => secret_vars["microregcode"],
+        "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
+        "FQDN" => machine_vars["fqdn"],
+        "SHORT" => machine_vars["short"],
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
+      }
+    end
+  end
+
   # SLE Micro 5.5 Server
   config.vm.define "#{LABNAME}micro5" do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}micro5.yaml")

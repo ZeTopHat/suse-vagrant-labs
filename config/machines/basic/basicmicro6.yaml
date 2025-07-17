@@ -1,0 +1,5 @@
+---
+ipaddress: ".4"
+fqdn: "basicmicro6.labs.suse.com"
+short: "basicmicro6"
+ntpserver: ".1"
