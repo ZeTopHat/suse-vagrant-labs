@@ -29,6 +29,8 @@ if [ "$MACHINE" == "s4hana01" ]; then
   zypper install -y open-iscsi lsscsi cron nfs-client
   zypper install -y saptune SAPHanaSR sapstartsrv-resource-agents sap-suse-cluster-connector supportutils-plugin-ha-sap
   zypper install -y -t pattern ha_sles sap-nw sap_server
+  systemctl disable YaST2-Firstboot.service
+  systemctl disable YaST2-Second-Stage.service
   echo "${SUBNET}${N2IP} s4hana02.labs.suse.com s4hana02" >>/etc/hosts
   echo "${SUBNET}${ISCSIIP} s4hanaiscsi.labs.suse.com s4hanaiscsi" >>/etc/hosts
   echo "${FLOATINGIP1} s4hascs" >>/etc/hosts
