@@ -28,6 +28,8 @@ if [ "$MACHINE" == "scaleout15n6" ]; then
   chown root:root /root/.ssh/id_rsa.pub
   zypper install -y open-iscsi lsscsi cron nfs-client
   zypper install -y -t pattern ha_sles sap-hana sap_server
+  systemctl disable YaST2-Firstboot.service
+  systemctl disable YaST2-Second-Stage.service
   zypper install -y saptune SAPHanaSR-ScaleOut SAPHanaSR-ScaleOut-doc ClusterTools2 sapstartsrv-resource-agents sap-suse-cluster-connector supportutils-plugin-ha-sap
   echo "${SUBNET}${N1IP} scaleout15n1.labs.suse.com scaleout15n1" >>/etc/hosts
   echo "${SUBNET}${N2IP} scaleout15n2.labs.suse.com scaleout15n2" >>/etc/hosts
