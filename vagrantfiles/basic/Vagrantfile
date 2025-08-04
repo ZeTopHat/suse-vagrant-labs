@@ -49,7 +49,7 @@ Vagrant.configure("2") do |config|
   end
 
   # SLE 12 SP5 Server
-  config.vm.define "#{LABNAME}12sp5" do |sle|
+  config.vm.define "#{LABNAME}12sp5", autostart: custom_vars["extra"] do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}12sp5.yaml")
     sle.vm.box = global_vars["box"]["sle12sp5"]
     sle.vm.box_url = global_vars["boxurl"]["sle12sp5"]
@@ -69,7 +69,7 @@ Vagrant.configure("2") do |config|
     end
   end
 
-  config.vm.define "#{LABNAME}12sp4" do |sle|
+  config.vm.define "#{LABNAME}12sp4", autostart: custom_vars["extra"] do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}12sp4.yaml")
     sle.vm.box = global_vars["box"]["sle12sp4"]
     sle.vm.box_url = global_vars["boxurl"]["sle12sp4"]
@@ -188,7 +188,7 @@ Vagrant.configure("2") do |config|
   end
 
   # SLE 15 SP5 Server
-  config.vm.define "#{LABNAME}15sp5" do |sle|
+  config.vm.define "#{LABNAME}15sp5", autostart: custom_vars["extra"] do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}15sp5.yaml")
     sle.vm.box = global_vars["box"]["sle15sp5"]
     sle.vm.box_url = global_vars["boxurl"]["sle15sp5"]
@@ -209,7 +209,7 @@ Vagrant.configure("2") do |config|
   end
 
   # SLE 15 SP4 Server
-  config.vm.define "#{LABNAME}15sp4" do |sle|
+  config.vm.define "#{LABNAME}15sp4", autostart: custom_vars["extra"] do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}15sp4.yaml")
     sle.vm.box = global_vars["box"]["sle15sp4"]
     sle.vm.box_url = global_vars["boxurl"]["sle15sp4"]
@@ -230,7 +230,7 @@ Vagrant.configure("2") do |config|
   end
 
   # SLE 15 SP3 Server
-  config.vm.define "#{LABNAME}15sp3" do |sle|
+  config.vm.define "#{LABNAME}15sp3", autostart: custom_vars["extra"] do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}15sp3.yaml")
     sle.vm.box = global_vars["box"]["sle15sp3"]
     sle.vm.box_url = global_vars["boxurl"]["sle15sp3"]
@@ -251,7 +251,7 @@ Vagrant.configure("2") do |config|
   end
 
   # SLE 15 SP2 Server
-  config.vm.define "#{LABNAME}15sp2" do |sle|
+  config.vm.define "#{LABNAME}15sp2", autostart: custom_vars["extra"] do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}15sp2.yaml")
     sle.vm.box = global_vars["box"]["sle15sp2"]
     sle.vm.box_url = global_vars["boxurl"]["sle15sp2"]
@@ -272,7 +272,7 @@ Vagrant.configure("2") do |config|
   end
 
   # SLE 15 SP1 Server
-  config.vm.define "#{LABNAME}15sp1" do |sle|
+  config.vm.define "#{LABNAME}15sp1", autostart: custom_vars["extra"] do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}15sp1.yaml")
     sle.vm.box = global_vars["box"]["sle15sp1"]
     sle.vm.box_url = global_vars["boxurl"]["sle15sp1"]
@@ -293,7 +293,7 @@ Vagrant.configure("2") do |config|
   end
   
   # OpenSUSE Leap 15 Server
-  config.vm.define "#{LABNAME}leap15" do |sle|
+  config.vm.define "#{LABNAME}leap15", autostart: custom_vars["extra"] do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}leap15.yaml")
     sle.vm.box = global_vars["box"]["leap15"]
     sle.vm.box_url = global_vars["boxurl"]["leap15"]
@@ -313,7 +313,7 @@ Vagrant.configure("2") do |config|
   end
   
   # OpenSUSE Leap 42 Server
-  config.vm.define "#{LABNAME}leap42" do |sle|
+  config.vm.define "#{LABNAME}leap42", autostart: custom_vars["extra"] do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}leap42.yaml")
     sle.vm.box = global_vars["box"]["leap42"]
     sle.vm.box_url = global_vars["boxurl"]["leap42"]

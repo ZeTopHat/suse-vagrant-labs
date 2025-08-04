@@ -1,0 +1,5 @@
+---
+ipaddress: ".25"
+fqdn: "auth15sp7.labs.suse.com"
+short: "auth15sp7"
+ntpserver: ".1"

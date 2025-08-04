@@ -13,6 +13,7 @@ if [ "$ENVIRONMENT" == "SLE12" ]; then
   systemctl restart ntpd
   systemctl enable ntpd
   echo "$IPADDRESS $FQDN $SHORT" >>/etc/hosts
+  echo "NOTE: Support for SLE 12 without LTSS ended in 31 Oct 2024. Regular LTSS support ends in 31 Oct 2027. (LTSS Core in 2030)"
 elif [ "$ENVIRONMENT" == "SLE15" ]; then
   echo "Deploying common SLE 15 configurations..."
   SUSEConnect -r $SLEREGCODE

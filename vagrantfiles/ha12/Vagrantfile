@@ -7,6 +7,7 @@
 # you're doing.
 
 Vagrant.configure("2") do |config|
+  puts "NOTE: Support for SLE 12 without LTSS ended in 31 Oct 2024. Regular LTSS support ends in 31 Oct 2027."
   unless File.exist?("./custom.yaml")
     abort("Required ./custom.yaml file does not exist. Consult vagrantfiles/custom.yaml for reference.")
   end
