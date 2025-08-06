@@ -30,6 +30,18 @@ elif [ "$ENVIRONMENT" == "SLE15" ]; then
   systemctl restart chronyd
   systemctl enable chronyd
   echo "$IPADDRESS $FQDN $SHORT" >>/etc/hosts
+elif [ "$ENVIRONMENT" == "SLE16" ]; then
+  echo "Deploying common SLE 16 configurations..."
+  SUSEConnect -r $RCREGCODE
+  sed -i 's/rpm.install.excludedocs = yes/rpm.install.excludedocs = no/' /etc/zypp/zypp.conf
+  zypper install -y --force chrony man man-pages-posix man-pages wget zypper-log bash-doc $(for i in $(rpm -qa); do rpm -q -s $i | grep "not installed" | grep -E "man" >/dev/null; if [[ "$?" == "0" ]]; then echo $i; fi;  done)
+  zypper install -y sudo
+  mandb -c >/dev/null 2>&1 &
+  echo "maxdistance 16.0" >>/etc/chrony.conf
+  echo "server $NTPSERVER" >>/etc/chrony.conf
+  systemctl restart chronyd
+  systemctl enable chronyd
+  echo "$IPADDRESS $FQDN $SHORT" >>/etc/hosts
 elif [ "$ENVIRONMENT" == "MICRO5" ]; then
   echo "Deploying common Micro 5 configurations..."
   echo "$IPADDRESS $FQDN $SHORT" >>/etc/hosts
