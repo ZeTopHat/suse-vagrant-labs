@@ -3,42 +3,46 @@ Vagrant labs for SUSE-based environments
 
 ### Lab Overview
 
-<p class="callout info">The VM names will start with the name of the directory you were in when you ran `vagrant up` followed by an underscore and the short hostname of the machine. Example if I ran `vagrant up` in the base directory of the project `./suse-vagrant-labs/`: suse-vagrant-labs_basic15sp5, suse-vagrant-labs_basic12sp5</p>
+<p class="callout info">The VM names will start with the name of the directory you were in when you ran `vagrant up` followed by an underscore and the short hostname of the machine. Example if I ran `vagrant up` in the base directory of the project `./suse-vagrant-labs/`: suse-vagrant-labs_basic15sp6, suse-vagrant-labs_basic15sp7</p>
 
 The `custom.yaml` in the same directory as the `Vagrantfile` you are using will determine several default values including `cpus`, `memory`, `primarysubnet`, etc. In this case, using the default `custom.yaml` file we might see:
 
 |Servers|OS|Specs|IP|User|Password|
 |---|---|---|---|---|---|
-|basic15sp5.labs.suse.com|15 SP5|1 vCPU, 2GB RAM, 42GB Disk|192.168.0.9|root|vagrant|
-|basic12sp5.labs.suse.com|12 SP5|1 vCPU, 2GB RAM, 42GB Disk|192.168.0.12|root|vagrant|
+|basic15sp7.labs.suse.com|15 SP7|1 vCPU, 2GB RAM, 42GB Disk|192.168.0.7|root|vagrant|
+|basic15sp6.labs.suse.com|15 SP6|1 vCPU, 2GB RAM, 42GB Disk|192.168.0.8|root|vagrant|
 
 
 #### Minimum Hypervisor Requirements:
 
-<p class="callout info">This has been tested most recently with no issues on OpenSUSE Leap 15.4. If you have a different hypervisor OS, make sure you test the deployment of the lab. Different labs may have different requirements.</p>
+<p class="callout info">This has been tested most recently with no issues on OpenSUSE Leap 15.6. If you have a different hypervisor OS, make sure you test the deployment of the lab. Different labs may have different requirements.</p>
 
 - Hypervisor: KVM
 - Processors: 4 (basic lab example)
 - RAM: 8GB (basic lab example)
 - Available Disk space: 60GB (basic lab example)
-- Access to SCC, download.opensuse.org, github, and the vagrant public cloud.
-- Packages installed in addition to KVM stack: `vagrant`, `vagrant-libvirt`, `git`
+- Access to SCC, download.opensuse.org, github, and internal "rabble.suse.cloud" for vagrant boxes (config/global.yaml can be edited to point to your own locations).
+- Packages installed in addition to KVM stack: `vagrant`, `vagrant-libvirt` (or install libvirt plugin), `git`
 - A vagrant network will be created using a `192.168.0.*` range by default. (see `custom.yaml` `primarysubnet` value)
 
 ### Lab Deployment
 
 #### Pre-requisites
 
-1. KVM's `libvirtd` service is enabled and running:
+1. KVM's virtqemud virtinterfaced virtnetworkd virtnodedevd virtsecretd virtstoraged services are enabled and running:
    
    ```
-   chamilton2:~ # systemctl is-enabled libvirtd
+   chamilton2:~ # systemctl is-enabled virtqemud virtinterfaced virtnetworkd virtnodedevd virtsecretd virtstoraged
    enabled
-   chamilton2:~ # systemctl is-active libvirtd
+   [...]
+   enabled
+   chamilton2:~ # systemctl is-active virtqemud virtinterfaced virtnetworkd virtnodedevd virtsecretd virtstoraged
+   active
+   [...]
    active
    ```
    
-2. `git`, `vagrant`, and `vagrant-libvirt` packages are installed.
+2. `git`, `vagrant`, and `vagrant-libvirt` packages are installed (in place of `vagrant-libvirt` you can install the plugin if available).
    
    ```
    chamilton2:~ # rpm -q git vagrant vagrant-libvirt
@@ -60,18 +64,16 @@ The `custom.yaml` in the same directory as the `Vagrantfile` you are using will 
    Resolving deltas: 100% (218/218), done.
    ```
    
-4. Change directories into the project and set the `config/secret.yaml` with your registration codes (for the basic lab only a standard registration code is needed in the `sleregcode` variable.)
+4. Change directories into the project and set the `config/secret.yaml` with your registration codes. For the basic lab a standard registration code is needed for SLE and SL Micro in the `sleregcode` and `microregcode` variables. If you don't plan to use one of those, you can simply set the parameter to `foobar` or some other random value for the unused code to proceed with deploying your valid machines. Here's an example for the HA labs or basic labs without using the Micro machines:
    
    ```
    chamilton2:~ # cd suse-vagrant-labs
    chamilton2:~/suse-vagrant-labs # cp config/secret_example.yaml config/secret.yaml
    chamilton2:~/suse-vagrant-labs # vim config/secret.yaml
    chamilton2:~/suse-vagrant-labs # cat config/secret.yaml
-   # The purpose of this file is to provide confidential variables, such as registration codes.
-   # Note that the GitHub project does not sync this file.
-   # Rename this file as secret.yaml, and configure below.
-   
+   rcregcode: ""
    sleregcode: "REALCODE"
+   microregcode: "foobar"
    haregcode: "REALCODE2"
    sapregcode: ""
    sumaregcode: ""
@@ -79,11 +81,9 @@ The `custom.yaml` in the same directory as the `Vagrantfile` you are using will 
    livepatchregcode: ""
    sccorguser: ""
    sccorgpass: ""
-   sccemptyuser: ""
-   sccemptypass: ""
    ```
    
-5. If you want to use a different lab, either change directories to the authentication Vagrantfile or make a new symbolic link in the primary directory:
+5. If you want to use a different lab, either change directories to the authentication Vagrantfile or make a new symbolic link in the primary directory (make sure there is desired custom.yaml configurations):
    
    Option 1 (example auth lab):
    
@@ -98,11 +98,10 @@ The `custom.yaml` in the same directory as the `Vagrantfile` you are using will 
    ```
    chamilton2:~/suse-vagrant-labs # unlink Vagrantfile
    chamilton2:~/suse-vagrant-labs # ln -s vagrantfiles/auth/Vagrantfile Vagrantfile
-   chamilton2:~/suse-vagrant-labs # ls Vagrantfile
-   Vagrantfile
+   chamilton2:~/suse-vagrant-labs # diff vagrantfiles/auth/custom.yaml custom.yaml
    ```
    
-6. Some labs may have multiple deployment options. The basic lab does not. You would change the `custom.yaml` file of your current working directory (established by the previous step) so that the variable (auth lab example) `deployment` is set to `"training"` instead of `"fulldeploy"`:
+6. Some labs may have multiple deployment options. The basic lab does not. You would change the `custom.yaml` file of your current working directory (established by the previous step) so that the variable (auth lab example) `deployment` is set to `"training"` instead of `"fulldeploy"` to follow training rather than having a fully deployed set of auth machines:
    
    ```
    chamilton2:~/suse-vagrant-labs # vim custom.yaml
@@ -121,7 +120,13 @@ The `custom.yaml` in the same directory as the `Vagrantfile` you are using will 
      primarysubnet: "192.168.0"
      secondarysubnet: "192.168.1"
    ```
-   
+
+7. If you don't have a bridged network and want the labs that would normally use it to disable their use of it (e.g. the cluster labs such as ha15 or hana15) simply set the `bridgename` variable in the `custom.yaml` to a null value:
+
+   ```
+     bridgename: ""
+   ```
+
 #### Inititate
 
 Run the following command:
