@@ -23,7 +23,7 @@ elif [ "$ENVIRONMENT" == "SLE15" ]; then
     zypper --non-interactive install --force-resolution -y kernel-default-$(uname -r | sed 's/-default/.1/' )
     zypper rm -y kernel-default-base
   fi
-  zypper install -y --force chrony man man-pages-posix man-pages wget zypper-log bash-doc $(for i in $(rpm -qa); do rpm -q -s $i | grep "not installed" | grep -E "man" >/dev/null; if [[ "$?" == "0" ]]; then echo $i; fi;  done)
+  zypper install -y --force man man-pages-posix man-pages wget zypper-log bash-doc $(for i in $(rpm -qa); do rpm -q -s $i | grep "not installed" | grep -E "man" >/dev/null; if [[ "$?" == "0" ]]; then echo $i; fi;  done)
   mandb -c >/dev/null 2>&1 &
   echo "maxdistance 16.0" >>/etc/chrony.conf
   echo "server $NTPSERVER" >>/etc/chrony.conf
@@ -34,7 +34,7 @@ elif [ "$ENVIRONMENT" == "SLE16" ]; then
   echo "Deploying common SLE 16 configurations..."
   SUSEConnect -r $RCREGCODE
   sed -i 's/rpm.install.excludedocs = yes/rpm.install.excludedocs = no/' /etc/zypp/zypp.conf
-  zypper install -y --force chrony man man-pages-posix man-pages wget zypper-log bash-doc $(for i in $(rpm -qa); do rpm -q -s $i | grep "not installed" | grep -E "man" >/dev/null; if [[ "$?" == "0" ]]; then echo $i; fi;  done)
+  zypper install -y --force man man-pages-posix man-pages wget zypper-log bash-doc $(for i in $(rpm -qa); do rpm -q -s $i | grep "not installed" | grep -E "man" >/dev/null; if [[ "$?" == "0" ]]; then echo $i; fi;  done)
   zypper install -y sudo
   mandb -c >/dev/null 2>&1 &
   echo "maxdistance 16.0" >>/etc/chrony.conf
@@ -68,7 +68,7 @@ elif [ "$ENVIRONMENT" == "LEAP42" ]; then
 elif [ "$ENVIRONMENT" == "LEAP15" ]; then
   echo "Deploying common LEAP 15 configurations..."
   sed -i 's/rpm.install.excludedocs = yes/rpm.install.excludedocs = no/' /etc/zypp/zypp.conf
-  zypper install -y --force chrony man man-pages-posix man-pages rsyslog aaa_base-extras wget zypper-log bash-doc logrotate $(for i in $(rpm -qa); do rpm -q -s $i | grep "not installed" | grep -E "man" >/dev/null; if [[ "$?" == "0" ]]; then echo $i; fi;  done)
+  zypper install -y --force man man-pages-posix man-pages rsyslog aaa_base-extras wget zypper-log bash-doc logrotate $(for i in $(rpm -qa); do rpm -q -s $i | grep "not installed" | grep -E "man" >/dev/null; if [[ "$?" == "0" ]]; then echo $i; fi;  done)
   mandb >/dev/null 2>&1
   mandb -c >/dev/null 2>&1 &
   echo "maxdistance 16.0" >>/etc/chrony.conf
