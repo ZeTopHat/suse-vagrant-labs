@@ -32,7 +32,7 @@ elif [ "$ENVIRONMENT" == "SLE15" ]; then
   echo "$IPADDRESS $FQDN $SHORT" >>/etc/hosts
 elif [ "$ENVIRONMENT" == "SLE16" ]; then
   echo "Deploying common SLE 16 configurations..."
-  SUSEConnect -r $RCREGCODE
+  SUSEConnect -r $SLEREGCODE
   sed -i 's/rpm.install.excludedocs = yes/rpm.install.excludedocs = no/' /etc/zypp/zypp.conf
   zypper install -y --force man man-pages-posix man-pages wget zypper-log bash-doc $(for i in $(rpm -qa); do rpm -q -s $i | grep "not installed" | grep -E "man" >/dev/null; if [[ "$?" == "0" ]]; then echo $i; fi;  done)
   zypper install -y sudo
@@ -41,6 +41,8 @@ elif [ "$ENVIRONMENT" == "SLE16" ]; then
   echo "server $NTPSERVER" >>/etc/chrony.conf
   systemctl restart chronyd
   systemctl enable chronyd
+  nmcli connection modify "Wired connection 3" ipv4.addresses $IPADDRESS/24 ipv4.gateway $SUBNET.1 ipv4.dns $SUBNET.1 ipv4.method manual
+  nmcli connection up "Wired connection 3"
   echo "$IPADDRESS $FQDN $SHORT" >>/etc/hosts
 elif [ "$ENVIRONMENT" == "MICRO5" ]; then
   echo "Deploying common Micro 5 configurations..."

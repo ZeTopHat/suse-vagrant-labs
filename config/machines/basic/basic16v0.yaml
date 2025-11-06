@@ -1,0 +1,5 @@
+---
+ipaddress: ".3"
+fqdn: "basic16v0.labs.suse.com"
+short: "basic16v0"
+ntpserver: ".1"
