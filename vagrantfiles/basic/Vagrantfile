@@ -89,11 +89,11 @@ Vagrant.configure("2") do |config|
     end
   end
 
-  # SLE 16 rc1 Server
-  config.vm.define "#{LABNAME}16rc1" do |sle|
-    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}16rc1.yaml")
-    sle.vm.box = global_vars["box"]["sle16rc1"]
-    sle.vm.box_url = global_vars["boxurl"]["sle16rc1"]
+  # SLE 16.0 Server
+  config.vm.define "#{LABNAME}16v0" do |sle|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}16v0.yaml")
+    sle.vm.box = global_vars["box"]["sle16v0"]
+    sle.vm.box_url = global_vars["boxurl"]["sle16v0"]
     sle.vm.hostname = machine_vars["fqdn"]
     sle.vm.network "private_network", type: "dhcp", auto_config: false
     sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", type: "dhcp", auto_config: false
@@ -101,7 +101,7 @@ Vagrant.configure("2") do |config|
       s.path = "#{WD}provisioners/common/bootstrap.sh"
       s.args = "SLE16"
       s.env = {
-        "RCREGCODE" => secret_vars["rcregcode"],
+        "SLEREGCODE" => secret_vars["sleregcode"],
         "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FQDN" => machine_vars["fqdn"],
         "SHORT" => machine_vars["short"],
