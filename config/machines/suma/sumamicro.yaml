@@ -1,0 +1,6 @@
+---
+ipaddress: ".131"
+fqdn: "sumamicro.labs.suse.com"
+short: "sumamicro"
+ntpserver: ".1"
+sumaproduct: "5.1"

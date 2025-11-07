@@ -1,24 +1,33 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-custom_vars = YAML.load_file("./custom.yaml")
-WD = custom_vars["wheredir"]
-global_vars = YAML.load_file("#{WD}config/global.yaml")
-secret_vars = YAML.load_file("#{WD}config/secret.yaml")
-lab_vars = YAML.load_file("#{WD}config/lab/suma.yaml")
-LABNAME = lab_vars["labname"]
-lab_vars["requiredsecrets"].each do |code|
-  if (secret_vars[code.downcase].empty?)
-    abort("Required #{code.downcase} variable has not been filled out in the config/secret.yaml file.")
+Vagrant.configure("2") do |config|
+  unless File.exist?("./custom.yaml")
+    abort("Required ./custom.yaml file does not exist. Consult vagrantfiles/custom.yaml for reference.")
   end
-end
-
-Vagrant.configure("2") do |config|    
+  custom_vars = YAML.load_file("./custom.yaml")
+  WD = custom_vars["wheredir"]
+  global_vars = YAML.load_file("#{WD}config/global.yaml")
+  if File.exist?("./secret.yaml")
+    secret_vars = YAML.load_file("./secret.yaml")
+  elsif File.exist?("#{WD}config/secret.yaml")
+    secret_vars = YAML.load_file("#{WD}config/secret.yaml")
+  else
+    abort("The required ./secret.yaml or #{WD}config/secret.yaml file does not exist. Consult #{WD}config/secret_example.yaml for reference.")
+  end
+  lab_vars = YAML.load_file("#{WD}config/lab/suma.yaml")
+  LABNAME = lab_vars["labname"]
+  lab_vars["requiredsecrets"].each do |code|
+    if (secret_vars[code.downcase].empty?)
+      abort("Required #{code.downcase} variable has not been filled out in the secret.yaml file.")
+    end
+  end
   config.vm.synced_folder ".", "/vagrant", disabled: true
   config.vm.provider :libvirt do |libvirt, override|
     libvirt.cpus = custom_vars["libvirt"]["cpus"]
     libvirt.memory = custom_vars["libvirt"]["memory"]
     libvirt.machine_virtual_size = custom_vars["libvirt"]["machine_virtual_size"]
+    libvirt.storage :file, size: "200G"
   end
 
   config.trigger.before :destroy do |trigger|
@@ -28,77 +37,133 @@ Vagrant.configure("2") do |config|
     trigger.only_on = lab_vars["suseconnect-d"]
     trigger.run_remote = {inline: <<-SHELL
       echo "nameserver #{custom_vars["network"]["nameserver"]}" >>/etc/resolv.conf
-      if [[ $( SUSEConnect --status | python -c "import sys, json; print(json.load(sys.stdin)[0]['status'])" ) == "Registered" ]];
+      if [[ $( SUSEConnect --status | python3 -c "import sys, json; print(json.load(sys.stdin)[0]['status'])" ) == "Registered" ]];
       then
-        SUSEConnect -d;
+        if command -v transactional-update >/dev/null 2>&1; then
+          transactional-update register -d
+        else
+          SUSEConnect -d;
+        fi
       fi
     SHELL
     }
-  end 
+  end
 
-  machine_list = lab_vars["machines"][custom_vars["deployment"]]
-
-  #client_products = []
-  #
-  # Add any machine yaml file suma-client-product values 
-  #machine_list.each do |machine|
-  #  file_path = "#{WD}config/machines/#{LABNAME}/#{machine}.yaml"
-  #  
-  #  if File.exists?(file_path)
-  #    yaml_content = YAML.load_file(file_path)
-  #  
-  #    if yaml_content.key?('suma-client-product')
-  #      client_products << yaml_content['suma-client-product']
-  #    end
-  #  end
-  #end
-
-  machine_list.each do |machine|
-    machine_vars = YAML.safe_load(File.read("#{WD}config/machines/#{LABNAME}/#{machine}.yaml"))  ### Loads all of the machine_vars, secret_vars, and custom_vars values for use in provisioning.
-    env_vars = {}
-    [machine_vars, secret_vars, custom_vars].each do |vars|
-      vars.each do |k, v|
-        env_var_name = k.to_s.upcase
-        env_var_value = v
-        if env_var_value.nil?
-          raise "Could not find a value for #{k}"
-        end  
-        env_vars[env_var_name] = env_var_value
-      end
-    end 
-
-    # Variables that interact with the other yaml files. 
-    # Also include them as variables for provisioning scripts below.
-    ipaddress = "#{custom_vars["network"][machine_vars["subnet"]]}#{machine_vars["ipaddress"]}"
-    env_vars["IPADDRESS"] = ipaddress
-
-    subnet = "#{custom_vars["network"][machine_vars["subnet"]]}"
-    env_vars["SUBNET"] = subnet
-
-    #env_vars["CLIENTPRODUCTS"] = client_products
-
-    ## Vagrant Machine Portion
-    config.vm.define machine_vars["short"] do |node|
-      node.vm.box = global_vars["box"][machine_vars["box"]]
-      node.vm.box_url = global_vars["boxurl"][machine_vars["box"]]
-      node.vm.hostname = machine_vars["fqdn"]
-      node.vm.network "private_network", ip: ipaddress, hostname: true
-      node.vm.provider :libvirt do |libvirt, override|
-        libvirt.cpus = machine_vars["cpus"]
-        libvirt.memory = machine_vars["memory"]
-        libvirt.storage :file, :size => machine_vars["datadisk"], :type => 'qcow2'
-      end
-      if machine_vars["public"] == "true"
-        node.vm.network "public_network", dev: custom_vars["network"]["bridgename"], mode: "bridge", type: "bridge"
-      end
-      Dir.glob("#{WD}provisioners/lab/#{LABNAME}/#{machine_vars["files"]}/*") do |file|
-        node.vm.provision "file", source: file, destination: "/tmp/#{File.basename(file)}"
-      end
-      node.vm.provision "shell" do |s|   
-        s.path = "#{WD}provisioners/lab/#{LABNAME}/#{machine_vars["provisioning"]}"
-        s.env = env_vars
-        #puts "s.env: #{s.env}" # For s.env debugging.
-      end  
+  # SUMA Client
+  config.vm.define "#{LABNAME}client" do |sle|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}client.yaml")
+    sle.vm.box = global_vars["box"]["sle15sp7"]
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp7"]
+    sle.vm.hostname = machine_vars["fqdn"]
+    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
+    sle.vm.provider :libvirt do |libvirt, override|
+      libvirt.cpus = 1
+      libvirt.memory = 2048
+    end
+    sle.vm.provision "shell" do |s|
+      s.name = "common"
+      s.path = "#{WD}provisioners/common/bootstrap.sh"
+      s.args = "SLE15"
+      s.env = {
+        "SLEREGCODE" => secret_vars["sleregcode"],
+        "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
+        "FQDN" => machine_vars["fqdn"],
+        "SHORT" => machine_vars["short"],
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
+      }
+    end
+    sle.vm.provision "shell" do |s|
+      s.name = "bootstrap"
+      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}client/bootstrap.sh"
+      s.args = "#{LABNAME}client #{custom_vars["deployment"]}"
+      s.env = {
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+      }
     end
   end
-end 
+
+  # SUMA 5 on SLE Micro
+  config.vm.define "#{LABNAME}micro" do |sle|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}micro.yaml")
+    sle.vm.box = global_vars["box"]["micro6"]
+    sle.vm.box_url = global_vars["boxurl"]["micro6"]
+    sle.vm.hostname = machine_vars["fqdn"]
+    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", type: "dhcp", auto_config: false
+    if ! (custom_vars["network"]["bridgename"].empty?)
+      sle.vm.network "public_network", dev: custom_vars["network"]["bridgename"], mode: "bridge", type: "bridge", auto_config: false
+    end
+    sle.vm.provision "shell" do |s|
+      s.name = "common"
+      s.path = "#{WD}provisioners/common/bootstrap.sh"
+      s.args = "MICRO5"
+      s.env = {
+        "MICROREGCODE" => secret_vars["microregcode"],
+        "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
+        "FQDN" => machine_vars["fqdn"],
+        "SHORT" => machine_vars["short"],
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
+      }
+    end
+    sle.vm.provision "shell" do |s|
+      s.name = "bootstrap"
+      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}micro/bootstrap.sh"
+      s.args = "#{LABNAME}micro #{custom_vars["deployment"]}"
+      s.env = {
+        "SUMAREGCODE" => secret_vars["sumaregcode"],
+        "SUMAPRODUCT" => machine_vars["sumaproduct"],
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+      }
+    end
+    sle.vm.provision :reload
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}micro/mgradm.yaml", destination: "/tmp/"
+    sle.vm.provision "shell" do |s|
+      s.name = "bootstrap2"
+      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}micro/bootstrap2.sh"
+      s.args = "#{LABNAME}micro #{custom_vars["deployment"]}"
+      s.env = {
+        "MIRRORUSER" => secret_vars["sccorguser"],
+        "MIRRORPASS" => secret_vars["sccorgpass"],
+      }
+    end
+  end
+
+  # SUMA 5 on SLE 15
+  config.vm.define "#{LABNAME}15" do |sle|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}15.yaml")
+    sle.vm.box = global_vars["box"]["sle15sp6"]
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp6"]
+    sle.vm.hostname = machine_vars["fqdn"]
+    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
+    if ! (custom_vars["network"]["bridgename"].empty?)
+      sle.vm.network "public_network", dev: custom_vars["network"]["bridgename"], mode: "bridge", type: "bridge"
+    end
+    sle.vm.provision "shell" do |s|
+      s.name = "common"
+      s.path = "#{WD}provisioners/common/bootstrap.sh"
+      s.args = "SLE15"
+      s.env = {
+        "SLEREGCODE" => secret_vars["sleregcode"],
+        "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
+        "FQDN" => machine_vars["fqdn"],
+        "SHORT" => machine_vars["short"],
+        "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
+      }
+    end
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15/mgradm.yaml", destination: "/tmp/"
+    sle.vm.provision "shell" do |s|
+      s.name = "bootstrap"
+      s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15/bootstrap.sh"
+      s.args = "#{LABNAME}15 #{custom_vars["deployment"]}"
+      s.env = {
+        "SUMAREGCODE" => secret_vars["sumaregcode"],
+        "SUMAPRODUCT" => machine_vars["sumaproduct"],
+        "SLEPRODUCT" => machine_vars["sleproduct"],
+        "MIRRORUSER" => secret_vars["sccorguser"],
+        "MIRRORPASS" => secret_vars["sccorgpass"],
+        "SUBNET" => custom_vars["network"]["primarysubnet"],
+      }
+    end
+  end
+
+end

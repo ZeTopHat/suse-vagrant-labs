@@ -1,0 +1,14 @@
+# Password for the CA certificate
+ssl:
+  password: vagrant
+
+# Organization name
+organization: SUSELabs
+
+# Administrators account details
+admin:
+  password: vagrant
+  login: admin
+  firstName: Admin
+  lastName: Admin
+  email: admin@example.com

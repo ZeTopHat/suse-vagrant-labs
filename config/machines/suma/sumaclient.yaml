@@ -1,0 +1,5 @@
+---
+ipaddress: ".132"
+fqdn: "sumaclient.labs.suse.com"
+short: "sumaclient"
+ntpserver: ".1"
