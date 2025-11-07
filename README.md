@@ -127,6 +127,12 @@ The `custom.yaml` in the same directory as the `Vagrantfile` you are using will 
      bridgename: ""
    ```
 
+8. Install `vagrant-reload` plugin (this is also where you could attempt to install the `vagrant-libvirt` plugin)
+
+   ```
+   chamilton2:~/suse-vagrant-labs # vagrant plugin install vagrant-reload
+   ```
+
 #### Inititate
 
 Run the following command:

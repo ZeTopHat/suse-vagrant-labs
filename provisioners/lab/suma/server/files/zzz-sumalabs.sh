@@ -1,1 +1,0 @@
-alias sumalabs='python3.6 /usr/share/rhn/sumalabs/sumalabs.py'
