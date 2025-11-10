@@ -9,12 +9,12 @@ if [ "$MACHINE" == "scaleout15n1" ]; then
   SUSEConnect --de-register
   SUSEConnect --cleanup
   rpm -e --nodeps sles-release
-  SUSEConnect -p $SAPPRODUCT -r $SAPREGCODE
-  SUSEConnect -p sle-module-basesystem/15.5/x86_64
-  SUSEConnect -p sle-module-desktop-applications/15.5/x86_64
-  SUSEConnect -p sle-module-server-applications/15.5/x86_64
-  SUSEConnect -p sle-ha/15.5/x86_64 -r $SAPREGCODE
-  SUSEConnect -p sle-module-sap-applications/15.5/x86_64
+  SUSEConnect -p SLES_SAP/$SAPPRODUCT/x86_64 -r $SAPREGCODE
+  SUSEConnect -p sle-module-basesystem/$SAPPRODUCT/x86_64
+  SUSEConnect -p sle-module-desktop-applications/$SAPPRODUCT/x86_64
+  SUSEConnect -p sle-module-server-applications/$SAPPRODUCT/x86_64
+  SUSEConnect -p sle-ha/$SAPPRODUCT/x86_64 -r $SAPREGCODE
+  SUSEConnect -p sle-module-sap-applications/$SAPPRODUCT/x86_64
   echo "StrictHostKeyChecking no" >>/etc/ssh/ssh_config
   mkdir /root/.ssh
   chmod 700 /root/.ssh
