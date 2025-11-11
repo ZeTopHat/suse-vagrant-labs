@@ -9,13 +9,13 @@ if [ "$MACHINE" == "hana15trento" ]; then
   SUSEConnect --de-register
   SUSEConnect --cleanup
   rpm -e --nodeps sles-release
-  SUSEConnect -p $SAPPRODUCT -r $SAPREGCODE
-  SUSEConnect -p sle-module-basesystem/15.6/x86_64
-  SUSEConnect -p sle-module-desktop-applications/15.6/x86_64
-  SUSEConnect -p sle-module-server-applications/15.6/x86_64
-  SUSEConnect -p sle-ha/15.6/x86_64 -r $SAPREGCODE
-  SUSEConnect -p sle-module-sap-applications/15.6/x86_64
-  SUSEConnect -p sle-module-containers/15.6/x86_64
+  SUSEConnect -p SLES_SAP/$SAPPRODUCT/x86_64 -r $SAPREGCODE
+  SUSEConnect -p sle-module-basesystem/$SAPPRODUCT/x86_64
+  SUSEConnect -p sle-module-desktop-applications/$SAPPRODUCT/x86_64
+  SUSEConnect -p sle-module-server-applications/$SAPPRODUCT/x86_64
+  SUSEConnect -p sle-ha/$SAPPRODUCT/x86_64 -r $SAPREGCODE
+  SUSEConnect -p sle-module-sap-applications/$SAPPRODUCT/x86_64
+  SUSEConnect -p sle-module-containers/$SAPPRODUCT/x86_64
   zypper install -y zypper-search-packages-plugin helm trento-server-installer unzip bash-completion
   zypper install -y -t pattern apparmor
   echo "${SUBNET}${N1IP} hana15n1.labs.suse.com hana15n1" >>/etc/hosts
