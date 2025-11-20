@@ -2,4 +2,5 @@
 suseconnect-d: ["hana12iscsi", "hana12n1", "hana12n2"]
 labname: "hana12"
 requiredsecrets: ["sleregcode", "sapregcode"]
+requiredplugins: ["vagrant-libvirt"]
 floatingip1: ".183"

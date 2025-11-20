@@ -1,0 +1,6 @@
+---
+ipaddress: ".161"
+fqdn: "ha16n1.labs.suse.com"
+short: "ha16n1"
+ntpserver: ".1"
+haproduct: "sle-ha/16.0/x86_64"

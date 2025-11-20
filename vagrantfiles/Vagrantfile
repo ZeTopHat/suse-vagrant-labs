@@ -31,6 +31,12 @@ Vagrant.configure("2") do |config|
       abort("Required #{code.downcase} variable has not been filled out in the secret.yaml file.")
     end
   end
+  # Loop over "requiredplugins" for the lab and exit if one of the required plugins is not loaded. ("vagrant plugin list" for list of loaded plugins)
+  lab_vars["requiredplugins"].each do |plugin|
+    unless Vagrant.has_plugin?(plugin)
+      abort("Required #{plugin.downcase} Vagrant plugin has not been loaded. See \"vagrant plugin list\" for loaded plugins.")
+    end
+  end
   # Don't sync a files from the current directory to a "/vagrant" folder on the VMs. This is enabled by default in vagrant, but disabled by default in our project.
   config.vm.synced_folder ".", "/vagrant", disabled: true
   # global libvirt parameters for the VMs, if they don't specify individually. The cpu, memory, and disk size are set by the custom.yaml file.

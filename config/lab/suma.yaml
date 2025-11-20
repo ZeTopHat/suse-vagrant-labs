@@ -2,3 +2,4 @@
 suseconnect-d: ["sumamicro", "suma15", "sumaclient"]
 labname: "suma"
 requiredsecrets: ["sleregcode", "microregcode"]
+requiredplugins: ["vagrant-libvirt", "vagrant-reload"]

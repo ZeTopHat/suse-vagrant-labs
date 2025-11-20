@@ -1,0 +1,7 @@
+primitive fs-shared Filesystem \
+        params directory="/shared" fstype=gfs2 device="/dev/vg-shared/lv-shared" \
+        op start timeout=60s interval=0 \
+        op stop timeout=60s interval=0 \
+        op monitor interval=20s timeout=40s
+
+group g-shared dlm lvmlockd vg-shared fs-shared 

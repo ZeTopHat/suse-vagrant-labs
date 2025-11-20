@@ -34,6 +34,11 @@ elif [ "$ENVIRONMENT" == "SLE16" ]; then
   echo "Deploying common SLE 16 configurations..."
   SUSEConnect -r $SLEREGCODE
   sed -i 's/rpm.install.excludedocs = yes/rpm.install.excludedocs = no/' /etc/zypp/zypp.conf
+  # Images since 15 SP6 only have kernel-default-base installed by default. This is problematic when the usual expected kernel modules are suddenly missing. e.g. tcp_iscsi
+  if ! rpm -q kernel-default > /dev/null 2>&1; then
+    zypper --non-interactive install --force-resolution -y kernel-default-$(uname -r | sed 's/-default/.1/' )
+    zypper rm -y kernel-default-base
+  fi
   zypper install -y --force man man-pages-posix man-pages wget zypper-log bash-doc $(for i in $(rpm -qa); do rpm -q -s $i | grep "not installed" | grep -E "man" >/dev/null; if [[ "$?" == "0" ]]; then echo $i; fi;  done)
   zypper install -y sudo
   mandb -c >/dev/null 2>&1 &
@@ -44,6 +49,7 @@ elif [ "$ENVIRONMENT" == "SLE16" ]; then
   nmcli connection modify "Wired connection 3" ipv4.addresses $IPADDRESS/24 ipv4.gateway $SUBNET.1 ipv4.dns $SUBNET.1 ipv4.method manual
   nmcli connection up "Wired connection 3"
   echo "$IPADDRESS $FQDN $SHORT" >>/etc/hosts
+  zypper up -y
 elif [ "$ENVIRONMENT" == "MICRO5" ]; then
   echo "Deploying common Micro 5 configurations..."
   echo "$IPADDRESS $FQDN $SHORT" >>/etc/hosts

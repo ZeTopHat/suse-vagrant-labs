@@ -2,5 +2,6 @@
 suseconnect-d: ["scaleout15iscsi", "scaleout15n1", "scaleout15n2", "scaleout15n3", "scaleout15n4", "scaleout15n5", "scaleout15n6"]
 labname: "scaleout15"
 requiredsecrets: ["sleregcode", "sapregcode"]
+requiredplugins: ["vagrant-libvirt"]
 floatingip1: ".197"
 floatingip2: ".198"

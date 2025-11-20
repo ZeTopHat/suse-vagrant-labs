@@ -2,4 +2,5 @@
 suseconnect-d: ["hana15iscsi", "hana15n1", "hana15n2", "hana15trento"]
 labname: "hana15"
 requiredsecrets: ["sleregcode", "sapregcode"]
+requiredplugins: ["vagrant-libvirt"]
 floatingip1: ".163"

@@ -1,0 +1,7 @@
+---
+suseconnect-d: ["ha16iscsi", "ha16n1", "ha16n2"]
+labname: "ha16"
+requiredsecrets: ["sleregcode", "haregcode"]
+requiredplugins: ["vagrant-libvirt", "vagrant-reload"]
+floatingip1: ".251"
+floatingip2: ".252"

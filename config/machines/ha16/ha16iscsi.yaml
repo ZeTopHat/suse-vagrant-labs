@@ -1,0 +1,5 @@
+---
+ipaddress: ".160"
+fqdn: "ha16iscsi.labs.suse.com"
+short: "ha16iscsi"
+ntpserver: ".1"
