@@ -2,5 +2,6 @@
 suseconnect-d: ["ha15iscsi", "ha15n1", "ha15n2"]
 labname: "ha15"
 requiredsecrets: ["sleregcode", "haregcode"]
+requiredplugins: ["vagrant-libvirt"]
 floatingip1: ".251"
 floatingip2: ".252"

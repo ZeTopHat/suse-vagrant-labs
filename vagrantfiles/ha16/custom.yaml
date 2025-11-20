@@ -1,0 +1,13 @@
+---
+wheredir: "../../"
+deployment: "fulldeploy"
+extra: false
+libvirt:
+  cpus: 1
+  memory: 2048
+  machine_virtual_size: 42
+network:
+  bridgename: "br0"
+  nameserver: "192.168.0.1"
+  primarysubnet: "192.168.0"
+  secondarysubnet: "192.168.1"

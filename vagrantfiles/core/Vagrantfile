@@ -22,6 +22,11 @@ Vagrant.configure("2") do |config|
       abort("Required #{code.downcase} variable has not been filled out in the secret.yaml file.")
     end
   end
+  lab_vars["requiredplugins"].each do |plugin|
+    unless Vagrant.has_plugin?(plugin)
+      abort("Required #{plugin.downcase} Vagrant plugin has not been loaded. See \"vagrant plugin list\" for loaded plugins.")
+    end
+  end
   config.vm.synced_folder ".", "/vagrant", disabled: true
   config.vm.provider :libvirt do |libvirt, override|
     libvirt.cpus = custom_vars["libvirt"]["cpus"]

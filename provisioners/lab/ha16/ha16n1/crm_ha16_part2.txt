@@ -1,0 +1,7 @@
+primitive vg-shared LVM-activate \
+        params vgname=vg-shared vg_access_mode=lvmlockd activation_mode=shared \
+        op start timeout=60s interval=0 \
+        op stop timeout=60s interval=0 \
+        op monitor interval=30s timeout=90s
+
+group g-shared dlm lvmlockd vg-shared

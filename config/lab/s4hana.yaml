@@ -2,5 +2,6 @@
 suseconnect-d: ["s4hanaiscsi", "s4hana01", "s4hana02"]
 labname: "s4hana"
 requiredsecrets: ["sleregcode", "sapregcode"]
+requiredplugins: ["vagrant-libvirt"]
 floatingip1: ".173"
 floatingip2: ".174"

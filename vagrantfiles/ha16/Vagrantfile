@@ -20,7 +20,7 @@ Vagrant.configure("2") do |config|
   else
     abort("The required ./secret.yaml or #{WD}config/secret.yaml file does not exist. Consult #{WD}config/secret_example.yaml for reference.")
   end
-  lab_vars = YAML.load_file("#{WD}config/lab/ha15.yaml")
+  lab_vars = YAML.load_file("#{WD}config/lab/ha16.yaml")
   LABNAME = lab_vars["labname"]
   lab_vars["requiredsecrets"].each do |code|
     if (secret_vars[code.downcase].empty?)
@@ -59,17 +59,18 @@ Vagrant.configure("2") do |config|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}iscsi.yaml")
     n1_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n1.yaml")
     n2_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n2.yaml")
-    sle.vm.box = global_vars["box"]["sle15sp7"]
-    sle.vm.box_url = global_vars["boxurl"]["sle15sp7"]
+    sle.vm.box = global_vars["box"]["sle16v0"]
+    sle.vm.box_url = global_vars["boxurl"]["sle16v0"]
     sle.vm.hostname = machine_vars["fqdn"]
-    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
+    sle.vm.network "private_network", type: "dhcp", auto_config: false
+    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", type: "dhcp", auto_config: false
     sle.vm.provider :libvirt do |libvirt, override|
       libvirt.cpus = 2
       libvirt.machine_virtual_size = 40
     end
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/common/bootstrap.sh"
-      s.args = "SLE15"
+      s.args = "SLE16"
       s.env = {
         "SLEREGCODE" => secret_vars["sleregcode"],
         "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
@@ -90,21 +91,22 @@ Vagrant.configure("2") do |config|
     end
   end
 
-  # HA15 Cluster Node 1
+  # HA16 Cluster Node 1
   config.vm.define "#{LABNAME}n1" do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n1.yaml")
     iscsi_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}iscsi.yaml")
     n2_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n2.yaml")
-    sle.vm.box = global_vars["box"]["sle15sp7"]
-    sle.vm.box_url = global_vars["boxurl"]["sle15sp7"]
+    sle.vm.box = global_vars["box"]["sle16v0"]
+    sle.vm.box_url = global_vars["boxurl"]["sle16v0"]
     sle.vm.hostname = machine_vars["fqdn"]
-    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
+    sle.vm.network "private_network", type: "dhcp", auto_config: false
+    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", type: "dhcp", auto_config: false
     if ! (custom_vars["network"]["bridgename"].empty?)
-      sle.vm.network "public_network", dev: custom_vars["network"]["bridgename"], mode: "bridge", type: "bridge"
+      sle.vm.network "public_network", dev: custom_vars["network"]["bridgename"], mode: "bridge", type: "bridge", auto_config: false
     end
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/common/bootstrap.sh"
-      s.args = "SLE15"
+      s.args = "SLE16"
       s.env = {
         "SLEREGCODE" => secret_vars["sleregcode"],
         "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
@@ -114,11 +116,12 @@ Vagrant.configure("2") do |config|
         "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
       }
     end
-    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_ha15_part1.txt", destination: "/tmp/"
-    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_ha15_part2.txt", destination: "/tmp/"
-    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_ha15_part3.txt", destination: "/tmp/"
-    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_ha15_part4.txt", destination: "/tmp/"
-    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_ha15_part5.txt", destination: "/tmp/"
+    sle.vm.provision :reload
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_ha16_part1.txt", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_ha16_part2.txt", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_ha16_part3.txt", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_ha16_part4.txt", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_ha16_part5.txt", destination: "/tmp/"
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/authorized_keys", destination: "/tmp/"
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/id_rsa", destination: "/tmp/"
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/id_rsa.pub", destination: "/tmp/"
@@ -128,6 +131,7 @@ Vagrant.configure("2") do |config|
       s.env = {
         "HAREGCODE" => secret_vars["haregcode"],
         "HAPRODUCT" => machine_vars["haproduct"],
+        "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "FLOATINGIP1" => "#{custom_vars["network"]["primarysubnet"]}#{lab_vars["floatingip1"]}", 
         "FLOATINGIP2" => "#{custom_vars["network"]["primarysubnet"]}#{lab_vars["floatingip2"]}",
         "SUBNET" => custom_vars["network"]["primarysubnet"],
@@ -137,21 +141,22 @@ Vagrant.configure("2") do |config|
     end
   end
 
-  # HA15 Cluster Node 2
+  # HA16 Cluster Node 2
   config.vm.define "#{LABNAME}n2" do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n2.yaml")
     iscsi_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}iscsi.yaml")
     n1_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n1.yaml")
-    sle.vm.box = global_vars["box"]["sle15sp7"]
-    sle.vm.box_url = global_vars["boxurl"]["sle15sp7"]
+    sle.vm.box = global_vars["box"]["sle16v0"]
+    sle.vm.box_url = global_vars["boxurl"]["sle16v0"]
     sle.vm.hostname = machine_vars["fqdn"]
-    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
+    sle.vm.network "private_network", type: "dhcp", auto_config: false
+    sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", type: "dhcp", auto_config: false
     if ! (custom_vars["network"]["bridgename"].empty?)
-      sle.vm.network "public_network", dev: custom_vars["network"]["bridgename"], mode: "bridge", type: "bridge"
+      sle.vm.network "public_network", dev: custom_vars["network"]["bridgename"], mode: "bridge", type: "bridge", auto_config: false
     end
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/common/bootstrap.sh"
-      s.args = "SLE15"
+      s.args = "SLE16"
       s.env = {
         "SLEREGCODE" => secret_vars["sleregcode"],
         "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
@@ -161,6 +166,7 @@ Vagrant.configure("2") do |config|
         "NTPSERVER" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ntpserver"]}"
       }
     end
+    sle.vm.provision :reload
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n2/authorized_keys", destination: "/tmp/"
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n2/id_rsa", destination: "/tmp/"
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n2/id_rsa.pub", destination: "/tmp/"
@@ -170,6 +176,7 @@ Vagrant.configure("2") do |config|
       s.env = {
         "HAREGCODE" => secret_vars["haregcode"],
         "HAPRODUCT" => machine_vars["haproduct"],
+        "IPADDRESS" => "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}",
         "SUBNET" => custom_vars["network"]["primarysubnet"],
         "ISCSIIP" => iscsi_vars["ipaddress"],
         "N1IP" => n1_vars["ipaddress"]
