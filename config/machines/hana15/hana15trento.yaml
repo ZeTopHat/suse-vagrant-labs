@@ -1,5 +1,5 @@
 ---
-ipaddress: ".164"
+ipaddress: ".144"
 fqdn: "hana15trento.labs.suse.com"
 short: "hana15trento"
 ntpserver: ".1"
