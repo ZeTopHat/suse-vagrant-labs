@@ -122,6 +122,7 @@ Vagrant.configure("2") do |config|
     end
     sle.vm.provision :reload
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}micro/mgradm.yaml", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}micro/.mgr-sync", destination: "/tmp/"
     sle.vm.provision "shell" do |s|
       s.name = "bootstrap2"
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}micro/bootstrap2.sh"
@@ -136,8 +137,8 @@ Vagrant.configure("2") do |config|
   # SUMA 5 on SLE 15
   config.vm.define "#{LABNAME}15" do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}15.yaml")
-    sle.vm.box = global_vars["box"]["sle15sp6"]
-    sle.vm.box_url = global_vars["boxurl"]["sle15sp6"]
+    sle.vm.box = global_vars["box"]["sle15sp7"]
+    sle.vm.box_url = global_vars["boxurl"]["sle15sp7"]
     sle.vm.hostname = machine_vars["fqdn"]
     sle.vm.network "private_network", ip: "#{custom_vars["network"]["primarysubnet"]}#{machine_vars["ipaddress"]}", hostname: true
     if ! (custom_vars["network"]["bridgename"].empty?)
@@ -156,6 +157,7 @@ Vagrant.configure("2") do |config|
       }
     end
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15/mgradm.yaml", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15/.mgr-sync", destination: "/tmp/"
     sle.vm.provision "shell" do |s|
       s.name = "bootstrap"
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}15/bootstrap.sh"
