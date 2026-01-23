@@ -1,0 +1,4 @@
+mgrsync.user = admin
+mgrsync.password = vagrant
+mgrsync.host = localhost
+mgrsync.port = 80

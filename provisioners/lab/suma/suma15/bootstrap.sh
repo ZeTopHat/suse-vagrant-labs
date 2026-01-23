@@ -11,8 +11,8 @@ if [ "$MACHINE" == "suma15" ]; then
     echo "training"
   elif [ "$DEPLOY" == "fulldeploy" ]; then
     echo "fulldeploy"
-    SUSEConnect -p SUSE-Manager-Server/$SUMAPRODUCT/x86_64 -r $SUMAREGCODE
     SUSEConnect -p sle-module-containers/$SLEPRODUCT/x86_64
+    SUSEConnect -p Multi-Linux-Manager-Server-SLE/$SUMAPRODUCT/x86_64 -r $SUMAREGCODE
     zypper install -y podman mgradm mgradm-bash-completion
     systemctl enable --now podman.service
     parted /dev/vdb mklabel gpt
@@ -26,6 +26,21 @@ if [ "$MACHINE" == "suma15" ]; then
     mgradm -c /tmp/mgradm.yaml install podman suma15.labs.suse.com
     if [[ -n "$MIRRORUSER" ]]; then
       echo "Configuring channels using mirror credentials.."
+      podman cp /tmp/.mgr-sync uyuni-server:/root/
+      mgrctl exec -- mgr-sync list channels
+      mgrctl exec -- mgr-sync add channel sle-product-sles15-sp7-pool-x86_64
+      mgrctl exec -- mgr-sync add channel sle-product-sles15-sp7-updates-x86_64
+      mgrctl exec -- mgr-sync add channel sle-module-basesystem15-sp7-pool-x86_64
+      mgrctl exec -- mgr-sync add channel sle-module-basesystem15-sp7-updates-x86_64
+      mgrctl exec -- mgr-sync add channel sle-module-server-applications15-sp7-pool-x86_64
+      mgrctl exec -- mgr-sync add channel sle-module-server-applications15-sp7-updates-x86_64
+      mgrctl exec -- mgr-sync add channel sle-module-python3-15-sp7-pool-x86_64
+      mgrctl exec -- mgr-sync add channel sle-module-python3-15-sp7-updates-x86_64
+      mgrctl exec -- mgr-sync add channel sle-module-systems-management-15-sp7-pool-x86_64
+      mgrctl exec -- mgr-sync add channel sle-module-systems-management-15-sp7-updates-x86_64
+      mgrctl exec -- mgr-sync add channel managertools-sle15-pool-x86_64-sp7
+      mgrctl exec -- mgr-sync add channel managertools-sle15-updates-x86_64-sp7
+      mgrctl exec -- mgr-sync list channels
     fi
   else
     echo "Deployment not recognized."
