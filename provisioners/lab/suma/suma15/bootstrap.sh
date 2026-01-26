@@ -27,7 +27,7 @@ if [ "$MACHINE" == "suma15" ]; then
     if [[ -n "$MIRRORUSER" ]]; then
       echo "Configuring channels using mirror credentials.."
       podman cp /tmp/.mgr-sync uyuni-server:/root/
-      mgrctl exec -- mgr-sync list channels
+      mgrctl exec -- mgr-sync refresh
       mgrctl exec -- mgr-sync add channel sle-product-sles15-sp7-pool-x86_64
       mgrctl exec -- mgr-sync add channel sle-product-sles15-sp7-updates-x86_64
       mgrctl exec -- mgr-sync add channel sle-module-basesystem15-sp7-pool-x86_64
