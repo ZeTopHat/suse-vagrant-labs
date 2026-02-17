@@ -22,7 +22,7 @@ The `custom.yaml` in the same directory as the `Vagrantfile` you are using will 
 - RAM: 8GB (basic lab example)
 - Available Disk space: 60GB (basic lab example)
 - Access to SCC, download.opensuse.org, github, and internal "rabble.suse.cloud" for vagrant boxes (config/global.yaml can be edited to point to your own locations).
-- Installed in addition to KVM stack: `vagrant` (latest tesed: https://releases.hashicorp.com/vagrant/2.4.9/), `vagrant-libvirt` plugin, `vagrant-reload` plugin, `git`
+- Installed in addition to KVM stack: `vagrant` (latest tested: https://releases.hashicorp.com/vagrant/2.4.9/), `vagrant-libvirt` plugin, `vagrant-reload` plugin, `git`
   - On later versions of OpenSUSE and SLE it's been required to simply download the vagrant binary then run `vagrant plugin install libvirt` rather than installing the vagrant packages.
 - A vagrant network will be created using a `192.168.0.*` range by default. (see `custom.yaml` `primarysubnet` value)
 
