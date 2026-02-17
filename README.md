@@ -22,7 +22,8 @@ The `custom.yaml` in the same directory as the `Vagrantfile` you are using will 
 - RAM: 8GB (basic lab example)
 - Available Disk space: 60GB (basic lab example)
 - Access to SCC, download.opensuse.org, github, and internal "rabble.suse.cloud" for vagrant boxes (config/global.yaml can be edited to point to your own locations).
-- Packages installed in addition to KVM stack: `vagrant`, `vagrant-libvirt` (or install libvirt plugin), `git`
+- Installed in addition to KVM stack: `vagrant` (latest tesed: https://releases.hashicorp.com/vagrant/2.4.9/), `vagrant-libvirt` plugin, `vagrant-reload` plugin, `git`
+  - On later versions of OpenSUSE and SLE it's been required to simply download the vagrant binary then run `vagrant plugin install libvirt` rather than installing the vagrant packages.
 - A vagrant network will be created using a `192.168.0.*` range by default. (see `custom.yaml` `primarysubnet` value)
 
 ### Lab Deployment
@@ -42,13 +43,16 @@ The `custom.yaml` in the same directory as the `Vagrantfile` you are using will 
    active
    ```
    
-2. `git`, `vagrant`, and `vagrant-libvirt` packages are installed (in place of `vagrant-libvirt` you can install the plugin if available).
+2. `git`, `vagrant` (latest tested: https://releases.hashicorp.com/vagrant/2.4.9/), plugin `vagrant-libvirt` and plugin `vagrant-reload`.
    
    ```
-   chamilton2:~ # rpm -q git vagrant vagrant-libvirt
+   chamilton2:~ # rpm -q git
    git-2.35.3-150300.10.18.1.x86_64
-   vagrant-2.2.18-bp153.2.1.x86_64
-   vagrant-libvirt-0.5.3-bp153.2.1.x86_64
+   chamilton@:~/suse-vagrant-labs # which vagrant
+   /root/bin/vagrant
+   chamilton@:~/suse-vagrant-labs # vagrant plugin list
+   vagrant-libvirt (0.12.2, global)
+   vagrant-reload (0.0.1, global)
    ```
    
 3. run `git clone https://github.com/ZeTopHat/suse-vagrant-labs.git` in order to pull the project
@@ -127,10 +131,11 @@ The `custom.yaml` in the same directory as the `Vagrantfile` you are using will 
      bridgename: ""
    ```
 
-8. Install `vagrant-reload` plugin (this is also where you could attempt to install the `vagrant-libvirt` plugin)
+8. Install `vagrant-reload` and `vagrant-libvirt` plugins if not installed already
 
    ```
    chamilton2:~/suse-vagrant-labs # vagrant plugin install vagrant-reload
+   chamilton2:~/suse-vagrant-labs # vagrant plugin install vagrant-libvirt
    ```
 
 #### Inititate
