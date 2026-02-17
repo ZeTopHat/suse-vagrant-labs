@@ -15,8 +15,14 @@ Vagrant.configure("2") do |config|
   else
     abort("The required ./secret.yaml or #{WD}config/secret.yaml file does not exist. Consult #{WD}config/secret_example.yaml for reference.")
   end
-  lab_vars = YAML.load_file("#{WD}config/lab/hana15.yaml")
+  if File.exist?("./hana15.yaml")
+    lab_vars = YAML.load_file("./hana15.yaml")
+  else
+    lab_vars = YAML.load_file("#{WD}config/lab/hana15.yaml")
+  end
   LABNAME = lab_vars["labname"]
+  RA = lab_vars["ra"].to_s.downcase
+  OPT = lab_vars["optimized"].to_s.downcase
   lab_vars["requiredsecrets"].each do |code|
     if (secret_vars[code.downcase].empty?)
       abort("Required #{code.downcase} variable has not been filled out in the secret.yaml file.")
@@ -58,10 +64,10 @@ Vagrant.configure("2") do |config|
   end
 
   # ISCSI Server
-  config.vm.define "#{LABNAME}iscsi" do |sle|
-    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}iscsi.yaml")
-    n1_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n1.yaml")
-    n2_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n2.yaml")
+  config.vm.define "#{LABNAME}_#{RA}_#{OPT}_iscsi" do |sle|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}_#{RA}_#{OPT}_iscsi.yaml")
+    n1_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}_#{RA}_#{OPT}_n1.yaml")
+    n2_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}_#{RA}_#{OPT}_n2.yaml")
     sle.vm.box = global_vars["box"]["sle15sp7"]
     sle.vm.box_url = global_vars["boxurl"]["sle15sp7"]
     sle.vm.hostname = machine_vars["fqdn"]
@@ -93,10 +99,10 @@ Vagrant.configure("2") do |config|
   end
 
   # HA15 Cluster Node 1
-  config.vm.define "#{LABNAME}n1" do |sle|
-    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n1.yaml")
-    iscsi_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}iscsi.yaml")
-    n2_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n2.yaml")
+  config.vm.define "#{LABNAME}_#{RA}_#{OPT}_n1" do |sle|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}_#{RA}_#{OPT}_n1.yaml")
+    iscsi_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}_#{RA}_#{OPT}_iscsi.yaml")
+    n2_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}_#{RA}_#{OPT}_n2.yaml")
     sle.vm.box = global_vars["box"]["sle15sp7"]
     sle.vm.box_url = global_vars["boxurl"]["sle15sp7"]
     sle.vm.hostname = machine_vars["fqdn"]
@@ -116,15 +122,15 @@ Vagrant.configure("2") do |config|
       }
     end
     sle.vm.synced_folder "#{WD}provisioners/lab/#{LABNAME}/hanaiso/", "/opt/", type: "rsync"
-    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_hana15_part1.txt", destination: "/tmp/"
-    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_hana15_part2.txt", destination: "/tmp/"
-    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_hana15_part3.txt", destination: "/tmp/"
-    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_hana15_part4.txt", destination: "/tmp/"
-    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_hana15_part5.txt", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_hana15_#{RA}_#{OPT}_part1.txt", destination: "/tmp/crm_hana15_part1.txt"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_hana15_#{RA}_#{OPT}_part2.txt", destination: "/tmp/crm_hana15_part2.txt"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_hana15_#{RA}_#{OPT}_part3.txt", destination: "/tmp/crm_hana15_part3.txt"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_hana15_#{RA}_#{OPT}_part4.txt", destination: "/tmp/crm_hana15_part4.txt"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/crm_hana15_#{RA}_#{OPT}_part5.txt", destination: "/tmp/crm_hana15_part5.txt"
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/authorized_keys", destination: "/tmp/"
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/id_rsa", destination: "/tmp/"
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/id_rsa.pub", destination: "/tmp/"
-    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/global.ini", destination: "/tmp/custom/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/global_#{RA}_#{OPT}.ini", destination: "/tmp/custom/global.ini"
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/install.rsp", destination: "/tmp/"
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/install.rsp.xml", destination: "/tmp/"
     sle.vm.provision "shell" do |s|
@@ -133,19 +139,21 @@ Vagrant.configure("2") do |config|
       s.env = {
         "SAPREGCODE" => secret_vars["sapregcode"],
         "SAPPRODUCT" => machine_vars["sapproduct"],
-        "FLOATINGIP1" => "#{custom_vars["network"]["primarysubnet"]}#{lab_vars["floatingip1"]}", 
+        "FLOATINGIP1" => "#{custom_vars["network"]["primarysubnet"]}#{lab_vars["floatingip1_#{RA}_#{OPT}"]}", 
         "SUBNET" => custom_vars["network"]["primarysubnet"],
         "ISCSIIP" => iscsi_vars["ipaddress"],
-        "N2IP" => n2_vars["ipaddress"]
+        "N2IP" => n2_vars["ipaddress"],
+        "RA" => "#{RA}",
+        "OPT" => "#{OPT}"
       }
     end
   end
 
   # HA15 Cluster Node 2
-  config.vm.define "#{LABNAME}n2" do |sle|
-    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n2.yaml")
-    iscsi_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}iscsi.yaml")
-    n1_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n1.yaml")
+  config.vm.define "#{LABNAME}_#{RA}_#{OPT}_n2" do |sle|
+    machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}_#{RA}_#{OPT}_n2.yaml")
+    iscsi_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}_#{RA}_#{OPT}_iscsi.yaml")
+    n1_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}_#{RA}_#{OPT}_n1.yaml")
     sle.vm.box = global_vars["box"]["sle15sp7"]
     sle.vm.box_url = global_vars["boxurl"]["sle15sp7"]
     sle.vm.hostname = machine_vars["fqdn"]
@@ -168,9 +176,12 @@ Vagrant.configure("2") do |config|
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n2/authorized_keys", destination: "/tmp/"
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n2/id_rsa", destination: "/tmp/"
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n2/id_rsa.pub", destination: "/tmp/"
-    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/global.ini", destination: "/tmp/custom/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/global_#{RA}_#{OPT}.ini", destination: "/tmp/custom/global.ini"
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/install.rsp", destination: "/tmp/"
     sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n1/install.rsp.xml", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n2/costinstall.rsp", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n2/costinstall.rsp.xml", destination: "/tmp/"
+    sle.vm.provision "file", source: "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n2/global_cost.ini", destination: "/tmp/custom/global_cost.ini"
     sle.vm.provision "shell" do |s|
       s.path = "#{WD}provisioners/lab/#{LABNAME}/#{LABNAME}n2/bootstrap.sh"
       s.args = "#{LABNAME}n2 #{custom_vars["deployment"]}"
@@ -179,7 +190,9 @@ Vagrant.configure("2") do |config|
         "SAPPRODUCT" => machine_vars["sapproduct"],
         "SUBNET" => custom_vars["network"]["primarysubnet"],
         "ISCSIIP" => iscsi_vars["ipaddress"],
-        "N1IP" => n1_vars["ipaddress"]
+        "N1IP" => n1_vars["ipaddress"],
+        "RA" => "#{RA}",
+        "OPT" => "#{OPT}"
       }
     end
   end
@@ -187,8 +200,8 @@ Vagrant.configure("2") do |config|
   # K3S Cluster prepped with trento
   config.vm.define "#{LABNAME}trento", autostart: false do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}trento.yaml")
-    n1_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n1.yaml")
-    n2_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n2.yaml")
+    n1_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}_#{RA}_#{OPT}_n1.yaml")
+    n2_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}_#{RA}_#{OPT}_n2.yaml")
     sle.vm.box = global_vars["box"]["sle15sp7"]
     sle.vm.box_url = global_vars["boxurl"]["sle15sp7"]
     sle.vm.hostname = machine_vars["fqdn"]

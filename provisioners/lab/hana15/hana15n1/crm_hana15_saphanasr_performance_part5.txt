@@ -1,0 +1,3 @@
+rsc_defaults rsc-options: \
+	resource-stickiness=1000 \
+	migration-threshold=5000

@@ -1,0 +1,4 @@
+primitive rsc_ip_HXE_HDB00 IPaddr2 \
+        meta target-role=Started \
+        op monitor interval=10s timeout=20s \
+        params ip=FLOATINGIP1

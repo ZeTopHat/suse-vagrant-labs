@@ -1,0 +1,4 @@
+# This is just SAPHanaSR-angi Performance Optimized since a Cost Optimized is not available with angi
+rsc_defaults rsc-options: \
+	resource-stickiness=1000 \
+	migration-threshold=5000

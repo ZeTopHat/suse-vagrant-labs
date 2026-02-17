@@ -30,7 +30,11 @@ if [ "$MACHINE" == "hana15n2" ]; then
   zypper install -y -t pattern ha_sles sap-hana sap_server
   systemctl disable YaST2-Firstboot.service
   systemctl disable YaST2-Second-Stage.service
-  zypper install -y saptune SAPHanaSR sapstartsrv-resource-agents sap-suse-cluster-connector supportutils-plugin-ha-sap
+  if [[ $RA == *"angi"* ]]; then
+    zypper install -y saptune SAPHanaSR-angi sapstartsrv-resource-agents sap-suse-cluster-connector supportutils-plugin-ha-sap ClusterTools2
+  else
+    zypper install -y saptune SAPHanaSR sapstartsrv-resource-agents sap-suse-cluster-connector supportutils-plugin-ha-sap ClusterTools2
+  fi
   echo "${SUBNET}${N1IP} hana15n1.labs.suse.com hana15n1" >>/etc/hosts
   echo "${SUBNET}${ISCSIIP} hana15iscsi.labs.suse.com hana15iscsi" >>/etc/hosts
   echo "InitiatorName=iqn.2022-08.com.suse.labs.hana15n2:initiator02" >/etc/iscsi/initiatorname.iscsi
@@ -54,8 +58,8 @@ if [ "$MACHINE" == "hana15n2" ]; then
     mkdir /hana
     echo "$(blkid | grep vdb1 | awk '{print $2}' | sed -e 's/\"//g') /hana xfs defaults 0 0" >>/etc/fstab
     mount -a
-    echo "hxeadm ALL=(ALL) NOPASSWD: /usr/sbin/crm_attribute -n hana_hxe_site_srHook_*" >> /etc/sudoers
-    echo "hxeadm ALL=(ALL) NOPASSWD: /usr/sbin/SAPHanaSR-hookHelper *" >> /etc/sudoers
+    echo "hxeadm ALL=(ALL) NOPASSWD: /usr/sbin/crm_attribute -n hana_hxe_site_*" >> /etc/sudoers
+    echo "hxeadm ALL=(ALL) NOPASSWD: /usr/sbin/SAPHanaSR-hookHelper --SID=HXE *" >> /etc/sudoers
     saptune solution apply HANA
     saptune service takeover
     saptune service enablestart

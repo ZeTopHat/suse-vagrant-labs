@@ -12,11 +12,15 @@ if [ "$MACHINE" == "suma15" ]; then
   elif [ "$DEPLOY" == "fulldeploy" ]; then
     echo "fulldeploy"
     SUSEConnect -p sle-module-containers/$SLEPRODUCT/x86_64
-    SUSEConnect -p Multi-Linux-Manager-Server-SLE/$SUMAPRODUCT/x86_64 -r $SUMAREGCODE
+    if grep -q "SP6" /etc/os-release; then
+      SUSEConnect -p SUSE-Manager-Server/$SUMAPRODUCT/x86_64 -r $SUMAREGCODE
+    else
+      SUSEConnect -p Multi-Linux-Manager-Server/$SUMAPRODUCT/x86_64 -r $SUMAREGCODE
+    fi
     zypper install -y podman mgradm mgradm-bash-completion
     systemctl enable --now podman.service
     parted /dev/vdb mklabel gpt
-    parted /dev/vdb mkpart primary xfs 1MiB 204799MiB
+    parted /dev/vdb mkpart primary xfs 1MiB 100%
     mgr-storage-server /dev/vdb1
     if [[ -n "$MIRRORUSER" ]]; then
       echo "scc:" >>/tmp/mgradm.yaml
