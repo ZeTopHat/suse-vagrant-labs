@@ -11,7 +11,7 @@ if [ "$MACHINE" == "hana12n2" ]; then
   rpm -e --nodeps sles-release
   SUSEConnect -p $SAPPRODUCT -r $SAPREGCODE
   echo "StrictHostKeyChecking no" >>/etc/ssh/ssh_config
-  mkdir /root/.ssh
+  mkdir -p /root/.ssh
   chmod 700 /root/.ssh
   mv /tmp/id_rsa /root/.ssh/id_rsa
   mv /tmp/id_rsa.pub /root/.ssh/id_rsa.pub

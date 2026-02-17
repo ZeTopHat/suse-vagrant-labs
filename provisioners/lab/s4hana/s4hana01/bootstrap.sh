@@ -16,7 +16,7 @@ if [ "$MACHINE" == "s4hana01" ]; then
   SUSEConnect -p sle-ha/$SAPPRODUCT/x86_64 -r $SAPREGCODE
   SUSEConnect -p sle-module-sap-applications/$SAPPRODUCT/x86_64
   echo "StrictHostKeyChecking no" >>/etc/ssh/ssh_config
-  mkdir /root/.ssh
+  mkdir -p /root/.ssh
   chmod 700 /root/.ssh
   mv /tmp/id_rsa /root/.ssh/id_rsa
   mv /tmp/id_rsa.pub /root/.ssh/id_rsa.pub
