@@ -1,0 +1,12 @@
+# This is just SAPHanaSR-angi Performance Optimized since a Cost Optimized is not available with angi
+primitive rsc_SAPHanaCon_HXE_HDB00 ocf:suse:SAPHanaController \
+        op start interval=0 timeout=1200 \
+        op stop interval=0 timeout=1200 \
+        op promote interval=0 timeout=900 \
+	op demote interval=0 timeout=320 \
+        op monitor interval=60 role=Promoted timeout=700 \
+        op monitor interval=61 role=Unpromoted timeout=700 \
+        params SID=HXE InstanceNumber=00 PREFER_SITE_TAKEOVER=true DUPLICATE_PRIMARY_TIMEOUT=7200 AUTOMATED_REGISTER=true \
+	meta priority=100
+clone mst_SAPHanaCon_HXE_HDB00 rsc_SAPHanaCon_HXE_HDB00 \
+        meta is-managed=true clone-node-max=1 target-role=Started interleave=true promotable=true

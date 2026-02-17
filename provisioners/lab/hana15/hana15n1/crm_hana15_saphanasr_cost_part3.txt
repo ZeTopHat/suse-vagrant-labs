@@ -1,0 +1,9 @@
+primitive rsc_ip_HXE_HDB00 IPaddr2 \
+        meta target-role=Started \
+        op monitor interval=10s timeout=20s \
+        params ip=FLOATINGIP1
+primitive rsc_SAP_QAS_HDB10 ocf:heartbeat:SAPInstance \
+	params InstanceName="QAS_HDB10_hana15n2" MONITOR_SERVICES="hdbindexserver|hdbnameserver" START_PROFILE="/usr/sap/QAS/SYS/profile/QAS_HDB10_hana15n2" \
+	op start interval="0" timeout="300" \
+	op monitor interval="120" timeout="700" \
+	op stop interval="0" timeout="300"

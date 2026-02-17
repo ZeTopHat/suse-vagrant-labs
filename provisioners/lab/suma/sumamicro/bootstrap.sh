@@ -17,7 +17,7 @@ if [ "$MACHINE" == "sumamicro" ]; then
       transactional-update --continue register -p Multi-Linux-Manager-Server/$SUMAPRODUCT/x86_64 -r $SUMAREGCODE
     fi
     transactional-update --continue run parted /dev/vdb mklabel gpt
-    transactional-update --continue run parted /dev/vdb mkpart primary xfs 1MiB 204799MiB
+    transactional-update --continue run parted /dev/vdb mkpart primary xfs 1MiB 100%
     transactional-update --continue run mkdir -p /var/lib/containers/storage
     transactional-update --continue run mgr-storage-server /dev/vdb1
   else

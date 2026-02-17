@@ -1,0 +1,5 @@
+colocation col_saphana_ip_HXE_HDB00 3000: rsc_ip_HXE_HDB00:Started msl_SAPHana_HXE_HDB00:Master
+order ord_SAPHana_HXE_HDB00 Optional: cln_SAPHanaTopology_HXE_HDB00 msl_SAPHana_HXE_HDB00
+location loc_QAS_never_on_hana15n1 rsc_SAP_QAS_HDB10 -inf: hana15n1
+colocation col_QAS_never_with_HXEip -inf: rsc_SAP_QAS_HDB10:Started rsc_ip_HXE_HDB00
+order ord_QASstop_before_HXE-promote mandatory: rsc_SAP_QAS_HDB10:stop msl_SAPHana_HXE_HDB00

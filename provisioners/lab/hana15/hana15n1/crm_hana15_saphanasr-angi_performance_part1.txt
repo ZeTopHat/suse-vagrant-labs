@@ -1,8 +1,14 @@
 primitive rsc_SAPHanaTopology_HXE_HDB00 ocf:suse:SAPHanaTopology \
-        operations $id=rsc_sap2_HXE_HDB00-operations \
         op monitor interval=10 timeout=300 \
         op start interval=0 timeout=300 \
         op stop interval=0 timeout=300 \
         params SID=HXE InstanceNumber=00
+primitive rsc_SAPHanaFil_HXE_HDB00 ocf:suse:SAPHanaFilesystem \
+	op start interval=0 timeout=10 \
+	op stop interval=0 timeout=20 \
+	op monitor interval=120 timeout=120 \
+	params SID=HXE InstanceNumber=00 ON_FAIL_ACTION="fence"
 clone cln_SAPHanaTopology_HXE_HDB00 rsc_SAPHanaTopology_HXE_HDB00 \
         meta clone-node-max=1 target-role=Started interleave=true
+clone cln_SAPHanaFil_HXE_HDB00 rsc_SAPHanaFil_HXE_HDB00 \
+	meta clone-node-max=1 target-role=Started interleave=true

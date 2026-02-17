@@ -1,0 +1,3 @@
+# This is just SAPHanaSR-angi Performance Optimized since a Cost Optimized is not available with angi
+colocation col_saphana_ip_HXE_HDB00 2000: rsc_ip_HXE_HDB00:Started mst_SAPHanaCon_HXE_HDB00:Promoted
+order ord_SAPHana_HXE_HDB00 Optional: cln_SAPHanaTopology_HXE_HDB00 mst_SAPHanaCon_HXE_HDB00

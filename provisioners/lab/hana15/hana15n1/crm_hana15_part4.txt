@@ -1,2 +1,0 @@
-colocation col_saphana_ip_HXE_HDB00 2000: rsc_ip_HXE_HDB00:Started msl_SAPHana_HXE_HDB00:Master                                                                                       
-order ord_SAPHana_HXE_HDB00 Mandatory: cln_SAPHanaTopology_HXE_HDB00 msl_SAPHana_HXE_HDB00

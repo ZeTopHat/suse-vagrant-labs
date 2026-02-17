@@ -30,7 +30,11 @@ if [ "$MACHINE" == "hana15n1" ]; then
   zypper install -y -t pattern ha_sles sap-hana sap_server
   systemctl disable YaST2-Firstboot.service
   systemctl disable YaST2-Second-Stage.service
-  zypper install -y saptune SAPHanaSR sapstartsrv-resource-agents sap-suse-cluster-connector supportutils-plugin-ha-sap
+  if [[ $RA == *"angi"* ]]; then
+    zypper install -y saptune SAPHanaSR-angi sapstartsrv-resource-agents sap-suse-cluster-connector supportutils-plugin-ha-sap ClusterTools2
+  else
+    zypper install -y saptune SAPHanaSR sapstartsrv-resource-agents sap-suse-cluster-connector supportutils-plugin-ha-sap ClusterTools2
+  fi
   echo "${SUBNET}${N2IP} hana15n2.labs.suse.com hana15n2" >>/etc/hosts
   echo "${SUBNET}${ISCSIIP} hana15iscsi.labs.suse.com hana15iscsi" >>/etc/hosts
   echo "InitiatorName=iqn.2022-08.com.suse.labs.hana15n1:initiator01" >/etc/iscsi/initiatorname.iscsi
@@ -73,8 +77,8 @@ if [ "$MACHINE" == "hana15n1" ]; then
     mkdir /hana
     echo "$(blkid | grep vdb1 | awk '{print $2}' | sed -e 's/\"//g') /hana xfs defaults 0 0" >>/etc/fstab
     mount -a
-    echo "hxeadm ALL=(ALL) NOPASSWD: /usr/sbin/crm_attribute -n hana_hxe_site_srHook_*" >> /etc/sudoers
-    echo "hxeadm ALL=(ALL) NOPASSWD: /usr/sbin/SAPHanaSR-hookHelper *" >> /etc/sudoers
+    echo "hxeadm ALL=(ALL) NOPASSWD: /usr/sbin/crm_attribute -n hana_hxe_*" >> /etc/sudoers
+    echo "hxeadm ALL=(ALL) NOPASSWD: /usr/sbin/SAPHanaSR-hookHelper --sid=HXE *" >> /etc/sudoers
     until ssh hana15n2 sbd -d ${BYID} dump 2>/dev/null; do
       echo "The SBD device is not readable yet on hana15n2. Rescanning scsi bus.."
       ssh hana15n2 rescan-scsi-bus.sh
@@ -96,6 +100,18 @@ if [ "$MACHINE" == "hana15n1" ]; then
       echo "Registration failed. Trying again in 10 seconds.."
       sleep 10
     done
+    if [[ $OPT == *"cost"* && $RA != *"angi"* ]]; then
+      ssh hana15n2 "sed -i 's/#\[m/\[m/' /usr/sap/HXE/SYS/global/hdb/custom/config/global.ini"
+      ssh hana15n2 "sed -i 's/#glo/glo/' /usr/sap/HXE/SYS/global/hdb/custom/config/global.ini"
+      ssh hana15n2 "sed -i 's/#pre/pre/' /usr/sap/HXE/SYS/global/hdb/custom/config/global.ini"
+      ssh hana15n2 "su - hxeadm -c 'HDB start'"
+      ssh hana15n2 "su - hxeadm -c 'hdbuserstore SET sus_HXE_costopt localhost:30013 SYSTEM SuSE1234'"
+      ssh hana15n2 "su - hxeadm -c 'hdbuserstore LIST sus_HXE_costopt'"
+      ssh hana15n2 "su - hxeadm -c 'HDB stop'"
+      ssh hana15n2 "mv /tmp/custom/global_cost.ini /tmp/custom/global.ini"
+      ssh hana15n2 "/opt/hdblcm --hdbinst_server_import_content=off --batch --configfile=/tmp/costinstall.rsp"
+      ssh hana15n2 "su - qasadm -c 'HDB stop'"
+    fi
     ssh hana15n2 "su - hxeadm -c 'HDB start'"
     crm configure load update /tmp/crm_hana15_part1.txt
     crm configure load update /tmp/crm_hana15_part2.txt
