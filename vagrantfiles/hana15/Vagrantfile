@@ -200,8 +200,8 @@ Vagrant.configure("2") do |config|
   # K3S Cluster prepped with trento
   config.vm.define "#{LABNAME}trento", autostart: false do |sle|
     machine_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}trento.yaml")
-    n1_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n1.yaml")
-    n2_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}n2.yaml")
+    n1_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}_#{RA}_#{OPT}_n1.yaml")
+    n2_vars = YAML.load_file("#{WD}config/machines/#{LABNAME}/#{LABNAME}_#{RA}_#{OPT}_n2.yaml")
     sle.vm.box = global_vars["box"]["sle15sp7"]
     sle.vm.box_url = global_vars["boxurl"]["sle15sp7"]
     sle.vm.hostname = machine_vars["fqdn"]
