@@ -15,7 +15,7 @@ if [ "$MACHINE" == "suma15" ]; then
     if grep -q "SP6" /etc/os-release; then
       SUSEConnect -p SUSE-Manager-Server/$SUMAPRODUCT/x86_64 -r $SUMAREGCODE
     else
-      SUSEConnect -p Multi-Linux-Manager-Server/$SUMAPRODUCT/x86_64 -r $SUMAREGCODE
+      SUSEConnect -p Multi-Linux-Manager-Server-SLE/$SUMAPRODUCT/x86_64 -r $SUMAREGCODE
     fi
     zypper install -y podman mgradm mgradm-bash-completion
     systemctl enable --now podman.service
