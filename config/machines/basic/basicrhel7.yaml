@@ -1,0 +1,5 @@
+---
+ipaddress: ".11"
+fqdn: "basicrhel7.labs.suse.com"
+short: "basicrhel7"
+ntpserver: ".1"
